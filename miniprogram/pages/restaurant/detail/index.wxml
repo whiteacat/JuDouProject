@@ -1,0 +1,39 @@
+<view class="container" wx:if="{{restaurant}}">
+  <view class="header">
+    <view class="name">{{restaurant.name}}</view>
+    <!-- 去过次数独立于评分展示：已去未评（score 为 null）时也能看到 -->
+    <view class="score-row" wx:if="{{stats}}">
+      <text class="score" wx:if="{{stats.score}}">⭐ {{stats.score}}</text>
+      <text class="visits" wx:if="{{stats.visit_count}}">我们群去过 {{stats.visit_count}} 次</text>
+      <text class="visits" wx:else>我们群还没去过这家店</text>
+    </view>
+    <view class="meta" wx:if="{{restaurant.category || restaurant.address}}">
+      {{restaurant.category}}{{restaurant.address ? ' · ' + restaurant.address : ''}}
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{bars.length > 0}}">
+    <view class="card-title">群评分</view>
+    <view wx:for="{{bars}}" wx:key="label" class="bar-row">
+      <view class="bar-label">{{item.label}}</view>
+      <view class="bar-track">
+        <view class="bar-fill" style="width: {{item.percent}}%"></view>
+      </view>
+      <view class="bar-score">{{item.score}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">群成员评价（{{reviews.length}}）</view>
+    <view wx:if="{{reviews.length === 0}}" class="no-review">还没有评价，完成聚餐后记得来点评</view>
+    <view wx:for="{{reviews}}" wx:key="id" class="review-item">
+      <view class="review-head">
+        <text class="review-nickname">{{item.nickname}}</text>
+        <text class="review-score">⭐ {{item.overall_score}}</text>
+      </view>
+      <view class="review-content" wx:if="{{item.content}}">{{item.content}}</view>
+    </view>
+  </view>
+
+  <button class="create-btn" bindtap="goCreateEvent">发起组队</button>
+</view>

@@ -1,0 +1,18 @@
+<view class="container">
+  <view wx:if="{{groups.length === 0 && !loading}}" class="empty">
+    还没有加入任何群组，去群组页创建一个吧
+  </view>
+
+  <view class="list">
+    <view
+      wx:for="{{groups}}"
+      wx:key="id"
+      class="item"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="item-name">{{item.name}}</view>
+      <view class="item-meta">{{item.member_count}} 位成员</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,23 @@
+<view class="container">
+  <view wx:if="{{groups.length === 0 && !loading}}" class="empty">
+    还没有加入任何群组，创建一个或输入邀请码加入
+  </view>
+
+  <view class="group-list">
+    <view
+      wx:for="{{groups}}"
+      wx:key="id"
+      class="group-card"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="group-name">{{item.name}}</view>
+      <view class="group-meta">{{item.member_count}} 位成员</view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="btn primary" bindtap="goCreate">创建群组</button>
+    <button class="btn secondary" bindtap="goJoin">输入邀请码加入</button>
+  </view>
+</view>

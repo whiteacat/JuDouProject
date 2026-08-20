@@ -1,0 +1,5 @@
+<view class="container">
+  <view class="title">聚豆</view>
+  <view class="desc">和群友一起组队聚餐</view>
+  <button class="login-btn" bindtap="onLogin">微信一键登录</button>
+</view>

@@ -1,0 +1,132 @@
+.container {
+  min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  padding-bottom: 160rpx;
+}
+
+.header {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 4rpx 16rpx;
+  font-size: 24rpx;
+  color: #ff6b35;
+  background: #fff3ee;
+  border-radius: 8rpx;
+}
+
+.status.cancelled {
+  color: #999;
+  background: #f0f0f0;
+}
+
+.meta {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-top: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-title {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.restaurant-name {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.restaurant-coords {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.member-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+
+.member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120rpx;
+}
+
+.member-avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background-color: #4a90d9;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.member-name {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  max-width: 120rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remark {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx;
+  background: #fff;
+  display: flex;
+  gap: 24rpx;
+}
+
+.btn {
+  flex: 1;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+}
+
+.btn.primary {
+  background-color: #ff6b35;
+  color: #fff;
+}
+
+.btn.secondary {
+  background-color: #fff;
+  color: #666;
+  border: 2rpx solid #ddd;
+}

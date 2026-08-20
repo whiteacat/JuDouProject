@@ -1,0 +1,40 @@
+<view class="container">
+  <block wx:if="{{loggedIn && user}}">
+    <view class="header-card">
+      <view class="avatar">
+        <image wx:if="{{user.avatar_url}}" class="avatar-img" src="{{user.avatar_url}}" mode="aspectFill" />
+        <text wx:else>{{user.short}}</text>
+      </view>
+      <view class="user-info">
+        <view class="nickname">{{user.nickname}}</view>
+        <view class="uid">ID: {{user.id}}</view>
+      </view>
+    </view>
+
+    <view class="menu">
+      <view class="menu-item" bindtap="goEvents">
+        <text class="menu-icon">🔥</text>
+        <text class="menu-text">我的组队</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goGroups">
+        <text class="menu-icon">👥</text>
+        <text class="menu-text">我的群组</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goReviews">
+        <text class="menu-icon">⭐</text>
+        <text class="menu-text">我的评价</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <button class="logout" bindtap="onLogout">退出登录</button>
+  </block>
+
+  <view wx:else class="unlogged">
+    <view class="logo">聚</view>
+    <view class="unlogged-text">登录后查看你的群组、组队与评价</view>
+    <button class="login-btn" bindtap="goLogin">微信一键登录</button>
+  </view>
+</view>

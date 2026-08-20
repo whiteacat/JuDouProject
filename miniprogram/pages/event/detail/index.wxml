@@ -1,0 +1,49 @@
+<view class="container" wx:if="{{event}}">
+  <view class="header">
+    <view class="title">{{event.title}}</view>
+    <view class="status {{event.status === 'CANCELLED' ? 'cancelled' : ''}}">{{statusText}}</view>
+    <view class="meta">🕐 {{event.time_display}} · {{event.current_members}}/{{event.max_members}} 人</view>
+  </view>
+
+  <view class="card" wx:if="{{event.restaurant}}">
+    <view class="card-title">餐厅</view>
+    <view class="restaurant-name">{{event.restaurant.name}}</view>
+    <view class="restaurant-coords">{{event.restaurant.latitude.toFixed(4)}}, {{event.restaurant.longitude.toFixed(4)}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">群成员（{{members.length}}）</view>
+    <view class="member-grid">
+      <view wx:for="{{members}}" wx:key="user_id" class="member">
+        <view class="member-avatar">{{item.short}}</view>
+        <view class="member-name">{{item.nickname}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{event.remark}}">
+    <view class="card-title">备注</view>
+    <view class="remark">{{event.remark}}</view>
+  </view>
+
+  <view class="action-bar" wx:if="{{event.status === 'RECRUITING' || event.status === 'CONFIRMED'}}">
+    <block wx:if="{{isCreator}}">
+      <button class="btn secondary" bindtap="onCancel">取消组队</button>
+      <button class="btn primary" bindtap="onComplete">完成聚餐</button>
+    </block>
+    <block wx:elif="{{joined}}">
+      <button class="btn secondary" bindtap="onLeave">退出组队</button>
+    </block>
+    <block wx:else>
+      <button class="btn primary" bindtap="onJoin">加入组队</button>
+    </block>
+  </view>
+
+  <!-- 去评价入口：仅限已完成且有餐厅的组队；参与资格由后端校验（403），
+       不依赖前端 joined 判断（mock 模式每次启动是新用户，joined 可能为 false 导致按钮消失） -->
+  <view class="action-bar" wx:elif="{{event.status === 'COMPLETED' && event.restaurant}}">
+    <button class="btn primary" bindtap="goReview" disabled="{{reviewed}}">
+      {{reviewed ? '已评价' : '去评价'}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/group/list/index",
+    "pages/group/create/index",
+    "pages/group/join/index",
+    "pages/group/detail/index",
+    "pages/event/create/index",
+    "pages/event/detail/index",
+    "pages/event/list/index",
+    "pages/event/review/index",
+    "pages/review/mine/index",
+    "pages/restaurant/detail/index",
+    "pages/group/restaurants/index",
+    "pages/group/mine/index",
+    "pages/user/profile/index",
+    "pages/login/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "聚豆",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f7f7"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#ff6b35",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "地图" },
+      { "pagePath": "pages/group/list/index", "text": "群组" },
+      { "pagePath": "pages/user/profile/index", "text": "我的" }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上显示你的位置并查找附近餐厅"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation"],
+  "sitemapLocation": "sitemap.json"
+}

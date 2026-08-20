@@ -1,0 +1,90 @@
+<view class="page">
+  <map
+    id="map"
+    class="map"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    markers="{{markers}}"
+    show-location
+    bindmarkertap="onMarkerTap"
+  />
+
+  <view class="top-bar">
+    <view class="group-select" wx:if="{{groups.length > 0}}">
+      <picker mode="selector" range="{{groupNames}}" value="{{groupIndex}}" bindchange="onGroupChange">
+        <view class="group-select-value">群：{{currentGroup.name}} ▾</view>
+      </picker>
+    </view>
+    <view class="group-empty" wx:else>
+      <text>还没有群组</text>
+      <text class="group-empty-link" bindtap="goGroupList">去创建</text>
+    </view>
+  </view>
+
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索餐厅，如：火锅"
+      value="{{keyword}}"
+      bindinput="onKeywordInput"
+      confirm-type="search"
+      bindconfirm="onSearch"
+    />
+    <button class="search-btn" bindtap="onSearch" disabled="{{searching}}">搜索</button>
+  </view>
+
+  <!-- 搜索结果列表 -->
+  <scroll-view wx:if="{{showResults && results.length > 0}}" class="results-panel" scroll-y>
+    <view class="results-header">
+      <text class="results-count">共 {{results.length}} 家</text>
+      <text class="results-close" bindtap="hideResults">收起</text>
+    </view>
+    <view
+      class="result-item"
+      wx:for="{{results}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onResultTap"
+    >
+      <view class="result-top">
+        <view class="result-name">{{item.name}}</view>
+        <view class="result-dist" wx:if="{{item.distance_text}}">{{item.distance_text}}</view>
+      </view>
+      <view class="result-meta" wx:if="{{item.category || item.address}}">
+        {{item.category}}{{item.address ? ' · ' + item.address : ''}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 餐厅详情弹层 -->
+  <view wx:if="{{selectedRestaurant}}" class="sheet-mask" bindtap="closeSheets"></view>
+  <view wx:if="{{selectedRestaurant}}" class="bottom-sheet">
+    <view class="sheet-title">{{selectedRestaurant.name}}</view>
+    <view class="sheet-info" wx:if="{{selectedRestaurant.category}}">分类：{{selectedRestaurant.category}}</view>
+    <view class="sheet-info" wx:if="{{selectedRestaurant.address}}">地址：{{selectedRestaurant.address}}</view>
+    <view class="sheet-info" wx:if="{{selectedRestaurant.phone}}">电话：{{selectedRestaurant.phone}}</view>
+    <view class="sheet-row">
+      <button class="sheet-btn half" bindtap="goRestaurantDetail">查看详情</button>
+      <button class="sheet-btn half" bindtap="goCreateEventForRestaurant">发起组队</button>
+    </view>
+    <button class="sheet-close" bindtap="closeSheets">关闭</button>
+  </view>
+
+  <!-- 组队详情弹层 -->
+  <view wx:if="{{selectedEvent}}" class="sheet-mask" bindtap="closeSheets"></view>
+  <view wx:if="{{selectedEvent}}" class="bottom-sheet">
+    <view class="sheet-title">{{selectedEvent.title}}</view>
+    <view class="sheet-info">🕐 {{selectedEvent.event_time_display}} · {{selectedEvent.current_members}}/{{selectedEvent.max_members}} 人</view>
+    <view class="sheet-info" wx:if="{{selectedEvent.restaurant}}">餐厅：{{selectedEvent.restaurant.name}}</view>
+    <view class="sheet-status">{{eventStatusText}}</view>
+    <view class="sheet-row">
+      <button class="sheet-btn half" bindtap="goEventDetail">查看详情</button>
+      <button
+        class="sheet-btn half"
+        bindtap="joinEventFromMap"
+        wx:if="{{selectedEvent.status === 'RECRUITING' || selectedEvent.status === 'CONFIRMED'}}"
+      >加入组队</button>
+    </view>
+    <button class="sheet-close" bindtap="closeSheets">关闭</button>
+  </view>
+</view>

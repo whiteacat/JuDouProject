@@ -1,0 +1,24 @@
+<view class="container">
+  <view wx:if="{{items.length === 0 && !loading}}" class="empty">
+    群组餐厅库还是空的，完成一次聚餐后这里会自动收录
+  </view>
+
+  <view class="list">
+    <view
+      wx:for="{{items}}"
+      wx:key="restaurant.id"
+      class="item"
+      data-id="{{item.restaurant.id}}"
+      bindtap="goDetail"
+    >
+      <view class="item-top">
+        <view class="item-name">{{item.restaurant.name}}</view>
+        <view class="item-score" wx:if="{{item.group_stats.score}}">⭐ {{item.group_stats.score}}</view>
+      </view>
+      <view class="item-meta">
+        去过 {{item.group_stats.visit_count}} 次
+        <text wx:if="{{item.restaurant.category}}"> · {{item.restaurant.category}}</text>
+      </view>
+    </view>
+  </view>
+</view>

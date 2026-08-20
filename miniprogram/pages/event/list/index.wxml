@@ -1,0 +1,22 @@
+<view class="container">
+  <view wx:if="{{events.length === 0 && !loading}}" class="empty">
+    还没有组队，去群组页或地图页发起一个吧
+  </view>
+
+  <view class="event-list">
+    <view
+      wx:for="{{events}}"
+      wx:key="id"
+      class="event-card"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="event-top">
+        <view class="event-title">{{item.title}}</view>
+        <view class="event-status">{{item.status_text}}</view>
+      </view>
+      <view class="event-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
+      <view class="event-restaurant" wx:if="{{item.restaurant}}">🍽 {{item.restaurant.name}}</view>
+    </view>
+  </view>
+</view>

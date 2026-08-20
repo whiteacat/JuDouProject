@@ -1,0 +1,93 @@
+.container {
+  min-height: 100vh;
+  padding: 24rpx;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  padding-bottom: 120rpx;
+}
+
+.header {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.restaurant {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-top: 24rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.dim-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.dim-label {
+  width: 140rpx;
+  font-size: 28rpx;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.star-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  font-size: 44rpx;
+  line-height: 1;
+  padding: 8rpx 10rpx;
+  color: #ddd;
+}
+
+.star.active {
+  color: #ffb400;
+}
+
+.dim-value {
+  width: 56rpx;
+  text-align: right;
+  font-size: 28rpx;
+  color: #ff6b35;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.content-input {
+  width: 100%;
+  min-height: 160rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #eee;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+
+.submit {
+  margin-top: 40rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  border-radius: 12rpx;
+}

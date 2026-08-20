@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: judou-postgres
+    environment:
+      POSTGRES_USER: judou
+      POSTGRES_PASSWORD: judou
+      POSTGRES_DB: judou
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U judou -d judou"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: judou-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        # 默认走清华 PyPI 镜像（国内网络稳定）；可用 PIP_INDEX_URL 环境变量覆盖
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+    container_name: judou-backend
+    env_file:
+      - .env
+    environment:
+      # 容器内使用服务名连接
+      DATABASE_URL: postgresql+asyncpg://judou:judou@postgres:5432/judou
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # 开发环境：先跑迁移再启动服务
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  pgdata:

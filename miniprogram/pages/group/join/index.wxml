@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="title">加入群组</view>
+  <view class="desc">向群主索取 8 位邀请码</view>
+  <input
+    class="input"
+    placeholder="输入邀请码"
+    value="{{inviteCode}}"
+    bindinput="onCodeInput"
+    maxlength="16"
+  />
+  <button class="submit" bindtap="onSubmit">加入</button>
+</view>

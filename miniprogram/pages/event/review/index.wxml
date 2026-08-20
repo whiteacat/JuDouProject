@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="header" wx:if="{{event}}">
+    <view class="title">{{event.title}}</view>
+    <view class="restaurant" wx:if="{{event.restaurant}}">🍽 {{event.restaurant.name}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">六维评分（点星打分）</view>
+    <view wx:for="{{dims}}" wx:key="key" class="dim-row">
+      <view class="dim-label">{{item.label}}</view>
+      <view class="star-row">
+        <view
+          wx:for="{{item.stars}}"
+          wx:key="value"
+          class="star {{star.active ? 'active' : ''}}"
+          data-dim-index="{{star.dimIndex}}"
+          data-score="{{star.value}}"
+          bindtap="onStarTap"
+        >★</view>
+      </view>
+      <view class="dim-value">{{item.score}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">文字评价</view>
+    <textarea
+      class="content-input"
+      placeholder="说说味道、环境、服务…（选填）"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="500"
+    />
+  </view>
+
+  <button class="submit" bindtap="onSubmit" disabled="{{submitting}}">提交评价</button>
+</view>

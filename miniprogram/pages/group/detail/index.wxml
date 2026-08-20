@@ -1,0 +1,30 @@
+<view class="container" wx:if="{{group}}">
+  <view class="header">
+    <view class="name">{{group.name}}</view>
+    <view class="meta">{{group.member_count}} 位成员</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">邀请码</view>
+    <view class="invite-row">
+      <text class="invite-code">{{group.invite_code}}</text>
+      <button class="copy-btn" bindtap="onCopyCode">复制</button>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">群成员</view>
+    <view class="member-grid">
+      <view wx:for="{{members}}" wx:key="user_id" class="member">
+        <view class="member-avatar">{{item.short}}</view>
+        <view class="member-name">{{item.nickname}}</view>
+        <view wx:if="{{item.role === 'OWNER'}}" class="member-role">群主</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="entry" bindtap="goRestaurants">🍽️ 群组餐厅库</view>
+    <view class="entry" bindtap="goCreateEvent">🔥 发起组队</view>
+  </view>
+</view>

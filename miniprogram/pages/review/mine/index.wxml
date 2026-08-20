@@ -1,0 +1,18 @@
+<view class="container">
+  <view wx:if="{{reviews.length === 0 && !loading}}" class="empty">
+    还没有评价，完成聚餐后记得给餐厅点评
+  </view>
+
+  <view class="list">
+    <view wx:for="{{reviews}}" wx:key="id" class="item">
+      <view class="item-top">
+        <view class="item-name">{{item.restaurant_name}}</view>
+        <view class="item-score">⭐ {{item.overall_score}}</view>
+      </view>
+      <view class="item-content" wx:if="{{item.content}}">{{item.content}}</view>
+      <view class="item-meta">
+        {{item.time_display}}<text wx:if="{{item.group_name}}"> · {{item.group_name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

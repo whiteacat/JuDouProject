@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="title">发起组队</view>
+  <view class="group-name" wx:if="{{groupName}}">群组：{{groupName}}</view>
+  <view class="restaurant-name" wx:if="{{restaurantName}}">餐厅：{{restaurantName}}</view>
+
+  <view class="field">
+    <view class="label">标题</view>
+    <input class="input" placeholder="如：周五火锅" value="{{title}}" bindinput="onTitleInput" maxlength="64" />
+  </view>
+
+  <view class="field">
+    <view class="label">日期</view>
+    <picker mode="date" value="{{date}}" bindchange="onDateChange">
+      <view class="picker-value">{{date || '请选择日期'}}</view>
+    </picker>
+  </view>
+
+  <view class="field">
+    <view class="label">时间</view>
+    <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+      <view class="picker-value">{{time || '请选择时间'}}</view>
+    </picker>
+  </view>
+
+  <view class="field">
+    <view class="label">人数</view>
+    <view class="member-row">
+      <text>最少</text>
+      <input class="num-input" type="number" value="{{minMembers}}" bindinput="onMinInput" />
+      <text>最多</text>
+      <input class="num-input" type="number" value="{{maxMembers}}" bindinput="onMaxInput" />
+    </view>
+  </view>
+
+  <view class="field">
+    <view class="label">备注</view>
+    <input class="input" placeholder="选填，如：想吃辣" value="{{remark}}" bindinput="onRemarkInput" maxlength="500" />
+  </view>
+
+  <button class="submit" bindtap="onSubmit" disabled="{{submitting}}">创建组队</button>
+</view>
