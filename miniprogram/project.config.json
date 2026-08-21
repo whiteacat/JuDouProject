@@ -1,5 +1,5 @@
 {
-  "appid": "wx91a40f56a892d256",
+  "appid": "wx4579ae1c8d5d7ca6",
   "compileType": "miniprogram",
   "libVersion": "3.7.0",
   "projectname": "judou-miniprogram",
@@ -33,5 +33,6 @@
     "ignore": [],
     "include": []
   },
-  "editorSetting": {}
+  "editorSetting": {},
+  "isGameTourist": false
 }
