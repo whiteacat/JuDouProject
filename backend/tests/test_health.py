@@ -47,6 +47,7 @@ async def test_health_ok(client):
     assert body["status"] == "ok"
     assert body["db"] is True
     assert body["postgis"] == "3.4.0"
+    assert body["db_error"] is None
 
 
 async def test_health_degraded(client):
@@ -58,6 +59,7 @@ async def test_health_degraded(client):
     assert body["status"] == "degraded"
     assert body["db"] is False
     assert body["postgis"] is None
+    assert body["db_error"] is not None  # 失败原因可见，便于部署排障
 
 
 async def test_unknown_route_returns_404(client):
