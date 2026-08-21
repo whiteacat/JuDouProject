@@ -24,7 +24,17 @@
   </view>
 
   <view class="card">
-    <view class="entry" bindtap="goRestaurants">🍽️ 群组餐厅库</view>
-    <view class="entry" bindtap="goCreateEvent">🔥 发起组队</view>
+    <view class="entry" bindtap="goGroupEvents">
+      <view class="icon icon-list"></view>
+      <text class="entry-text">群组组队</text>
+    </view>
+    <view class="entry" bindtap="goRestaurants">
+      <view class="icon icon-restaurant"></view>
+      <text class="entry-text">群组餐厅库</text>
+    </view>
+    <view class="entry" bindtap="goCreateEvent">
+      <view class="icon icon-event"></view>
+      <text class="entry-text">发起组队</text>
+    </view>
   </view>
 </view>

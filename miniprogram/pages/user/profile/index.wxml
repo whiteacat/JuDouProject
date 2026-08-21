@@ -13,17 +13,17 @@
 
     <view class="menu">
       <view class="menu-item" bindtap="goEvents">
-        <text class="menu-icon">🔥</text>
+        <view class="icon icon-event"></view>
         <text class="menu-text">我的组队</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goGroups">
-        <text class="menu-icon">👥</text>
+        <view class="icon icon-group"></view>
         <text class="menu-text">我的群组</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goReviews">
-        <text class="menu-icon">⭐</text>
+        <view class="icon icon-star"></view>
         <text class="menu-text">我的评价</text>
         <text class="menu-arrow">›</text>
       </view>

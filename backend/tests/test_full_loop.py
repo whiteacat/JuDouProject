@@ -131,7 +131,8 @@ async def test_full_mvp_loop(require_db, client):
             f"{BASE}/groups/{gid}/restaurants/{rid}", headers=_auth(token_a)
         )
     ).json()["group_stats"]
-    assert stats["score"] == 4.0
+    # 总分 = 五维加权（口味5, 性价比4, 环境4, 服务4, 交通4 → 4.3）
+    assert stats["score"] == 4.3
     assert stats["visit_count"] == 1
 
     # 9. 再组队：同一餐厅第二次 → 完成 → visit_count=2

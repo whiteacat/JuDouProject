@@ -94,6 +94,14 @@ Page({
     })
   },
 
+  goGroupEvents() {
+    const group = this.data.group
+    if (!group) return
+    wx.navigateTo({
+      url: `/pages/group/events/index?group_id=${group.id}&group_name=${encodeURIComponent(group.name)}`
+    })
+  },
+
   goCreateEvent() {
     const group = this.data.group
     if (!group) return

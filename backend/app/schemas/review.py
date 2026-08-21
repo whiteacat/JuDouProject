@@ -9,7 +9,8 @@ from app.schemas.restaurant import RestaurantOut
 
 
 class ReviewCreate(BaseModel):
-    overall_score: float = Field(ge=1, le=5, description="总体评分")
+    """提交评价：五维评分（总分由服务端加权计算，不单独提交）。"""
+
     taste_score: float = Field(ge=1, le=5, description="口味")
     value_score: float = Field(ge=1, le=5, description="性价比")
     environment_score: float = Field(ge=1, le=5, description="环境")

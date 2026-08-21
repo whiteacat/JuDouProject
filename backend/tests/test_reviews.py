@@ -184,6 +184,21 @@ async def test_review_without_restaurant_400(require_db, client):
     assert resp.status_code == 400  # 无餐厅不可评价
 
 
+async def test_overall_computed_from_five_dims(require_db, client):
+    """客户端即使提交 overall_score 也被忽略，总分由五维加权计算。"""
+    group_id, token_a, _ = await _group(client, "rv_oc_a", "rv_oc_b")
+    rid = (await _first_restaurant(client, token_a))["id"]
+    event = await _event_with_restaurant(client, token_a, group_id, rid)
+    await _complete(client, token_a, event["id"])
+
+    # overall 提交 1，五维全 5 → 总分应为 5.0（而非 1）
+    resp = await _review(
+        client, token_a, event["id"], _payload(1, 5, 5, 5, 5, 5, "总分由五维计算")
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["overall_score"] == 5.0
+
+
 # ---------- 聚合评分（§38 验收） ----------
 
 
@@ -210,14 +225,29 @@ async def test_aggregate_score_correct(require_db, client):
         resp = await _review(client, tkn, event["id"], _payload(o, t, v, e, s, tr))
         assert resp.status_code == 201, resp.text
 
-    # 期望：overall(5,4,3,4)=4.0; taste(5,3,4,4)=4.0; value(4,5,3,4)=4.0;
-    # environment(4,2,5,4)=3.75→3.8; service(3,4,2,4)=3.25→3.2; traffic(3,5,4,4)=4.0
+    from app.services.review_service import compute_overall_score
+
+    # 总分 = 五维加权（与后端同一函数）；其余五维断言保持 AVG
+    expected_overalls = [
+        compute_overall_score(
+            {
+                "taste_score": t,
+                "value_score": v,
+                "environment_score": e,
+                "service_score": s,
+                "traffic_score": tr,
+            }
+        )
+        for _, _o, t, v, e, s, tr in reviews
+    ]
+    expected_score = round(sum(expected_overalls) / len(expected_overalls), 1)
+
     resp = await client.get(
         f"{BASE}/groups/{group_id}/restaurants/{rid}", headers=_auth(token_a)
     )
     assert resp.status_code == 200, resp.text
     stats = resp.json()["group_stats"]
-    assert stats["score"] == 4.0
+    assert stats["score"] == expected_score
     assert stats["taste"] == 4.0
     assert stats["value"] == 4.0
     assert stats["environment"] == 3.8
@@ -288,7 +318,8 @@ async def test_my_reviews_list(require_db, client):
     assert item["restaurant_name"]
     assert item["group_id"] == group_id
     assert item["event_id"] == event["id"]
-    assert item["overall_score"] == 5.0
+    # 总分 = 五维加权：(口味5, 性价比4, 环境4, 服务4, 交通4) → 4.3
+    assert item["overall_score"] == 4.3
     assert item["content"] == "好吃"
 
     # 未评价的用户列表为空

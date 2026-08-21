@@ -248,6 +248,34 @@ async def map_events(
     ]
 
 
+async def list_group_events(
+    db: AsyncSession, group_id: int, user_id: int
+) -> list[dict]:
+    """群内组队列表：成员可见、含全部状态、按时间倒序、无坐标过滤。"""
+    await _require_group_member(db, group_id, user_id)
+
+    result = await db.execute(
+        select(GroupEvent)
+        .where(GroupEvent.group_id == group_id)
+        .order_by(GroupEvent.event_time.desc())
+    )
+    events = list(result.scalars().all())
+
+    counts = await _count_batch(db, [e.id for e in events])
+    restaurant_ids = {e.restaurant_id for e in events if e.restaurant_id}
+    restaurants: dict[int, Restaurant] = {}
+    if restaurant_ids:
+        r_result = await db.execute(
+            select(Restaurant).where(Restaurant.id.in_(restaurant_ids))
+        )
+        restaurants = {r.id: r for r in r_result.scalars().all()}
+
+    return [
+        _event_dict(e, counts.get(e.id, 0), restaurants.get(e.restaurant_id))
+        for e in events
+    ]
+
+
 async def join_event(db: AsyncSession, event_id: int, user_id: int) -> GroupEvent:
     """加入组队：行锁串行化并发加入，保证不超员。"""
     event = await _get_event(db, event_id, user_id, for_update=True)

@@ -18,6 +18,27 @@ from app.services.event_service import _get_event
 ALREADY_REVIEWED = "该聚餐已评价过"
 NOT_ELIGIBLE = "仅参与聚餐的成员可评价"
 
+# 总分权重：口味最高，交通/服务次之（五维加权，和为 1）
+SCORE_WEIGHTS: dict[str, float] = {
+    "taste": 0.3,
+    "value": 0.2,
+    "environment": 0.2,
+    "service": 0.15,
+    "traffic": 0.15,
+}
+
+
+def compute_overall_score(scores: dict) -> float:
+    """由五维评分加权计算总分（总分不单独由用户提交）。
+
+    注意：提交载荷的键为 ``{维度}_score``（如 taste_score），
+    与 SCORE_WEIGHTS 的维度键（如 taste）不同，取值时需拼接后缀。
+    """
+    total = sum(
+        SCORE_WEIGHTS[key] * float(scores[f"{key}_score"]) for key in SCORE_WEIGHTS
+    )
+    return round(total, 1)
+
 
 async def submit_review(
     db: AsyncSession, event_id: int, user_id: int, payload: dict
@@ -55,7 +76,8 @@ async def submit_review(
         group_id=event.group_id,
         event_id=event_id,
         user_id=user_id,
-        overall_score=payload["overall_score"],
+        # 总分由五维加权计算，忽略客户端提交的 overall_score
+        overall_score=compute_overall_score(payload),
         taste_score=payload["taste_score"],
         value_score=payload["value_score"],
         environment_score=payload["environment_score"],

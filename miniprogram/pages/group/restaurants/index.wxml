@@ -8,12 +8,16 @@
       wx:for="{{items}}"
       wx:key="restaurant.id"
       class="item"
+      hover-class="item-hover"
       data-id="{{item.restaurant.id}}"
       bindtap="goDetail"
     >
       <view class="item-top">
         <view class="item-name">{{item.restaurant.name}}</view>
         <view class="item-score" wx:if="{{item.group_stats.score}}">⭐ {{item.group_stats.score}}</view>
+      </view>
+      <view class="score-track" wx:if="{{item.group_stats.score}}">
+        <view class="score-fill" style="width: {{item.group_stats.score / 5 * 100}}%"></view>
       </view>
       <view class="item-meta">
         去过 {{item.group_stats.visit_count}} 次

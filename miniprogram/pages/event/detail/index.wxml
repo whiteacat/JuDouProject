@@ -38,12 +38,12 @@
       <button class="btn primary" bindtap="onJoin">加入组队</button>
     </block>
   </view>
-
-  <!-- 去评价入口：仅限已完成且有餐厅的组队；参与资格由后端校验（403），
-       不依赖前端 joined 判断（mock 模式每次启动是新用户，joined 可能为 false 导致按钮消失） -->
   <view class="action-bar" wx:elif="{{event.status === 'COMPLETED' && event.restaurant}}">
     <button class="btn primary" bindtap="goReview" disabled="{{reviewed}}">
       {{reviewed ? '已评价' : '去评价'}}
     </button>
+  </view>
+  <view class="action-bar" wx:elif="{{event.status === 'COMPLETED'}}">
+    <view class="no-review-hint">该组队未指定餐厅，无法评价</view>
   </view>
 </view>

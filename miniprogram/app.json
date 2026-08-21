@@ -5,6 +5,7 @@
     "pages/group/create/index",
     "pages/group/join/index",
     "pages/group/detail/index",
+    "pages/group/events/index",
     "pages/event/create/index",
     "pages/event/detail/index",
     "pages/event/list/index",
@@ -27,9 +28,24 @@
     "selectedColor": "#ff6b35",
     "backgroundColor": "#ffffff",
     "list": [
-      { "pagePath": "pages/index/index", "text": "地图" },
-      { "pagePath": "pages/group/list/index", "text": "群组" },
-      { "pagePath": "pages/user/profile/index", "text": "我的" }
+      {
+        "pagePath": "pages/index/index",
+        "text": "地图",
+        "iconPath": "assets/icons/tab-map.png",
+        "selectedIconPath": "assets/icons/tab-map-active.png"
+      },
+      {
+        "pagePath": "pages/group/list/index",
+        "text": "群组",
+        "iconPath": "assets/icons/tab-group.png",
+        "selectedIconPath": "assets/icons/tab-group-active.png"
+      },
+      {
+        "pagePath": "pages/user/profile/index",
+        "text": "我的",
+        "iconPath": "assets/icons/tab-me.png",
+        "selectedIconPath": "assets/icons/tab-me-active.png"
+      }
     ]
   },
   "permission": {

@@ -1,0 +1,25 @@
+<view class="container">
+  <view wx:if="{{groupName}}" class="group-name">{{groupName}} · 组队</view>
+
+  <view wx:if="{{events.length === 0 && !loading}}" class="empty">
+    该群还没有组队，去发起第一个吧
+  </view>
+
+  <view class="list">
+    <view
+      wx:for="{{events}}"
+      wx:key="id"
+      class="item"
+      hover-class="item-hover"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <view class="item-top">
+        <view class="item-title">{{item.title}}</view>
+        <view class="item-status">{{item.status_text}}</view>
+      </view>
+      <view class="item-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
+      <view class="item-restaurant" wx:if="{{item.restaurant}}">🍽 {{item.restaurant.name}}</view>
+    </view>
+  </view>
+</view>

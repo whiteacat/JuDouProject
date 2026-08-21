@@ -33,6 +33,16 @@ async def create_group_event(
     return EventOut(**detail)
 
 
+@router.get("/groups/{group_id}/events", response_model=list[EventOut])
+async def list_group_events(
+    group_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[EventOut]:
+    events = await event_service.list_group_events(db, group_id, current_user.id)
+    return [EventOut(**e) for e in events]
+
+
 @router.get("/groups/{group_id}/events/map", response_model=list[EventOut])
 async def map_group_events(
     group_id: int,

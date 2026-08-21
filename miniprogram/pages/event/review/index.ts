@@ -22,13 +22,30 @@ interface Dim {
 }
 
 const DIM_DEFS = [
-  { key: 'overall', label: '总体评分' },
   { key: 'taste', label: '口味' },
   { key: 'value', label: '性价比' },
   { key: 'environment', label: '环境' },
   { key: 'service', label: '服务' },
   { key: 'traffic', label: '交通' }
 ]
+
+// 总分权重（与后端 review_service.SCORE_WEIGHTS 保持一致）
+const SCORE_WEIGHTS: Record<string, number> = {
+  taste: 0.3,
+  value: 0.2,
+  environment: 0.2,
+  service: 0.15,
+  traffic: 0.15
+}
+
+/** 五维加权计算总分（与后端 compute_overall_score 同一算法）。 */
+function computeTotal(dims: Dim[]): number {
+  let total = 0
+  for (const d of dims) {
+    total += (SCORE_WEIGHTS[d.key] || 0) * d.score
+  }
+  return Math.round(total * 10) / 10
+}
 
 /** 构建六维数据：dimIndex/active 直接嵌入每颗星，避免嵌套循环作用域取值问题。 */
 function buildDims(): Dim[] {
@@ -48,6 +65,7 @@ Page({
     eventId: 0,
     event: null as EventDetail | null,
     dims: buildDims(),
+    totalScore: 5,
     content: '',
     submitting: false
   },
@@ -98,7 +116,7 @@ Page({
     if (!dim) return
     dim.score = Number(score)
     dim.stars = dim.stars.map((s) => ({ ...s, active: s.value <= dim.score }))
-    this.setData({ dims })
+    this.setData({ dims, totalScore: computeTotal(dims) })
   },
 
   onContentInput(e: WechatMiniprogram.TextareaInput) {

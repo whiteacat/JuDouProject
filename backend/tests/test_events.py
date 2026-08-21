@@ -172,6 +172,64 @@ async def test_map_events_radius_filter(require_db, client):
     assert len(ids) >= 1
 
 
+async def test_map_events_group_isolation(require_db, client):
+    """群组切换视角（§40）：A 群的组队不出现在 B 群的地图查询中。"""
+    token, _ = await _login(client, "ev_iso_a")
+    g1 = (
+        await client.post(
+            f"{EVENTS_URL}/groups", json={"name": "群A"}, headers=_auth(token)
+        )
+    ).json()
+    g2 = (
+        await client.post(
+            f"{EVENTS_URL}/groups", json={"name": "群B"}, headers=_auth(token)
+        )
+    ).json()
+    event = await _create_event(client, token, g1["id"], latitude=LAT, longitude=LNG)
+
+    m1 = await client.get(
+        f"{EVENTS_URL}/groups/{g1['id']}/events/map",
+        params={"longitude": LNG, "latitude": LAT, "radius": 5000},
+        headers=_auth(token),
+    )
+    m2 = await client.get(
+        f"{EVENTS_URL}/groups/{g2['id']}/events/map",
+        params={"longitude": LNG, "latitude": LAT, "radius": 5000},
+        headers=_auth(token),
+    )
+    ids1 = {e["id"] for e in m1.json()}
+    ids2 = {e["id"] for e in m2.json()}
+    assert event["id"] in ids1  # 群 A 可见
+    assert event["id"] not in ids2  # 群 B 不可见
+
+
+async def test_group_events_list(require_db, client):
+    """群组组队列表：成员可见全部状态，非成员 403。"""
+    group_id, token_a, _ = await _group_with_second(client, "ev_gl_a", "ev_gl_b")
+    event1 = await _create_event(client, token_a, group_id)
+    event2 = await _create_event(client, token_a, group_id)
+    await client.post(f"{EVENTS_URL}/events/{event2['id']}/cancel", headers=_auth(token_a))
+
+    # 成员可见（含已取消的全状态）
+    token_b, _ = await _login(client, "ev_gl_b")
+    resp = await client.get(
+        f"{EVENTS_URL}/groups/{group_id}/events", headers=_auth(token_b)
+    )
+    assert resp.status_code == 200
+    events = resp.json()
+    ids = {e["id"] for e in events}
+    assert event1["id"] in ids and event2["id"] in ids
+    statuses = {e["id"]: e["status"] for e in events}
+    assert statuses[event2["id"]] == "CANCELLED"
+
+    # 非成员不可见
+    outsider, _ = await _login(client, "ev_gl_x")
+    resp = await client.get(
+        f"{EVENTS_URL}/groups/{group_id}/events", headers=_auth(outsider)
+    )
+    assert resp.status_code == 403
+
+
 # ---------- 加入 / 重复 / 满员 ----------
 
 
@@ -297,6 +355,29 @@ async def test_leave_when_not_joined_404(require_db, client):
         f"{EVENTS_URL}/events/{event['id']}/leave", headers=_auth(outsider)
     )
     assert resp.status_code == 404
+
+
+async def test_concurrent_leave_no_error(require_db, client):
+    """两个成员同时退出：行锁串行化处理，均成功且人数正确（§40 多人同时退出）。"""
+    group_id, token_a, invite_code = await _group_with_second(
+        client, "ev_clv_a", "ev_clv_b"
+    )
+    event = await _create_event(client, token_a, group_id, max_members=6)
+    token_b, _ = await _login(client, "ev_clv_b")  # B 已是群成员
+    token_c = await _add_member(client, invite_code, "ev_clv_c")
+    for t in (token_b, token_c):
+        await client.post(f"{EVENTS_URL}/events/{event['id']}/join", headers=_auth(t))
+
+    r1, r2 = await asyncio.gather(
+        client.post(f"{EVENTS_URL}/events/{event['id']}/leave", headers=_auth(token_b)),
+        client.post(f"{EVENTS_URL}/events/{event['id']}/leave", headers=_auth(token_c)),
+    )
+    assert r1.status_code == 204 and r2.status_code == 204
+
+    detail = (
+        await client.get(f"{EVENTS_URL}/events/{event['id']}", headers=_auth(token_a))
+    ).json()
+    assert detail["current_members"] == 1  # 只剩创建者
 
 
 # ---------- 状态流转 ----------
