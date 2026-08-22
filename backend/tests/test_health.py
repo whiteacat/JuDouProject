@@ -67,9 +67,11 @@ async def test_unknown_route_returns_404(client):
     assert resp.status_code == 404
 
 
-async def test_health_module_router_registered():
-    # 保证 health 路由被聚合进 v1 路由
-    from app.api.v1.router import api_router
-
-    routes = {getattr(r, "path", None) for r in api_router.routes}
-    assert "/health" in routes
+async def test_health_module_router_registered(client):
+    # 保证 health 路由被聚合进 v1 路由（功能性校验：缺失 include 会 404）。
+    # 注：FastAPI 0.141 起 include_router 延迟封装（_IncludedRouter），
+    # 不能再靠 api_router.routes 的 .path 内省断言。
+    app = _override(_FakeDB())
+    resp = await client.get("/api/v1/health")
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
