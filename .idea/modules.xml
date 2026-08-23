@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/JuDouProject.iml" filepath="$PROJECT_DIR$/.idea/JuDouProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/judou-backend.iml" filepath="$PROJECT_DIR$/.idea/judou-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/judouproject.iml" filepath="$PROJECT_DIR$/.idea/judouproject.iml" />
     </modules>
   </component>
 </project>
