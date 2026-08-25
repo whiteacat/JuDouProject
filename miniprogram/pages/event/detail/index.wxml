@@ -1,8 +1,9 @@
 <view class="container" wx:if="{{event}}">
   <view class="header">
     <view class="title">{{event.title}}</view>
-    <view class="status {{event.status === 'CANCELLED' ? 'cancelled' : ''}}">{{statusText}}</view>
+    <view class="status {{event.status === 'CANCELLED' || event.status === 'EXPIRED' ? 'cancelled' : ''}}">{{statusText}}</view>
     <view class="meta">🕐 {{event.time_display}} · {{event.current_members}}/{{event.max_members}} 人</view>
+    <view class="meta expiry">⏳ {{event.expiry_display}}</view>
   </view>
 
   <view class="card" wx:if="{{event.restaurant}}">
@@ -24,6 +25,123 @@
   <view class="card" wx:if="{{event.remark}}">
     <view class="card-title">备注</view>
     <view class="remark">{{event.remark}}</view>
+  </view>
+
+  <!-- 我的可参加时段 -->
+  <view class="card" wx:if="{{event.status === 'RECRUITING' || event.status === 'CONFIRMED'}}">
+    <view class="card-title">{{joined ? '我的可参加时段' : '告诉我你能来的时间'}}</view>
+    <view class="window-hint">可跨多天、每天多段，方便大家对齐时间</view>
+    <view wx:for="{{myWindows}}" wx:key="index" wx:for-item="w" wx:for-index="i" class="window-item">
+      <view class="window-row">
+        <picker mode="date" value="{{w.date}}" data-index="{{i}}" bindchange="onMyWindowDateChange">
+          <view class="picker-value">{{w.date || '日期'}}</view>
+        </picker>
+        <picker mode="time" value="{{w.start}}" data-index="{{i}}" bindchange="onMyWindowStartChange">
+          <view class="picker-value">{{w.start || '开始'}}</view>
+        </picker>
+        <text class="window-sep">~</text>
+        <picker mode="time" value="{{w.end}}" data-index="{{i}}" bindchange="onMyWindowEndChange">
+          <view class="picker-value">{{w.end || '结束'}}</view>
+        </picker>
+      </view>
+      <view class="window-del" data-index="{{i}}" catchtap="onRemoveMyWindow">删除该时段</view>
+    </view>
+    <view class="window-add" bindtap="onAddMyWindow">+ 添加时段</view>
+    <button
+      wx:if="{{joined}}"
+      class="btn-save"
+      bindtap="onSaveMyWindows"
+      disabled="{{windowSaving}}"
+    >{{windowSaving ? '保存中…' : '保存我的时间'}}</button>
+    <view wx:else class="window-join-tip">点击底部「加入组队」时一并提交</view>
+  </view>
+
+  <!-- 成员可参加时段：默认文字摘要，可展开多天甘特图 -->
+  <view class="card" wx:if="{{windowTexts.length > 0}}">
+    <view class="card-title">大家的时间窗口</view>
+    <view wx:for="{{windowTexts}}" wx:key="label" class="window-text-row">
+      <view class="gantt-label {{item.mine ? 'mine' : ''}}">{{item.mine ? '我' : item.label}}</view>
+      <view class="window-text {{item.text === '未设置' ? 'empty' : ''}}">{{item.text}}</view>
+    </view>
+
+    <!-- 共同可参加时间：直接给出成员间重叠时段 -->
+    <view class="overlap-box" wx:if="{{overlap}}">
+      <view class="overlap-title">共同可参加时间</view>
+      <view class="overlap-sub" wx:if="{{overlap.unset > 0}}">按 {{overlap.involved}} 位已设置时段的成员计算（另有 {{overlap.unset}} 人未设置）</view>
+      <block wx:if="{{overlap.all.length > 0}}">
+        <view class="overlap-line" wx:for="{{overlap.all}}" wx:key="index">
+          <view class="overlap-chip all">全员</view>
+          <text class="overlap-time">{{item.dateLabel}} {{item.start}}~{{item.end}}</text>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="overlap-line" wx:for="{{overlap.best}}" wx:key="index">
+          <view class="overlap-chip">{{item.count}}人</view>
+          <text class="overlap-time">{{item.dateLabel}} {{item.start}}~{{item.end}}</text>
+          <view class="overlap-missing" wx:if="{{item.missingText}}">缺：{{item.missingText}}</view>
+        </view>
+        <view class="overlap-none" wx:if="{{overlap.best.length === 0}}">没有 2 人以上重叠的时段，可参考下方时间轴各自调整</view>
+      </block>
+    </view>
+
+    <view class="gantt-toggle" wx:if="{{gantt}}" bindtap="onToggleGantt">
+      {{ganttOpen ? '收起时间轴' : '查看时间轴'}}
+    </view>
+    <block wx:if="{{gantt && ganttOpen}}">
+      <scroll-view scroll-x class="gantt-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="gantt" style="min-width: {{gantt.min_width}}rpx;">
+          <view class="gantt-grid">
+            <!-- 表头：名字列 + 日期列（变宽，无重叠日折叠为「…」） -->
+            <view class="gantt-head">
+              <view class="gantt-label gantt-head-label"></view>
+              <view class="gantt-track" style="width: {{gantt.track_width}}rpx;">
+                <view
+                  wx:for="{{gantt.columns}}"
+                  wx:key="index"
+                  class="gantt-head-col {{item.kind}} {{item.is_event ? 'is-event' : ''}} {{item.green ? 'green' : ''}}"
+                  style="width: {{item.kind === 'day' ? 110 : (gantt.mode === 'day' ? 72 : 36)}}rpx;"
+                >{{item.label}}</view>
+              </view>
+            </view>
+            <!-- 共同行 -->
+            <view class="gantt-head" wx:if="{{gantt.common.length > 0}}">
+              <view class="gantt-label common">共同</view>
+              <view class="gantt-track gantt-cell common-cell" style="width: {{gantt.track_width}}rpx;">
+                <view
+                  wx:for="{{gantt.common}}"
+                  wx:key="index"
+                  wx:for-item="seg"
+                  class="gantt-bar common {{seg.best ? 'best' : ''}} {{seg.tiny ? 'tiny' : ''}}"
+                  style="left: {{seg.left}}; width: {{seg.width}};"
+                >{{seg.text}}</view>
+              </view>
+            </view>
+            <!-- 成员行 -->
+            <view class="gantt-head" wx:for="{{gantt.rows}}" wx:key="label" wx:for-item="row">
+              <view class="gantt-label {{row.mine ? 'mine' : ''}}">{{row.mine ? '我' : row.label}}</view>
+              <view class="gantt-track gantt-cell" style="width: {{gantt.track_width}}rpx;">
+                <view
+                  wx:for="{{row.blocks}}"
+                  wx:key="index"
+                  wx:for-item="blk"
+                  class="gantt-bar {{row.mine ? 'mine' : ''}} {{blk.tiny ? 'tiny' : ''}}"
+                  style="left: {{blk.left}}; width: {{blk.width}};"
+                >{{blk.text}}</view>
+              </view>
+            </view>
+            <view class="gantt-event-line" wx:if="{{gantt.event_left}}" style="left: {{gantt.event_left}};"></view>
+          </view>
+          <view class="gantt-hint" wx:if="{{gantt.hint}}">{{gantt.hint}}</view>
+          <view class="gantt-legend">
+            <view class="gantt-legend-item"><view class="gantt-event-line v"></view>聚餐时间（{{gantt.event_label}}）</view>
+            <view class="gantt-legend-item" wx:if="{{gantt.common.length > 0}}">
+              <view class="gantt-common-sample {{overlap.all.length > 0 ? '' : 'best'}}"></view>{{gantt.mode === 'day' ? '当天有重叠' : (overlap.all.length > 0 ? '全员共同时段' : '人数最多的时段')}}
+            </view>
+            <view class="gantt-legend-item"><view class="gantt-bar-sample"></view>可参加时段</view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
   </view>
 
   <view class="action-bar" wx:if="{{event.status === 'RECRUITING' || event.status === 'CONFIRMED'}}">

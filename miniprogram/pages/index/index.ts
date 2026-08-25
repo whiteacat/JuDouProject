@@ -254,7 +254,8 @@ Page({
       RECRUITING: '招募中',
       CONFIRMED: '已确认',
       COMPLETED: '已完成',
-      CANCELLED: '已取消'
+      CANCELLED: '已取消',
+      EXPIRED: '已失效'
     }
     return map[status] || status
   },

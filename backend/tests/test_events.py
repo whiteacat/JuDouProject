@@ -506,3 +506,247 @@ async def test_event_detail_non_group_member_404(require_db, client):
         f"{EVENTS_URL}/events/{event['id']}/members", headers=_auth(outsider)
     )
     assert resp.status_code == 404
+
+
+# ---------- 失效策略与时间窗口 ----------
+
+
+async def test_create_event_expiry_validation(require_db, client):
+    """失效策略参数校验：非法 mode / 缺参 → 422。"""
+    group_id, token, _ic = await _group_with_second(client, "ev_ex_v_a", "ev_ex_v_b")
+    # 非法 mode
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "expiry_mode": "bogus"},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+    # at_time 缺 expires_at
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "expiry_mode": "at_time"},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+    # after_hours 缺时长
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "expiry_mode": "after_hours"},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+    # 时段结束不晚于开始
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "time_windows": [{"date": "2030-01-01", "start": "20:00", "end": "19:00"}]},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+    # 同一天重叠时段
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "time_windows": [
+                  {"date": "2030-01-01", "start": "18:00", "end": "20:00"},
+                  {"date": "2030-01-01", "start": "19:30", "end": "21:00"},
+              ]},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+    # 日期格式非法
+    resp = await client.post(
+        f"{EVENTS_URL}/groups/{group_id}/events",
+        json={"title": "x", "event_time": _future(), "max_members": 2,
+              "time_windows": [{"date": "2030-1-1", "start": "18:00", "end": "20:00"}]},
+        headers=_auth(token),
+    )
+    assert resp.status_code == 422
+
+
+async def test_expiry_modes_persisted(require_db, client):
+    """各失效策略落库：at_time 原样、after_hours 折算、none/at_complete 无截止。"""
+    group_id, token, _ic = await _group_with_second(client, "ev_ex_p_a", "ev_ex_p_b")
+    # 默认 none
+    ev = await _create_event(client, token, group_id, title="长期有效")
+    assert ev["expiry_mode"] == "none"
+    assert ev["expires_at"] is None
+    # at_time
+    future = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=24)).isoformat()
+    ev = await _create_event(
+        client, token, group_id, title="指定时间失效",
+        expiry_mode="at_time", expires_at=future,
+    )
+    assert ev["expiry_mode"] == "at_time"
+    assert ev["expires_at"] is not None
+    # after_hours 折算出 expires_at
+    ev = await _create_event(
+        client, token, group_id, title="24小时后失效",
+        expiry_mode="after_hours", expires_after_hours=24,
+    )
+    assert ev["expiry_mode"] == "after_hours"
+    assert ev["expires_at"] is not None
+    # at_complete 无截止
+    ev = await _create_event(
+        client, token, group_id, title="完成才失效", expiry_mode="at_complete"
+    )
+    assert ev["expiry_mode"] == "at_complete"
+    assert ev["expires_at"] is None
+
+
+async def test_event_lazy_expiry_blocks_join(require_db, client):
+    """过截止时间的组队惰性失效：加入 400、详情/列表显示 EXPIRED。"""
+    from sqlalchemy import update
+
+    from app.db.session import async_session_factory
+    from app.models.event import GroupEvent
+
+    group_id, token_a, invite = await _group_with_second(client, "ev_ex_e_a", "ev_ex_e_b")
+    token_b = await _add_member(client, invite, "ev_ex_e_c")
+    event = await _create_event(
+        client, token_a, group_id, max_members=3,
+        title="即将失效",
+        expiry_mode="at_time",
+        expires_at=_future(),  # 先建，下面把截止改到过去
+    )
+    async with async_session_factory() as db:
+        await db.execute(
+            update(GroupEvent)
+            .where(GroupEvent.id == event["id"])
+            .values(expires_at=dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1))
+        )
+        await db.commit()
+
+    # 加入被拒（惰性失效后状态 EXPIRED）
+    resp = await client.post(f"{EVENTS_URL}/events/{event['id']}/join", headers=_auth(token_b))
+    assert resp.status_code == 400
+
+    # 详情显示 EXPIRED
+    resp = await client.get(f"{EVENTS_URL}/events/{event['id']}", headers=_auth(token_b))
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "EXPIRED"
+
+    # 群列表同样显示 EXPIRED
+    resp = await client.get(f"{EVENTS_URL}/groups/{group_id}/events", headers=_auth(token_b))
+    assert resp.status_code == 200
+    statuses = {e["id"]: e["status"] for e in resp.json()}
+    assert statuses[event["id"]] == "EXPIRED"
+
+
+async def test_long_valid_join_after_event_time(require_db, client):
+    """长期有效策略：过了聚餐时间仍可加入（本功能的意义）。"""
+    from sqlalchemy import update
+
+    from app.db.session import async_session_factory
+    from app.models.event import GroupEvent
+
+    group_id, token_a, invite = await _group_with_second(client, "ev_lv_a", "ev_lv_b")
+    token_b = await _add_member(client, invite, "ev_lv_c")
+    event = await _create_event(
+        client, token_a, group_id, max_members=3,
+        title="长期有效聚餐", expiry_mode="none",
+    )
+    # 把聚餐时间改到过去
+    async with async_session_factory() as db:
+        await db.execute(
+            update(GroupEvent)
+            .where(GroupEvent.id == event["id"])
+            .values(event_time=dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1))
+        )
+        await db.commit()
+    resp = await client.post(f"{EVENTS_URL}/events/{event['id']}/join", headers=_auth(token_b))
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["current_members"] == 2
+
+
+async def test_join_with_multi_day_windows(require_db, client):
+    """多日多段时间窗：创建/加入携带；成员列表回显；my-windows 整体替换/清除。"""
+    group_id, token_a, invite = await _group_with_second(client, "ev_w_a", "ev_w_b")
+    token_b = await _add_member(client, invite, "ev_w_c")
+    event = await _create_event(
+        client, token_a, group_id, max_members=3,
+        time_windows=[
+            {"date": "2030-01-01", "start": "18:00", "end": "21:00"},
+            {"date": "2030-01-03", "start": "12:00", "end": "14:00"},
+        ],
+    )
+    # B 带多日多段窗口加入（乱序提交，服务端应规范化排序）
+    resp = await client.post(
+        f"{EVENTS_URL}/events/{event['id']}/join",
+        json={"time_windows": [
+            {"date": "2030-01-02", "start": "19:00", "end": "21:00"},
+            {"date": "2030-01-01", "start": "18:30", "end": "20:00"},
+        ]},
+        headers=_auth(token_b),
+    )
+    assert resp.status_code == 200, resp.text
+
+    # 成员列表回显多段窗口（创建者取创建时的值）
+    resp = await client.get(
+        f"{EVENTS_URL}/events/{event['id']}/members", headers=_auth(token_a)
+    )
+    assert resp.status_code == 200
+    by_user = {m["user_id"]: m for m in resp.json()}
+    creator_member = by_user[event["creator_id"]]
+    assert len(creator_member["time_windows"]) == 2
+    assert creator_member["time_windows"][0] == {
+        "date": "2030-01-01", "start": "18:00", "end": "21:00"
+    }
+    joiner = [m for m in resp.json() if m["user_id"] != event["creator_id"]][0]
+    # 已按 (date, start) 排序
+    assert [w["date"] for w in joiner["time_windows"]] == ["2030-01-01", "2030-01-02"]
+    assert joiner["time_windows"][0] == {
+        "date": "2030-01-01", "start": "18:30", "end": "20:00"
+    }
+
+    # B 整体替换自己的窗口（新增第三天）
+    resp = await client.post(
+        f"{EVENTS_URL}/events/{event['id']}/my-windows",
+        json={"time_windows": [
+            {"date": "2030-01-02", "start": "19:00", "end": "21:00"},
+            {"date": "2030-01-03", "start": "12:00", "end": "15:00"},
+        ]},
+        headers=_auth(token_b),
+    )
+    assert resp.status_code == 200, resp.text
+    assert [w["date"] for w in resp.json()["time_windows"]] == ["2030-01-02", "2030-01-03"]
+
+    # B 清除自己的窗口（传 []）
+    resp = await client.post(
+        f"{EVENTS_URL}/events/{event['id']}/my-windows",
+        json={"time_windows": []},
+        headers=_auth(token_b),
+    )
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["time_windows"] == []
+
+
+async def test_my_windows_not_member_404(require_db, client):
+    """加进群但未加入组队者不可设置时间窗口。"""
+    group_id, token_a, invite = await _group_with_second(client, "ev_wm_a", "ev_wm_b")
+    event = await _create_event(client, token_a, group_id)
+    outsider = await _add_member(client, invite, "ev_wm_x")
+    resp = await client.post(
+        f"{EVENTS_URL}/events/{event['id']}/my-windows",
+        json={"time_windows": [{"date": "2030-01-01", "start": "18:00", "end": "20:00"}]},
+        headers=_auth(outsider),
+    )
+    assert resp.status_code == 404
+
+
+async def test_my_windows_overlap_422(require_db, client):
+    """同一天重叠时段 → 422（请求模型校验拒绝）。"""
+    group_id, token_a, invite = await _group_with_second(client, "ev_wi_a", "ev_wi_b")
+    event = await _create_event(client, token_a, group_id)
+    resp = await client.post(
+        f"{EVENTS_URL}/events/{event['id']}/my-windows",
+        json={"time_windows": [
+            {"date": "2030-01-01", "start": "18:00", "end": "20:00"},
+            {"date": "2030-01-01", "start": "19:30", "end": "21:00"},
+        ]},
+        headers=_auth(token_a),
+    )
+    assert resp.status_code == 422

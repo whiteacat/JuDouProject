@@ -212,7 +212,7 @@ async def test_full_mvp_loop(require_db, client):
     )
     assert resp.status_code == 400
 
-    # 12. 异常路径：过期（创建时用过去时间 → 400；已过期组队不可加入 → 400）
+    # 12. 异常路径：过期（创建时用过去时间 → 400；到期失效的组队不可加入 → 400）
     past = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=1)).isoformat()
     resp = await client.post(
         f"{BASE}/groups/{gid}/events",
@@ -228,6 +228,12 @@ async def test_full_mvp_loop(require_db, client):
     )
     assert resp.status_code == 400
 
+    # 指定失效时间已过的组队：惰性失效为 EXPIRED，加入被拒
+    from sqlalchemy import update
+
+    from app.db.session import async_session_factory
+    from app.models.event import GroupEvent
+
     event5 = (
         await client.post(
             f"{BASE}/groups/{gid}/events",
@@ -238,15 +244,12 @@ async def test_full_mvp_loop(require_db, client):
                 "max_members": 2,
                 "latitude": LAT,
                 "longitude": LNG,
+                "expiry_mode": "at_time",
+                "expires_at": past,
             },
             headers=_auth(token_a),
         )
     ).json()
-    from sqlalchemy import update
-
-    from app.db.session import async_session_factory
-    from app.models.event import GroupEvent
-
     async with async_session_factory() as db:
         await db.execute(
             update(GroupEvent)

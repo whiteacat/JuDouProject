@@ -7,10 +7,10 @@ import math
 from typing import Optional
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.event import EventStatus, GroupEvent
+from app.models.event import EventStatus, ExpiryMode, GroupEvent
 from app.models.event_member import EventMember, EventMemberStatus
 from app.models.member import GroupMember
 from app.models.restaurant import Restaurant
@@ -82,6 +82,31 @@ async def _require_group_member(
     return member
 
 
+def _expiry_exceeded(event: GroupEvent, now: dt.datetime) -> bool:
+    """组队是否已过失效截止时间（仅带 expires_at 的策略参与判断）。"""
+    if event.status not in (EventStatus.RECRUITING, EventStatus.CONFIRMED):
+        return False
+    if event.expiry_mode not in (ExpiryMode.AT_TIME, ExpiryMode.AFTER_HOURS):
+        return False
+    return event.expires_at is not None and event.expires_at <= now
+
+
+async def _expire_stale_events(db: AsyncSession, events: list[GroupEvent]) -> None:
+    """列表查询的批量惰性失效：把已过截止时间的活动组队落库为 EXPIRED。"""
+    now = dt.datetime.now(dt.timezone.utc)
+    stale = [e for e in events if _expiry_exceeded(e, now)]
+    if not stale:
+        return
+    await db.execute(
+        update(GroupEvent)
+        .where(GroupEvent.id.in_([e.id for e in stale]))
+        .values(status=EventStatus.EXPIRED)
+    )
+    await db.commit()
+    for e in stale:
+        e.status = EventStatus.EXPIRED
+
+
 async def _get_event(
     db: AsyncSession, event_id: int, user_id: int, *, for_update: bool = False
 ) -> GroupEvent:
@@ -103,6 +128,13 @@ async def _get_event(
     )
     if member.scalar_one_or_none() is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=EVENT_NOT_FOUND)
+
+    # 惰性失效：过截止时间的活动组队落库为 EXPIRED
+    # （for_update 场景由调用方统一提交；普通读直接提交）
+    if _expiry_exceeded(event, dt.datetime.now(dt.timezone.utc)):
+        event.status = EventStatus.EXPIRED
+        if not for_update:
+            await db.commit()
     return event
 
 
@@ -130,6 +162,8 @@ def _event_dict(event: GroupEvent, current_members: int, restaurant: Optional[Re
         "latitude": float(event.latitude) if event.latitude is not None else None,
         "longitude": float(event.longitude) if event.longitude is not None else None,
         "restaurant": _restaurant_brief(restaurant) if restaurant else None,
+        "expiry_mode": event.expiry_mode,
+        "expires_at": event.expires_at,
     }
 
 
@@ -167,6 +201,15 @@ async def create_event(
         latitude = payload["latitude"]
         longitude = payload["longitude"]
 
+    # 失效策略：at_time 用用户指定时间；after_hours 在创建时折算为绝对截止
+    expiry_mode = payload.get("expiry_mode") or ExpiryMode.NONE
+    expires_at = payload.get("expires_at")
+    if expiry_mode == ExpiryMode.AFTER_HOURS:
+        hours = payload.get("expires_after_hours")
+        expires_at = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=hours)
+    elif expiry_mode not in (ExpiryMode.AT_TIME,):
+        expires_at = None
+
     event = GroupEvent(
         group_id=group_id,
         creator_id=user_id,
@@ -179,13 +222,18 @@ async def create_event(
         longitude=longitude,
         remark=payload.get("remark"),
         status=EventStatus.RECRUITING,
+        expiry_mode=expiry_mode,
+        expires_at=expires_at,
     )
     db.add(event)
     await db.flush()
-    # 创建者自动成为第一名成员
+    # 创建者自动成为第一名成员（可参加时段取创建时填写的值，后续可单独调整）
     db.add(
         EventMember(
-            event_id=event.id, user_id=user_id, status=EventMemberStatus.JOINED
+            event_id=event.id,
+            user_id=user_id,
+            status=EventMemberStatus.JOINED,
+            time_windows=_normalize_time_windows(payload.get("time_windows")),
         )
     )
     await db.commit()
@@ -215,6 +263,8 @@ async def map_events(
         stmt = stmt.where(GroupEvent.event_time <= end_time)
     result = await db.execute(stmt.order_by(GroupEvent.event_time.asc()))
     events = list(result.scalars().all())
+    await _expire_stale_events(db, events)
+    events = [e for e in events if e.status != EventStatus.EXPIRED]
 
     # 坐标过滤（MVP 平面近似；未来换 PostGIS ST_DWithin）
     filtered = []
@@ -260,6 +310,7 @@ async def list_group_events(
         .order_by(GroupEvent.event_time.desc())
     )
     events = list(result.scalars().all())
+    await _expire_stale_events(db, events)
 
     counts = await _count_batch(db, [e.id for e in events])
     restaurant_ids = {e.restaurant_id for e in events if e.restaurant_id}
@@ -276,16 +327,31 @@ async def list_group_events(
     ]
 
 
-async def join_event(db: AsyncSession, event_id: int, user_id: int) -> GroupEvent:
-    """加入组队：行锁串行化并发加入，保证不超员。"""
+def _normalize_time_windows(raw: Optional[list[dict]]) -> list[dict]:
+    """把请求里的 time_windows 规范化为存储结构并排序（date, start）。"""
+    windows = [
+        {"date": w["date"], "start": w["start"], "end": w["end"]}
+        for w in (raw or [])
+    ]
+    windows.sort(key=lambda w: (w["date"], w["start"]))
+    return windows
+
+
+async def join_event(
+    db: AsyncSession,
+    event_id: int,
+    user_id: int,
+    time_windows: Optional[list[dict]] = None,
+) -> GroupEvent:
+    """加入组队：行锁串行化并发加入，保证不超员；可选携带本人可参加时段。"""
     event = await _get_event(db, event_id, user_id, for_update=True)
+    if event.status == EventStatus.EXPIRED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="组队已失效，无法加入"
+        )
     if event.status not in (EventStatus.RECRUITING, EventStatus.CONFIRMED):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="当前状态不可加入"
-        )
-    if event.event_time <= dt.datetime.now(dt.timezone.utc):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="组队时间已过，无法加入"
         )
 
     membership = await get_event_membership(db, event_id, user_id)
@@ -298,14 +364,19 @@ async def join_event(db: AsyncSession, event_id: int, user_id: int) -> GroupEven
     if current >= event.max_members:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="组队人数已满")
 
+    windows = _normalize_time_windows(time_windows)
     if membership is None:
         db.add(
             EventMember(
-                event_id=event_id, user_id=user_id, status=EventMemberStatus.JOINED
+                event_id=event_id,
+                user_id=user_id,
+                status=EventMemberStatus.JOINED,
+                time_windows=windows,
             )
         )
     else:
         membership.status = EventMemberStatus.JOINED
+        membership.time_windows = windows
 
     if current + 1 >= event.max_members:
         event.status = EventStatus.CONFIRMED  # 满员自动确认
@@ -424,6 +495,30 @@ async def list_members(db: AsyncSession, event_id: int, user_id: int) -> list[di
             "joined_at": m.joined_at,
             "nickname": user_map[m.user_id].nickname if m.user_id in user_map else "",
             "avatar_url": user_map[m.user_id].avatar_url if m.user_id in user_map else "",
+            "time_windows": m.time_windows or [],
         }
         for m in members
     ]
+
+
+async def update_my_windows(
+    db: AsyncSession,
+    event_id: int,
+    user_id: int,
+    time_windows: list[dict],
+) -> dict:
+    """本人设置自己的可参加时段（整体替换；传 [] 表示清除）。"""
+    event = await _get_event(db, event_id, user_id, for_update=True)
+
+    membership = await get_event_membership(db, event_id, user_id)
+    if membership is None or membership.status != EventMemberStatus.JOINED:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="未加入该组队"
+        )
+
+    membership.time_windows = _normalize_time_windows(time_windows)
+    await db.commit()
+    return {
+        "time_windows": membership.time_windows,
+        "event_status": event.status,
+    }

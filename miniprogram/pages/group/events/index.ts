@@ -17,17 +17,11 @@ const STATUS_TEXT: Record<string, string> = {
   RECRUITING: '招募中',
   CONFIRMED: '已确认',
   COMPLETED: '已完成',
-  CANCELLED: '已取消'
+  CANCELLED: '已取消',
+  EXPIRED: '已失效'
 }
 
-/** 招募中的组队若已过聚餐时间，标记为已过期。 */
-function statusTextOf(status: string, eventTime: string): string {
-  if (
-    (status === 'RECRUITING' || status === 'CONFIRMED') &&
-    new Date(eventTime).getTime() < Date.now()
-  ) {
-    return '已过期'
-  }
+function statusTextOf(status: string): string {
   return STATUS_TEXT[status] || status
 }
 
@@ -68,7 +62,7 @@ Page({
         events: events.map((e) => ({
           ...e,
           time_display: formatTime(e.event_time),
-          status_text: statusTextOf(e.status, e.event_time)
+          status_text: statusTextOf(e.status)
         }))
       })
     } catch (err) {

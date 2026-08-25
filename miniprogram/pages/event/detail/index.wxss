@@ -138,3 +138,375 @@
   color: #999;
   line-height: 88rpx;
 }
+
+.expiry {
+  color: #ff6b35;
+}
+
+.window-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.window-row picker {
+  flex: 1;
+}
+
+.picker-value {
+  font-size: 30rpx;
+  color: #333;
+  background: #f7f7f7;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  text-align: center;
+}
+
+.window-sep {
+  color: #999;
+  font-size: 28rpx;
+}
+
+.btn-save {
+  margin-top: 24rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  line-height: 80rpx;
+}
+
+.btn-save[disabled] {
+  opacity: 0.6;
+}
+
+.window-hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.window-item {
+  margin-top: 20rpx;
+}
+
+.window-del {
+  margin-top: 12rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #e64340;
+}
+
+.window-add {
+  margin-top: 24rpx;
+  padding: 16rpx 0;
+  text-align: center;
+  font-size: 28rpx;
+  color: #ff6b35;
+  border: 2rpx dashed #ffb994;
+  border-radius: 12rpx;
+}
+
+.window-join-tip {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+}
+
+/* 文字摘要行（折叠态默认展示） */
+.window-text-row {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 16rpx;
+}
+
+.window-text-row .gantt-label {
+  height: auto;
+  min-height: 40rpx;
+  width: 120rpx;
+  flex-shrink: 0;
+  border-bottom: none;
+  line-height: 40rpx;
+}
+
+.window-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+  line-height: 40rpx;
+  word-break: break-all;
+}
+
+.window-text.empty {
+  color: #bbb;
+}
+
+.gantt-toggle {
+  margin-top: 24rpx;
+  padding: 12rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #ff6b35;
+}
+
+/* 甘特图（非均匀列：重叠日展开、其余折叠） */
+.gantt-scroll {
+  margin-top: 8rpx;
+  width: 100%;
+}
+
+.gantt {
+  position: relative;
+  padding-bottom: 8rpx;
+}
+
+.gantt-grid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 每行 = 固定宽度名字列 + 变宽轨道（表头列与数据条共享同一列宽） */
+.gantt-head {
+  display: flex;
+  align-items: stretch;
+}
+
+.gantt-track {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+/* 双类选择器提升优先级，避免被下方 .gantt-label 的 height:72rpx 覆盖 */
+.gantt-label.gantt-head-label {
+  height: 40rpx;
+  border-bottom: 2rpx solid #e5e5e5;
+  border-right: none;
+}
+
+.gantt-head-col {
+  height: 40rpx;
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 22rpx;
+  color: #999;
+  border-bottom: 2rpx solid #e5e5e5;
+  border-left: 2rpx solid #eee;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gantt-head-col.gap {
+  color: #ccc;
+}
+
+.gantt-head-col.is-event {
+  color: #4a90d9;
+  font-weight: bold;
+}
+
+.gantt-head-col.green {
+  color: #2e7d32;
+  font-weight: bold;
+  border-bottom-color: #43a047;
+}
+
+.gantt-label {
+  width: 120rpx;
+  flex: none;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12rpx;
+  box-sizing: border-box;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.gantt-label.mine {
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+.gantt-cell {
+  position: relative;
+  height: 72rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  background: #fafafa;
+}
+
+.gantt-bar {
+  position: absolute;
+  top: 10rpx;
+  bottom: 10rpx;
+  background: rgba(255, 107, 53, 0.75);
+  border-radius: 6rpx;
+  font-size: 20rpx;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 8rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.gantt-bar.mine {
+  background: #ff6b35;
+  font-weight: bold;
+}
+
+/* 折叠列/日期级列的小块：不显示时间文字 */
+.gantt-bar.tiny {
+  font-size: 0;
+  padding: 0;
+}
+
+/* 共同行 */
+.gantt-cell.common-cell {
+  background-color: #fff;
+}
+
+.gantt-label.common {
+  color: #43a047;
+  font-weight: bold;
+}
+
+.gantt-bar.common {
+  background: #43a047;
+  font-weight: bold;
+}
+
+.gantt-bar.common.best {
+  background: rgba(102, 187, 106, 0.85);
+}
+
+.gantt-common-sample {
+  display: inline-block;
+  width: 24rpx;
+  height: 12rpx;
+  background: #43a047;
+  border-radius: 4rpx;
+  vertical-align: middle;
+}
+
+.gantt-common-sample.best {
+  background: rgba(102, 187, 106, 0.85);
+}
+
+/* 共同可参加时间（文字区） */
+.overlap-box {
+  margin-top: 24rpx;
+  padding: 20rpx 24rpx;
+  background: #f4fbf4;
+  border: 2rpx solid #d7edd7;
+  border-radius: 12rpx;
+}
+
+.overlap-title {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.overlap-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.overlap-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.overlap-chip {
+  flex-shrink: 0;
+  padding: 2rpx 12rpx;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 22rpx;
+  border-radius: 6rpx;
+}
+
+.overlap-chip.all {
+  background: #43a047;
+  color: #fff;
+}
+
+.overlap-time {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.overlap-missing {
+  font-size: 22rpx;
+  color: #e6a23c;
+}
+
+.overlap-none {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 聚餐参考线：从表头下沿贯穿到网格底部 */
+.gantt-event-line {
+  position: absolute;
+  top: 40rpx;
+  bottom: 0;
+  width: 4rpx;
+  background: #4a90d9;
+  border-radius: 2rpx;
+  z-index: 2;
+}
+
+.gantt-hint {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.5;
+}
+
+.gantt-event-line.v {
+  position: static;
+  width: 24rpx;
+  height: 12rpx;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.gantt-bar-sample {
+  display: inline-block;
+  width: 24rpx;
+  height: 12rpx;
+  background: #ff6b35;
+  border-radius: 4rpx;
+  vertical-align: middle;
+}
+
+.gantt-legend {
+  display: flex;
+  gap: 32rpx;
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+.gantt-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}

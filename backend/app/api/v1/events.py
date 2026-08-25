@@ -9,7 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.event import EventCreate, EventMemberOut, EventOut
+from app.schemas.event import (
+    EventCreate,
+    EventJoin,
+    EventMemberOut,
+    EventOut,
+)
 from app.services import event_service
 
 router = APIRouter(tags=["events"])
@@ -102,12 +107,34 @@ async def get_event_members(
 @router.post("/events/{event_id}/join", response_model=EventOut)
 async def join_event(
     event_id: int,
+    body: EventJoin = EventJoin(),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> EventOut:
-    event = await event_service.join_event(db, event_id, current_user.id)
+    event = await event_service.join_event(
+        db,
+        event_id,
+        current_user.id,
+        time_windows=[w.model_dump() for w in body.time_windows],
+    )
     detail = await event_service.get_event_detail(db, event.id, current_user.id)
     return EventOut(**detail)
+
+
+@router.post("/events/{event_id}/my-windows")
+async def update_my_windows(
+    event_id: int,
+    body: EventJoin,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """本人设置自己的可参加时段（整体替换；传 [] 清除）。"""
+    return await event_service.update_my_windows(
+        db,
+        event_id,
+        current_user.id,
+        [w.model_dump() for w in body.time_windows],
+    )
 
 
 @router.post("/events/{event_id}/leave", status_code=status.HTTP_204_NO_CONTENT)

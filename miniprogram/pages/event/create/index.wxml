@@ -33,6 +33,72 @@
   </view>
 
   <view class="field">
+    <view class="label">失效策略</view>
+    <view class="expiry-list">
+      <view
+        wx:for="{{expiryModes}}"
+        wx:key="key"
+        class="expiry-option {{expiryMode === item.key ? 'active' : ''}}"
+        data-mode="{{item.key}}"
+        bindtap="onExpiryModeChange"
+      >
+        <view class="expiry-radio {{expiryMode === item.key ? 'on' : ''}}"></view>
+        <view>
+          <view class="expiry-label">{{item.label}}</view>
+          <view class="expiry-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <block wx:if="{{expiryMode === 'at_time'}}">
+      <view class="sub-field">
+        <view class="label">失效时间</view>
+        <view class="picker-row">
+          <picker mode="date" value="{{expiryDate}}" bindchange="onExpiryDateChange">
+            <view class="picker-value">{{expiryDate || '请选择日期'}}</view>
+          </picker>
+          <picker mode="time" value="{{expiryTime}}" bindchange="onExpiryTimeChange">
+            <view class="picker-value">{{expiryTime || '请选择时间'}}</view>
+          </picker>
+        </view>
+      </view>
+    </block>
+
+    <block wx:if="{{expiryMode === 'after_hours'}}">
+      <view class="sub-field">
+        <view class="label">创建后多少小时失效</view>
+        <input class="num-input" type="number" value="{{expiresAfterHours}}" bindinput="onExpiryHoursInput" />
+      </view>
+    </block>
+  </view>
+
+  <view class="field">
+    <view class="field-head">
+      <view class="label">我的可参加时段</view>
+      <switch checked="{{windowEnabled}}" bindchange="onWindowToggle" color="#ff6b35" />
+    </view>
+    <view wx:if="{{windowEnabled}}" class="sub-field">
+      <view class="window-hint">告诉群里的人你能来的时间，可跨多天、每天多段</view>
+      <view wx:for="{{myWindows}}" wx:key="index" wx:for-item="w" wx:for-index="i" class="window-item">
+        <view class="picker-row">
+          <picker mode="date" value="{{w.date}}" data-index="{{i}}" bindchange="onWindowDateChange">
+            <view class="picker-value">{{w.date || '日期'}}</view>
+          </picker>
+          <picker mode="time" value="{{w.start}}" data-index="{{i}}" bindchange="onWindowStartChange">
+            <view class="picker-value">{{w.start || '开始'}}</view>
+          </picker>
+          <text class="window-sep">~</text>
+          <picker mode="time" value="{{w.end}}" data-index="{{i}}" bindchange="onWindowEndChange">
+            <view class="picker-value">{{w.end || '结束'}}</view>
+          </picker>
+        </view>
+        <view class="window-del" data-index="{{i}}" catchtap="onRemoveWindow">删除该时段</view>
+      </view>
+      <view class="window-add" bindtap="onAddWindow">+ 添加时段</view>
+    </view>
+  </view>
+
+  <view class="field">
     <view class="label">备注</view>
     <input class="input" placeholder="选填，如：想吃辣" value="{{remark}}" bindinput="onRemarkInput" maxlength="500" />
   </view>
