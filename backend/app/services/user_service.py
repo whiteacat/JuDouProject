@@ -34,10 +34,10 @@ async def get_or_create_user(
         if unionid and not user.unionid:
             user.unionid = unionid
             changed = True
-        if nickname and user.nickname == "微信用户":
+        if nickname and nickname != user.nickname:
             user.nickname = nickname
             changed = True
-        if avatar_url and not user.avatar_url:
+        if avatar_url and avatar_url != user.avatar_url:
             user.avatar_url = avatar_url
             changed = True
         if changed:
