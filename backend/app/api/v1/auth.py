@@ -19,6 +19,9 @@ async def wechat_login(
     db: AsyncSession = Depends(get_db),
 ) -> LoginResponse:
     session = await WechatClient().code2session(body.code)
-    user = await get_or_create_user(db, session["openid"], session.get("unionid"))
+    user = await get_or_create_user(
+        db, session["openid"], session.get("unionid"),
+        nickname=body.nickname, avatar_url=body.avatar_url,
+    )
     token = create_access_token(user.id)
     return LoginResponse(access_token=token, user=UserOut.model_validate(user))

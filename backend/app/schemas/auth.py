@@ -7,6 +7,8 @@ from app.schemas.user import UserOut
 
 class WechatLoginRequest(BaseModel):
     code: str = Field(min_length=1, max_length=128, description="wx.login 返回的临时登录凭证")
+    nickname: str | None = Field(default=None, max_length=64, description="用户昵称（小程序选填）")
+    avatar_url: str | None = Field(default=None, max_length=512, description="用户头像 URL（小程序选填）")
 
 
 class LoginResponse(BaseModel):

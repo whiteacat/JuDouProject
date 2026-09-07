@@ -1,5 +1,20 @@
 <view class="container">
   <view class="title">聚豆</view>
   <view class="desc">和群友一起组队聚餐</view>
-  <button class="login-btn" bindtap="onLogin">微信一键登录</button>
+
+  <!-- 头像选择器 -->
+  <view class="avatar-wrap">
+    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image class="avatar-img" src="{{avatarUrl || '/assets/icons/tab-me.png'}}" mode="aspectFill" />
+    </button>
+    <text class="avatar-hint">点击选择头像</text>
+  </view>
+
+  <!-- 昵称输入（type=nickname 可直接弹出微信昵称选择面板） -->
+  <view class="nickname-wrap">
+    <text class="nickname-label">昵称</text>
+    <input class="nickname-input" type="nickname" placeholder="请输入昵称" value="{{nickname}}" bindinput="onNicknameInput" />
+  </view>
+
+  <button class="login-btn" bindtap="onLogin" disabled="{{!nickname}}">确认登录</button>
 </view>

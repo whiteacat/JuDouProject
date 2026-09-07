@@ -12,7 +12,7 @@ export interface LoginResponse {
   user: UserProfile
 }
 
-export async function login(): Promise<LoginResponse> {
+export async function login(nickname?: string, avatarUrl?: string): Promise<LoginResponse> {
   return new Promise((resolve, reject) => {
     wx.login({
       success: async (res) => {
@@ -21,7 +21,10 @@ export async function login(): Promise<LoginResponse> {
           return
         }
         try {
-          const data = await post<LoginResponse>('/auth/wechat/login', { code: res.code })
+          const body: Record<string, string> = { code: res.code }
+          if (nickname) body.nickname = nickname
+          if (avatarUrl) body.avatar_url = avatarUrl
+          const data = await post<LoginResponse>('/auth/wechat/login', body)
           wx.setStorageSync('token', data.access_token)
           wx.setStorageSync('userInfo', data.user)
           resolve(data)

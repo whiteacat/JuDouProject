@@ -1,15 +1,31 @@
-// 登录页占位：M1 接入微信登录（wx.login -> 后端换 token）
 import { login } from '../../utils/auth'
 
 Page({
+  data: {
+    nickname: '',
+    avatarUrl: '',
+  },
   loading: false,
 
+  onChooseAvatar(e: WechatMiniprogram.ButtonChooseAvatar) {
+    this.setData({ avatarUrl: e.detail.avatarUrl })
+  },
+
+  onNicknameInput(e: WechatMiniprogram.Input) {
+    this.setData({ nickname: e.detail.value })
+  },
+
   async onLogin() {
+    const { nickname, avatarUrl } = this.data
+    if (!nickname) {
+      wx.showToast({ title: '请输入昵称', icon: 'none' })
+      return
+    }
     if (this.loading) return
     this.loading = true
     wx.showLoading({ title: '登录中' })
     try {
-      const res = await login()
+      const res = await login(nickname, avatarUrl)
       wx.setStorageSync('userInfo', res.user)
       wx.showToast({ title: '登录成功' })
       setTimeout(() => wx.navigateBack(), 800)

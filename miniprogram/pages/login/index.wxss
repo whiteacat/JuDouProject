@@ -24,3 +24,65 @@
   background-color: #ff6b35;
   color: #fff;
 }
+
+/* 头像选择 */
+.avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60rpx;
+}
+
+.avatar-btn {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  background: #f0f0f0;
+  line-height: 140rpx;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
+.avatar-img {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+}
+
+.avatar-hint {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 昵称输入 */
+.nickname-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 40rpx;
+  width: 500rpx;
+  border-bottom: 1rpx solid #e5e5e5;
+  padding-bottom: 16rpx;
+}
+
+.nickname-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-right: 20rpx;
+  white-space: nowrap;
+}
+
+.nickname-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.login-btn[disabled] {
+  background-color: #ccc;
+  color: #999;
+}
