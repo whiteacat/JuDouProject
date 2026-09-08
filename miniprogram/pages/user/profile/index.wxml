@@ -2,7 +2,7 @@
   <block wx:if="{{loggedIn && user}}">
     <view class="header-card">
       <view class="avatar">
-        <image wx:if="{{user.avatar_url}}" class="avatar-img" src="{{user.avatar_url}}" mode="aspectFill" />
+        <image wx:if="{{user.avatar_src}}" class="avatar-img" src="{{user.avatar_src}}" mode="aspectFill" />
         <text wx:else>{{user.short}}</text>
       </view>
       <view class="user-info" bindtap="goEdit">
