@@ -40,7 +40,7 @@
       bindinput="onNicknameInput"
       maxlength="20"
     />
-    <view class="nickname-hint">不超过 20 个字，禁止包含联系方式或广告信息</view>
+    <view class="nickname-hint">不超过 20 个字</view>
   </view>
 
   <!-- 保存按钮 -->
