@@ -114,3 +114,6 @@ export const get = <T = unknown>(
 
 export const post = <T = unknown>(url: string, data?: Record<string, unknown>) =>
   request<T>({ url, method: 'POST', data })
+
+export const patch = <T = unknown>(url: string, data?: Record<string, unknown>) =>
+  request<T>({ url, method: 'PATCH', data })

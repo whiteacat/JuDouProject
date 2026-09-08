@@ -29,6 +29,10 @@ Page({
     wx.navigateTo({ url: '/pages/login/index' })
   },
 
+  goEdit() {
+    wx.navigateTo({ url: '/pages/user/edit/index' })
+  },
+
   goEvents() {
     wx.navigateTo({ url: '/pages/event/list/index' })
   },

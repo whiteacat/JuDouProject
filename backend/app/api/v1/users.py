@@ -1,6 +1,6 @@
 """用户路由。"""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,8 +11,9 @@ from app.models.member import GroupMember
 from app.models.review import Review
 from app.models.user import User
 from app.schemas.review import MyReviewOut
-from app.schemas.user import UserOut, UserStatsOut
+from app.schemas.user import UserOut, UserStatsOut, UserUpdateRequest
 from app.services import review_service
+from app.services.user_service import ProfileUpdateError, update_user_profile
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -20,6 +21,23 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("/me", response_model=UserOut)
 async def get_me(current_user: User = Depends(get_current_user)) -> User:
     return current_user
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_me(
+    body: UserUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """修改当前用户的昵称/头像。"""
+    try:
+        return await update_user_profile(
+            db, current_user,
+            nickname=body.nickname,
+            avatar_url=body.avatar_url,
+        )
+    except ProfileUpdateError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message) from e
 
 
 @router.get("/me/stats", response_model=UserStatsOut)

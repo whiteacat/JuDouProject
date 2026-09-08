@@ -5,9 +5,10 @@
         <image wx:if="{{user.avatar_url}}" class="avatar-img" src="{{user.avatar_url}}" mode="aspectFill" />
         <text wx:else>{{user.short}}</text>
       </view>
-      <view class="user-info">
+      <view class="user-info" bindtap="goEdit">
         <view class="nickname">{{user.nickname}}</view>
         <view class="uid">ID: {{user.id}}</view>
+        <view class="edit-hint">点击编辑 ›</view>
       </view>
     </view>
 

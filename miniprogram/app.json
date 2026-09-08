@@ -15,6 +15,7 @@
     "pages/group/restaurants/index",
     "pages/group/mine/index",
     "pages/user/profile/index",
+    "pages/user/edit/index",
     "pages/login/index"
   ],
   "window": {

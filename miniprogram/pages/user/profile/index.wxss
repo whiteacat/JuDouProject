@@ -50,6 +50,12 @@
   opacity: 0.85;
 }
 
+.edit-hint {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  opacity: 0.7;
+}
+
 /* 功能菜单 */
 .menu {
   background: #fff;
