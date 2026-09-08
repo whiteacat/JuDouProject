@@ -16,7 +16,8 @@
     <view class="card-title">群成员</view>
     <view class="member-grid">
       <view wx:for="{{members}}" wx:key="user_id" class="member">
-        <view class="member-avatar">{{item.short}}</view>
+        <image wx:if="{{item.avatar_src}}" class="member-avatar-img" src="{{item.avatar_src}}" mode="aspectFill" />
+        <view wx:else class="member-avatar">{{item.short}}</view>
         <view class="member-name">{{item.nickname}}</view>
         <view wx:if="{{item.role === 'OWNER'}}" class="member-role">群主</view>
       </view>

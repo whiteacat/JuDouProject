@@ -1,5 +1,6 @@
 // 组队详情页：信息、餐厅、成员、操作栏
 import { get, post } from '../../../utils/request'
+import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface RestaurantBrief {
   id: number
@@ -559,7 +560,7 @@ Page({
       const overlap = buildOverlaps(members)
       this.setData({
         event: { ...full, expiry_display: expiryDisplayOf(full) },
-        members: members.map((m) => ({ ...m, short: m.nickname ? m.nickname[0] : '?' })),
+        members: members.map((m) => ({ ...m, short: m.nickname ? m.nickname[0] : '?', avatar_src: resolveAvatarSrc(m.avatar_url || '') })),
         userId,
         joined,
         isCreator: event.creator_id === userId,

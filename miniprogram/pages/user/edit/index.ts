@@ -1,6 +1,7 @@
 // 编辑用户资料页：修改昵称 + 选择头像（微信头像 / 预设头像）
 import { getUserProfile, UserProfile } from '../../../utils/auth'
 import { patch } from '../../../utils/request'
+import { resolveAvatarSrc } from '../../../utils/avatar'
 
 /** 预设头像列表（与后端 PRESET_AVATARS 同步） */
 const PRESET_AVATARS = [
@@ -14,21 +15,7 @@ const PRESET_AVATARS = [
   'preset://avatar/8',
 ]
 
-/** 预设头像对应的本地图片路径（放在 assets/icons/preset-avatars/ 下） */
-const PRESET_AVATAR_IMAGES: Record<string, string> = {
-  'preset://avatar/1': '/assets/icons/preset-avatars/1.png',
-  'preset://avatar/2': '/assets/icons/preset-avatars/2.png',
-  'preset://avatar/3': '/assets/icons/preset-avatars/3.png',
-  'preset://avatar/4': '/assets/icons/preset-avatars/4.png',
-  'preset://avatar/5': '/assets/icons/preset-avatars/5.png',
-  'preset://avatar/6': '/assets/icons/preset-avatars/6.png',
-  'preset://avatar/7': '/assets/icons/preset-avatars/7.png',
-  'preset://avatar/8': '/assets/icons/preset-avatars/8.png',
-}
-
-function resolveAvatarSrc(url: string): string {
-  return PRESET_AVATAR_IMAGES[url] || url
-}
+const PRESET_AVATAR_SRCS = PRESET_AVATARS.map(resolveAvatarSrc)
 
 Page({
   data: {
@@ -37,7 +24,7 @@ Page({
     /** 用于展示的头像图片地址 */
     avatarSrc: '',
     presetAvatars: PRESET_AVATARS,
-    presetAvatarSrcs: PRESET_AVATARS.map(resolveAvatarSrc),
+    presetAvatarSrcs: PRESET_AVATAR_SRCS,
     /** 当前选中的预设头像 key（空串表示未选预设） */
     selectedPreset: '',
     submitting: false,

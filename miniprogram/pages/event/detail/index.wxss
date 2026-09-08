@@ -77,6 +77,13 @@
   width: 120rpx;
 }
 
+.member-avatar-img {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #f0f0f0;
+}
+
 .member-avatar {
   width: 88rpx;
   height: 88rpx;

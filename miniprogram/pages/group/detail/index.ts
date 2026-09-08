@@ -1,5 +1,6 @@
 // 群组主页：群信息、邀请码、成员列表、功能入口
 import { get } from '../../../utils/request'
+import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface Member {
   user_id: number
@@ -65,7 +66,8 @@ Page({
         group,
         members: members.map((m) => ({
           ...m,
-          short: m.nickname ? m.nickname[0] : '?'
+          short: m.nickname ? m.nickname[0] : '?',
+          avatar_src: resolveAvatarSrc(m.avatar_url || ''),
         }))
       })
     } catch (err) {

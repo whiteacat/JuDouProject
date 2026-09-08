@@ -1,5 +1,6 @@
 // 群组列表页：展示我加入的群组，入口：创建 / 加入
 import { get } from '../../../utils/request'
+import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface GroupItem {
   id: number
@@ -24,7 +25,12 @@ Page({
     this.setData({ loading: true })
     try {
       const groups = await get<GroupItem[]>('/groups')
-      this.setData({ groups })
+      this.setData({
+        groups: groups.map((g) => ({
+          ...g,
+          avatar_src: resolveAvatarSrc(g.avatar_url || ''),
+        }))
+      })
     } catch (err) {
       console.error('获取群组列表失败', err)
       wx.showToast({ title: '加载失败', icon: 'none' })
