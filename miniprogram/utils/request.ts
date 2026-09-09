@@ -3,7 +3,7 @@ import { BASE_URL } from './config'
 
 interface RequestOptions {
   url: string
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   data?: Record<string, unknown>
   params?: Record<string, string | number>
   auth?: boolean
@@ -66,7 +66,7 @@ function doRequest<T>(options: RequestOptions, isRetry = false): Promise<T> {
 
     wx.request({
       url: buildUrl(`${BASE_URL}${options.url}`, options.params),
-      method: options.method || 'GET',
+      method: (options.method || 'GET') as WechatMiniprogram.RequestOption['method'],
       data: options.data,
       header: {
         'Content-Type': 'application/json',

@@ -47,7 +47,7 @@ Page({
     }
   },
 
-  onChooseAvatar(e: WechatMiniprogram.ButtonChooseAvatar) {
+  onChooseAvatar(e: { detail: { avatarUrl: string } }) {
     this.setData({
       avatarUrl: e.detail.avatarUrl,
       avatarSrc: e.detail.avatarUrl,
