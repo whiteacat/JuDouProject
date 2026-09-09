@@ -1,3 +1,4 @@
+<wxs src="./strlen.wxs" module="s" />
 <view class="container">
   <!-- 活动类型选择 -->
   <view class="type-section">
@@ -67,7 +68,7 @@
         maxlength="200"
         auto-height
       />
-      <view class="char-count">{{(remark || '').length}}/200</view>
+      <view class="char-count">{{s.len(remark)}}/200</view>
     </view>
   </view>
 
