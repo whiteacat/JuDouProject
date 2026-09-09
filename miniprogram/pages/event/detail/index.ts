@@ -36,6 +36,7 @@ interface EventMember {
   avatar_url: string
   time_windows: { date: string; start: string; end: string }[]
   short?: string
+  avatar_src?: string
 }
 
 const STATUS_TEXT: Record<string, string> = {

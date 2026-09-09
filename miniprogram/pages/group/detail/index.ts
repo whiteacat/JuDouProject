@@ -9,6 +9,7 @@ interface Member {
   nickname: string
   avatar_url: string
   short?: string
+  avatar_src?: string
 }
 
 interface GroupDetail {
