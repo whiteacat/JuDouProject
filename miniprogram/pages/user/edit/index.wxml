@@ -1,3 +1,4 @@
+<wxs src="./strlen.wxs" module="s" />
 <view class="container">
   <!-- 头像区域 -->
   <view class="section">
@@ -51,7 +52,7 @@
       maxlength="50"
       auto-height
     />
-    <view class="char-hint">{{(signature || '').length}}/50</view>
+    <view class="char-hint">{{s.len(signature)}}/50</view>
   </view>
 
   <!-- 我的偏好 -->
