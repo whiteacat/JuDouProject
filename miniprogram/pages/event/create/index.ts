@@ -63,6 +63,10 @@ Page({
     maxMembers: 6,
     remark: '',
     submitting: false,
+    // 活动类型
+    category: '聚餐',
+    // 标签
+    selectedTags: [] as string[],
     // 失效策略
     expiryModes: EXPIRY_MODES,
     expiryMode: 'none',
@@ -151,6 +155,32 @@ Page({
   onTimeChange(e: WechatMiniprogram.PickerChange) {
     const time = String(e.detail.value)
     this.setData({ time })
+  },
+
+  onCategoryChange(e: WechatMiniprogram.TouchEvent) {
+    const cat = e.currentTarget.dataset.cat as string
+    this.setData({ category: cat })
+  },
+
+  onAddTag() {
+    wx.showModal({
+      title: '添加标签',
+      editable: true,
+      placeholderText: '输入标签名称',
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const tag = res.content.trim()
+          if (tag && !this.data.selectedTags.includes(tag)) {
+            this.setData({ selectedTags: [...this.data.selectedTags, tag] })
+          }
+        }
+      }
+    })
+  },
+
+  onRemoveTag(e: WechatMiniprogram.TouchEvent) {
+    const tag = e.currentTarget.dataset.tag as string
+    this.setData({ selectedTags: this.data.selectedTags.filter((t) => t !== tag) })
   },
 
   onExpiryModeChange(e: WechatMiniprogram.TouchEvent) {

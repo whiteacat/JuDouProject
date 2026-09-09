@@ -1,38 +1,90 @@
 <view class="container">
-  <view class="title">发起组队</view>
-  <view class="group-name" wx:if="{{groupName}}">群组：{{groupName}}</view>
-  <view class="restaurant-name" wx:if="{{restaurantName}}">餐厅：{{restaurantName}}</view>
-
-  <view class="field">
-    <view class="label">标题</view>
-    <input class="input" placeholder="如：周五火锅" value="{{title}}" bindinput="onTitleInput" maxlength="64" />
-  </view>
-
-  <view class="field">
-    <view class="label">日期</view>
-    <picker mode="date" value="{{date}}" bindchange="onDateChange">
-      <view class="picker-value">{{date || '请选择日期'}}</view>
-    </picker>
-  </view>
-
-  <view class="field">
-    <view class="label">时间</view>
-    <picker mode="time" value="{{time}}" bindchange="onTimeChange">
-      <view class="picker-value">{{time || '请选择时间'}}</view>
-    </picker>
-  </view>
-
-  <view class="field">
-    <view class="label">人数</view>
-    <view class="member-row">
-      <text>最少</text>
-      <input class="num-input" type="number" value="{{minMembers}}" bindinput="onMinInput" />
-      <text>最多</text>
-      <input class="num-input" type="number" value="{{maxMembers}}" bindinput="onMaxInput" />
+  <!-- 活动类型选择 -->
+  <view class="type-section">
+    <view class="section-label">活动类型</view>
+    <view class="type-grid">
+      <view class="type-item {{category === '聚餐' ? 'active' : ''}}" data-cat="聚餐" bindtap="onCategoryChange">
+        <view class="type-icon">🍽</view>
+        <text class="type-text">聚餐</text>
+      </view>
+      <view class="type-item {{category === '游玩' ? 'active' : ''}}" data-cat="游玩" bindtap="onCategoryChange">
+        <view class="type-icon">🎮</view>
+        <text class="type-text">游玩</text>
+      </view>
+      <view class="type-item {{category === '约会' ? 'active' : ''}}" data-cat="约会" bindtap="onCategoryChange">
+        <view class="type-icon">💕</view>
+        <text class="type-text">约会</text>
+      </view>
+      <view class="type-item {{category === '其他' ? 'active' : ''}}" data-cat="其他" bindtap="onCategoryChange">
+        <view class="type-icon">📌</view>
+        <text class="type-text">其他</text>
+      </view>
     </view>
   </view>
 
-  <view class="field">
+  <!-- 基本信息 -->
+  <view class="form-card">
+    <view class="field">
+      <view class="label">标题</view>
+      <input class="input" placeholder="如：周五火锅局" value="{{title}}" bindinput="onTitleInput" maxlength="64" />
+    </view>
+
+    <view class="field">
+      <view class="label">选择地点</view>
+      <view class="picker-value placeholder" wx:if="{{!restaurantName}}">请选择餐厅或地点</view>
+      <view class="picker-value" wx:else>{{restaurantName}}</view>
+    </view>
+
+    <view class="field">
+      <view class="label">活动时间</view>
+      <view class="picker-row">
+        <picker mode="date" value="{{date}}" bindchange="onDateChange">
+          <view class="picker-value">{{date || '请选择日期'}}</view>
+        </picker>
+        <picker mode="time" value="{{time}}" bindchange="onTimeChange">
+          <view class="picker-value">{{time || '请选择时间'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="field">
+      <view class="label">参与人数</view>
+      <view class="member-row">
+        <text class="member-label">最少</text>
+        <input class="num-input" type="number" value="{{minMembers}}" bindinput="onMinInput" />
+        <text class="member-label">最多</text>
+        <input class="num-input" type="number" value="{{maxMembers}}" bindinput="onMaxInput" />
+      </view>
+    </view>
+
+    <view class="field">
+      <view class="label">活动描述（可选）</view>
+      <textarea
+        class="textarea"
+        placeholder="介绍一下活动，吸引更多人加入…"
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+        maxlength="200"
+        auto-height
+      />
+      <view class="char-count">{{(remark || '').length}}/200</view>
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="form-card">
+    <view class="label">添加标签（可选）</view>
+    <view class="tag-list">
+      <view wx:for="{{selectedTags}}" wx:key="*this" class="tag-item">
+        {{item}}
+        <text class="tag-remove" data-tag="{{item}}" catchtap="onRemoveTag">×</text>
+      </view>
+      <view class="tag-add" bindtap="onAddTag">+</view>
+    </view>
+  </view>
+
+  <!-- 失效策略 -->
+  <view class="form-card">
     <view class="label">失效策略</view>
     <view class="expiry-list">
       <view
@@ -72,7 +124,8 @@
     </block>
   </view>
 
-  <view class="field">
+  <!-- 我的可参加时段 -->
+  <view class="form-card">
     <view class="field-head">
       <view class="label">我的可参加时段</view>
       <switch checked="{{windowEnabled}}" bindchange="onWindowToggle" color="#ff6b35" />
@@ -98,10 +151,6 @@
     </view>
   </view>
 
-  <view class="field">
-    <view class="label">备注</view>
-    <input class="input" placeholder="选填，如：想吃辣" value="{{remark}}" bindinput="onRemarkInput" maxlength="500" />
-  </view>
-
-  <button class="submit" bindtap="onSubmit" disabled="{{submitting}}">创建组队</button>
+  <!-- 提交按钮 -->
+  <button class="submit" bindtap="onSubmit" disabled="{{submitting}}">发布活动</button>
 </view>

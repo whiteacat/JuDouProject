@@ -1,41 +1,73 @@
 <view class="container" wx:if="{{group}}">
-  <view class="header">
-    <view class="name">{{group.name}}</view>
-    <view class="meta">{{group.member_count}} 位成员</view>
+  <!-- 顶部封面 -->
+  <view class="cover-section">
+    <image class="cover-bg" src="{{group.avatar_src || '/assets/icons/default-cover.png'}}" mode="aspectFill" />
+    <view class="cover-overlay"></view>
+    <view class="cover-info">
+      <view class="group-name">{{group.name}}</view>
+      <view class="group-meta">{{group.member_count}} 位成员</view>
+      <view class="joined-badge" wx:if="{{isMember}}">已加入</view>
+    </view>
   </view>
 
-  <view class="card">
-    <view class="card-title">邀请码</view>
+  <!-- 功能按钮行 -->
+  <view class="action-row">
+    <view class="action-item" bindtap="goCreateEvent">
+      <view class="action-icon">📝</view>
+      <text class="action-label">发起活动</text>
+    </view>
+    <view class="action-item" bindtap="toggleMembers">
+      <view class="action-icon">👥</view>
+      <text class="action-label">成员列表</text>
+    </view>
+    <view class="action-item" bindtap="onAnnouncement">
+      <view class="action-icon">📢</view>
+      <text class="action-label">群公告</text>
+    </view>
+    <view class="action-item" bindtap="onMore">
+      <view class="action-icon">⋯</view>
+      <text class="action-label">更多</text>
+    </view>
+  </view>
+
+  <!-- 邀请码 -->
+  <view class="section-card">
+    <view class="section-title">邀请码</view>
     <view class="invite-row">
       <text class="invite-code">{{group.invite_code}}</text>
       <button class="copy-btn" bindtap="onCopyCode">复制</button>
     </view>
   </view>
 
-  <view class="card">
-    <view class="card-title">群成员</view>
+  <!-- 群组活动 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">群组组队</view>
+      <view class="section-link" bindtap="goGroupEvents">查看全部 ›</view>
+    </view>
+    <view wx:if="{{recentEvents.length === 0}}" class="empty-hint">暂无组队，点击上方「发起活动」创建</view>
+    <view wx:for="{{recentEvents}}" wx:key="id" class="event-mini" data-id="{{item.id}}" bindtap="goEventDetail">
+      <view class="event-mini-top">
+        <view class="event-mini-title">{{item.title}}</view>
+        <view class="event-mini-status">{{item.status_text}}</view>
+      </view>
+      <view class="event-mini-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
+    </view>
+  </view>
+
+  <!-- 群成员 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">群成员（{{members.length}}）</view>
+      <view class="section-link" wx:if="{{members.length > 8}}">查看更多 ›</view>
+    </view>
     <view class="member-grid">
-      <view wx:for="{{members}}" wx:key="user_id" class="member">
+      <view wx:for="{{showMembers}}" wx:key="user_id" class="member">
         <image wx:if="{{item.avatar_src}}" class="member-avatar-img" src="{{item.avatar_src}}" mode="aspectFill" />
         <view wx:else class="member-avatar">{{item.short}}</view>
         <view class="member-name">{{item.nickname}}</view>
         <view wx:if="{{item.role === 'OWNER'}}" class="member-role">群主</view>
       </view>
-    </view>
-  </view>
-
-  <view class="card">
-    <view class="entry" bindtap="goGroupEvents">
-      <view class="icon icon-list"></view>
-      <text class="entry-text">群组组队</text>
-    </view>
-    <view class="entry" bindtap="goRestaurants">
-      <view class="icon icon-restaurant"></view>
-      <text class="entry-text">群组餐厅库</text>
-    </view>
-    <view class="entry" bindtap="goCreateEvent">
-      <view class="icon icon-event"></view>
-      <text class="entry-text">发起组队</text>
     </view>
   </view>
 </view>

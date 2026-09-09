@@ -2,19 +2,16 @@
   <!-- 头像区域 -->
   <view class="section">
     <view class="section-title">头像</view>
-
-    <!-- 当前头像预览 -->
     <view class="current-avatar">
       <image class="avatar-img" src="{{avatarSrc}}" mode="aspectFill" />
+      <view class="camera-badge">📷</view>
     </view>
 
-    <!-- 微信头像按钮 -->
     <view class="sub-title">从微信选择</view>
     <button class="wechat-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       选择微信头像
     </button>
 
-    <!-- 预设头像 -->
     <view class="sub-title">预设头像</view>
     <view class="preset-grid">
       <view
@@ -29,7 +26,7 @@
     </view>
   </view>
 
-  <!-- 昵称区域 -->
+  <!-- 昵称 -->
   <view class="section">
     <view class="section-title">昵称</view>
     <input
@@ -40,7 +37,57 @@
       bindinput="onNicknameInput"
       maxlength="20"
     />
-    <view class="nickname-hint">不超过 20 个字</view>
+    <view class="char-hint">{{nickname.length}}/20</view>
+  </view>
+
+  <!-- 个性签名 -->
+  <view class="section">
+    <view class="section-title">个性签名</view>
+    <textarea
+      class="signature-input"
+      placeholder="介绍一下自己吧…"
+      value="{{signature}}"
+      bindinput="onSignatureInput"
+      maxlength="50"
+      auto-height
+    />
+    <view class="char-hint">{{(signature || '').length}}/50</view>
+  </view>
+
+  <!-- 我的偏好 -->
+  <view class="section">
+    <view class="section-title">我的偏好</view>
+
+    <view class="pref-group">
+      <view class="pref-label">美食偏好</view>
+      <view class="pref-tags">
+        <view wx:for="{{foodPrefs}}" wx:key="*this" class="pref-tag {{selectedFoodPrefs.includes(item) ? 'active' : ''}}" data-tag="{{item}}" data-group="food" bindtap="onTogglePref">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="pref-group">
+      <view class="pref-label">游玩偏好</view>
+      <view class="pref-tags">
+        <view wx:for="{{playPrefs}}" wx:key="*this" class="pref-tag {{selectedPlayPrefs.includes(item) ? 'active' : ''}}" data-tag="{{item}}" data-group="play" bindtap="onTogglePref">{{item}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 其他设置 -->
+  <view class="section">
+    <view class="section-title">其他设置</view>
+    <view class="setting-item">
+      <text class="setting-label">消费预算</text>
+      <text class="setting-value">{{budget || '50-100元'}}</text>
+    </view>
+    <view class="setting-item">
+      <text class="setting-label">出行距离</text>
+      <text class="setting-value">{{distance || '10km以内'}}</text>
+    </view>
+    <view class="setting-item">
+      <text class="setting-label">时间偏好</text>
+      <text class="setting-value">{{timePref || '周末优先'}}</text>
+    </view>
   </view>
 
   <!-- 保存按钮 -->

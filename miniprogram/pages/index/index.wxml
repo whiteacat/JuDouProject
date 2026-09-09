@@ -9,27 +9,26 @@
     bindmarkertap="onMarkerTap"
   />
 
-  <view class="top-bar">
-    <view class="group-select" wx:if="{{groups.length > 0}}">
-      <picker mode="selector" range="{{groupNames}}" value="{{groupIndex}}" bindchange="onGroupChange">
-        <view class="group-select-value">群：{{currentGroup.name}} ▾</view>
-      </picker>
-    </view>
-    <view class="group-empty" wx:else>
-      <text>还没有群组</text>
-      <text class="group-empty-link" bindtap="goGroupList">去创建</text>
-    </view>
+  <!-- 顶部标题栏 -->
+  <view class="top-header">
+    <view class="app-title">吃饭 · 玩乐 · 组队</view>
+    <view class="app-subtitle">和有趣的人，一起发现好地方</view>
   </view>
 
+  <!-- 搜索栏 -->
   <view class="search-bar">
-    <input
-      class="search-input"
-      placeholder="搜索餐厅，如：火锅"
-      value="{{keyword}}"
-      bindinput="onKeywordInput"
-      confirm-type="search"
-      bindconfirm="onSearch"
-    />
+    <view class="search-wrap">
+      <image class="search-icon" src="/assets/icons/search.png" mode="aspectFit" />
+      <input
+        class="search-input"
+        placeholder="搜索餐厅、地点、活动…"
+        placeholder-style="color: #bbb"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        confirm-type="search"
+        bindconfirm="onSearch"
+      />
+    </view>
     <button class="search-btn" bindtap="onSearch" disabled="{{searching}}">搜索</button>
   </view>
 
@@ -56,6 +55,26 @@
     </view>
   </scroll-view>
 
+  <!-- 底部快捷入口卡片 -->
+  <view class="quick-bar">
+    <view class="quick-item" bindtap="goCategory" data-category="聚餐">
+      <view class="quick-icon quick-icon-eat">🍽</view>
+      <text class="quick-label">聚餐</text>
+    </view>
+    <view class="quick-item" bindtap="goCategory" data-category="游玩">
+      <view class="quick-icon quick-icon-play">🎮</view>
+      <text class="quick-label">游玩</text>
+    </view>
+    <view class="quick-item" bindtap="goCategory" data-category="约会">
+      <view class="quick-icon quick-icon-date">💕</view>
+      <text class="quick-label">约会</text>
+    </view>
+    <view class="quick-item" bindtap="goCreateEvent">
+      <view class="quick-icon quick-icon-team">👥</view>
+      <text class="quick-label">组队</text>
+    </view>
+  </view>
+
   <!-- 餐厅详情弹层 -->
   <view wx:if="{{selectedRestaurant}}" class="sheet-mask" bindtap="closeSheets"></view>
   <view wx:if="{{selectedRestaurant}}" class="bottom-sheet">
@@ -65,7 +84,7 @@
     <view class="sheet-info" wx:if="{{selectedRestaurant.phone}}">电话：{{selectedRestaurant.phone}}</view>
     <view class="sheet-row">
       <button class="sheet-btn half" bindtap="goRestaurantDetail">查看详情</button>
-      <button class="sheet-btn half" bindtap="goCreateEventForRestaurant">发起组队</button>
+      <button class="sheet-btn half primary" bindtap="goCreateEventForRestaurant">发起组队</button>
     </view>
     <button class="sheet-close" bindtap="closeSheets">关闭</button>
   </view>
@@ -80,7 +99,7 @@
     <view class="sheet-row">
       <button class="sheet-btn half" bindtap="goEventDetail">查看详情</button>
       <button
-        class="sheet-btn half"
+        class="sheet-btn half primary"
         bindtap="joinEventFromMap"
         wx:if="{{selectedEvent.status === 'RECRUITING' || selectedEvent.status === 'CONFIRMED'}}"
       >加入组队</button>

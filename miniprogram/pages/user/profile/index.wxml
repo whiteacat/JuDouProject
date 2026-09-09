@@ -1,31 +1,70 @@
 <view class="container">
   <block wx:if="{{loggedIn && user}}">
-    <view class="header-card">
-      <view class="avatar">
+    <!-- 用户信息卡 -->
+    <view class="profile-card">
+      <view class="avatar-wrap" bindtap="goEdit">
         <image wx:if="{{user.avatar_src}}" class="avatar-img" src="{{user.avatar_src}}" mode="aspectFill" />
-        <text wx:else>{{user.short}}</text>
+        <view wx:else class="avatar-fallback">{{user.short}}</view>
+        <view class="avatar-edit">✏️</view>
       </view>
-      <view class="user-info" bindtap="goEdit">
+      <view class="profile-info">
         <view class="nickname">{{user.nickname}}</view>
-        <view class="uid">ID: {{user.id}}</view>
-        <view class="edit-hint">点击编辑 ›</view>
+        <view class="signature">{{user.signature || '点击编辑个性签名'}}</view>
+      </view>
+      <view class="edit-entry" bindtap="goEdit">资料 ›</view>
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="stats-bar">
+      <view class="stat-item">
+        <view class="stat-num">{{stats.group_count}}</view>
+        <view class="stat-label">加入群组</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{stats.event_count}}</view>
+        <view class="stat-label">参加活动</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-num">{{stats.review_count}}</view>
+        <view class="stat-label">评价店铺</view>
       </view>
     </view>
 
+    <!-- 功能菜单 -->
     <view class="menu">
       <view class="menu-item" bindtap="goEvents">
-        <view class="icon icon-event"></view>
-        <text class="menu-text">我的组队</text>
+        <text class="menu-icon">📋</text>
+        <text class="menu-text">我的活动</text>
         <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" bindtap="goGroups">
-        <view class="icon icon-group"></view>
-        <text class="menu-text">我的群组</text>
+      <view class="menu-item" bindtap="goFavorites">
+        <text class="menu-icon">⭐</text>
+        <text class="menu-text">我的收藏</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" bindtap="goReviews">
-        <view class="icon icon-star"></view>
+        <text class="menu-icon">💬</text>
         <text class="menu-text">我的评价</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPreferences">
+        <text class="menu-icon">🎯</text>
+        <text class="menu-text">我的偏好</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goPrivacy">
+        <text class="menu-icon">🔒</text>
+        <text class="menu-text">隐私设置</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goFeedback">
+        <text class="menu-icon">💡</text>
+        <text class="menu-text">帮助与反馈</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goAbout">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于我们</text>
         <text class="menu-arrow">›</text>
       </view>
     </view>
@@ -33,9 +72,11 @@
     <button class="logout" bindtap="onLogout">退出登录</button>
   </block>
 
+  <!-- 未登录态 -->
   <view wx:else class="unlogged">
     <view class="logo">聚</view>
-    <view class="unlogged-text">登录后查看你的群组、组队与评价</view>
+    <view class="unlogged-title">吃饭 · 玩乐 · 组队</view>
+    <view class="unlogged-text">登录后查看你的群组、活动与评价</view>
     <button class="login-btn" bindtap="goLogin">微信一键登录</button>
   </view>
 </view>

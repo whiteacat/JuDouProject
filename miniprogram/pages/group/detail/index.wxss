@@ -1,43 +1,120 @@
 .container {
   min-height: 100vh;
-  padding: 24rpx;
-  box-sizing: border-box;
   background: #f7f7f7;
 }
 
-.header {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 40rpx 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+/* 封面区 */
+.cover-section {
+  position: relative;
+  width: 100%;
+  height: 360rpx;
 }
 
-.name {
-  font-size: 40rpx;
+.cover-bg {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff6b35, #ff9a5c);
+}
+
+.cover-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+}
+
+.cover-info {
+  position: absolute;
+  bottom: 32rpx;
+  left: 32rpx;
+  right: 32rpx;
+}
+
+.group-name {
+  font-size: 44rpx;
   font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.3);
 }
 
-.meta {
+.group-meta {
   margin-top: 8rpx;
   font-size: 26rpx;
-  color: #999;
+  color: rgba(255,255,255,0.85);
 }
 
-.card {
+.joined-badge {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 4rpx 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: rgba(255,255,255,0.25);
+  border-radius: 20rpx;
+  border: 2rpx solid rgba(255,255,255,0.5);
+}
+
+/* 功能按钮行 */
+.action-row {
+  display: flex;
+  justify-content: space-around;
   background: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+  padding: 28rpx 16rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.card-title {
-  font-size: 28rpx;
-  color: #999;
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.action-icon {
+  font-size: 40rpx;
+}
+
+.action-label {
+  font-size: 24rpx;
+  color: #333;
+}
+
+/* 通用分区卡片 */
+.section-card {
+  background: #fff;
+  margin-bottom: 24rpx;
+  padding: 32rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 20rpx;
 }
 
+.section-link {
+  font-size: 26rpx;
+  color: #ff6b35;
+  margin-bottom: 20rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #ccc;
+  text-align: center;
+  padding: 24rpx 0;
+}
+
+/* 邀请码 */
 .invite-row {
   display: flex;
   align-items: center;
@@ -61,6 +138,53 @@
   border-radius: 8rpx;
 }
 
+.copy-btn::after {
+  border: none;
+}
+
+/* 活动迷你卡片 */
+.event-mini {
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.event-mini:last-child {
+  border-bottom: none;
+}
+
+.event-mini-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.event-mini-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-mini-status {
+  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: #ff6b35;
+  background: #fff3ee;
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+.event-mini-meta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 成员网格 */
 .member-grid {
   display: flex;
   flex-wrap: wrap;
@@ -85,7 +209,7 @@
   width: 88rpx;
   height: 88rpx;
   border-radius: 50%;
-  background-color: #ff6b35;
+  background: linear-gradient(135deg, #ff6b35, #ff9a5c);
   color: #fff;
   display: flex;
   align-items: center;
@@ -95,31 +219,16 @@
 
 .member-name {
   margin-top: 8rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   max-width: 120rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #333;
 }
 
 .member-role {
   margin-top: 4rpx;
   font-size: 20rpx;
   color: #ff6b35;
-}
-
-.entry {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 0;
-  font-size: 30rpx;
-  border-bottom: 2rpx solid #f5f5f5;
-}
-
-.entry:last-child {
-  border-bottom: none;
-}
-
-.entry-text {
-  margin-left: 16rpx;
 }

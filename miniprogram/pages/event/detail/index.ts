@@ -495,6 +495,8 @@ Page({
     overlap: null as OverlapSummary | null,
     // 甘特图默认折叠（文字摘要紧凑，时间轴按需展开）
     ganttOpen: false,
+    // 活动标签（从 remark 或后端字段提取）
+    tags: [] as string[],
     // 成员时段文字摘要（与 gantt 同源，折叠时展示）
     windowTexts: [] as { label: string; mine: boolean; text: string }[],
     // 我的可参加时段编辑（未加入时随 join 提交；已加入时通过 my-windows 保存）

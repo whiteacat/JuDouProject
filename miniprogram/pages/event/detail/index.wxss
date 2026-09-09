@@ -1,69 +1,158 @@
 .container {
   min-height: 100vh;
-  padding: 24rpx;
-  box-sizing: border-box;
   background: #f7f7f7;
   padding-bottom: 160rpx;
 }
 
-.header {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 40rpx 32rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+/* 封面区 */
+.cover-section {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
 }
 
-.title {
+.cover-img {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff6b35, #ff9a5c);
+}
+
+.cover-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: linear-gradient(transparent, rgba(0,0,0,0.3));
+}
+
+.cover-actions {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+/* 核心信息卡片 */
+.info-card {
+  background: #fff;
+  margin: -40rpx 24rpx 0;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+}
+
+.card-tag {
+  display: inline-block;
+  padding: 6rpx 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: #ff6b35;
+  border-radius: 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.info-title {
   font-size: 40rpx;
   font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
 }
 
-.status {
+.info-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.meta-item {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.info-status {
   display: inline-block;
-  margin-top: 12rpx;
+  margin-top: 16rpx;
   padding: 4rpx 16rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #ff6b35;
   background: #fff3ee;
   border-radius: 8rpx;
 }
 
-.status.cancelled {
+.info-status.cancelled {
   color: #999;
-  background: #f0f0f0;
+  background: #f5f5f5;
 }
 
-.meta {
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #666;
+.info-expiry {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #999;
 }
 
-.card {
+/* 通用分区卡片 */
+.section-card {
   background: #fff;
-  border-radius: 16rpx;
+  margin: 24rpx 0 0;
   padding: 32rpx;
-  margin-top: 24rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.card-title {
-  font-size: 28rpx;
-  color: #999;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 20rpx;
 }
 
-.restaurant-name {
-  font-size: 32rpx;
-  font-weight: bold;
+.section-link {
+  font-size: 26rpx;
+  color: #ff6b35;
+  margin-bottom: 20rpx;
 }
 
-.restaurant-coords {
-  margin-top: 8rpx;
+.section-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 活动标签 */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.tag-item {
+  padding: 8rpx 24rpx;
   font-size: 24rpx;
-  color: #999;
+  color: #ff6b35;
+  background: #fff3ee;
+  border-radius: 20rpx;
 }
 
+/* 成员网格 */
 .member-grid {
   display: flex;
   flex-wrap: wrap;
@@ -88,7 +177,7 @@
   width: 88rpx;
   height: 88rpx;
   border-radius: 50%;
-  background-color: #4a90d9;
+  background-color: #ff6b35;
   color: #fff;
   display: flex;
   align-items: center;
@@ -98,95 +187,14 @@
 
 .member-name {
   margin-top: 8rpx;
-  font-size: 24rpx;
+  font-size: 22rpx;
   max-width: 120rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.remark {
-  font-size: 30rpx;
-  color: #333;
-}
-
-.action-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 24rpx;
-  background: #fff;
-  display: flex;
-  gap: 24rpx;
-}
-
-.btn {
-  flex: 1;
-  border-radius: 12rpx;
-  font-size: 30rpx;
-}
-
-.btn.primary {
-  background-color: #ff6b35;
-  color: #fff;
-}
-
-.btn.secondary {
-  background-color: #fff;
-  color: #666;
-  border: 2rpx solid #ddd;
-}
-
-.no-review-hint {
-  flex: 1;
-  text-align: center;
-  font-size: 28rpx;
-  color: #999;
-  line-height: 88rpx;
-}
-
-.expiry {
-  color: #ff6b35;
-}
-
-.window-row {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.window-row picker {
-  flex: 1;
-}
-
-.picker-value {
-  font-size: 30rpx;
-  color: #333;
-  background: #f7f7f7;
-  border-radius: 8rpx;
-  padding: 12rpx 16rpx;
-  text-align: center;
-}
-
-.window-sep {
-  color: #999;
-  font-size: 28rpx;
-}
-
-.btn-save {
-  margin-top: 24rpx;
-  background-color: #ff6b35;
-  color: #fff;
-  border-radius: 12rpx;
-  font-size: 30rpx;
-  line-height: 80rpx;
-}
-
-.btn-save[disabled] {
-  opacity: 0.6;
-}
-
+/* 时段编辑 */
 .window-hint {
   font-size: 24rpx;
   color: #999;
@@ -197,21 +205,48 @@
   margin-top: 20rpx;
 }
 
+.window-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.picker-value {
+  padding: 12rpx 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.window-sep {
+  color: #999;
+  font-size: 28rpx;
+}
+
 .window-del {
-  margin-top: 12rpx;
+  margin-top: 8rpx;
   text-align: right;
   font-size: 24rpx;
   color: #e64340;
 }
 
 .window-add {
-  margin-top: 24rpx;
+  margin-top: 20rpx;
   padding: 16rpx 0;
   text-align: center;
   font-size: 28rpx;
   color: #ff6b35;
   border: 2rpx dashed #ffb994;
   border-radius: 12rpx;
+}
+
+.btn-save {
+  margin-top: 24rpx;
+  background: #ff6b35;
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 28rpx;
 }
 
 .window-join-tip {
@@ -221,196 +256,30 @@
   text-align: center;
 }
 
-/* 文字摘要行（折叠态默认展示） */
+/* 文字摘要 */
 .window-text-row {
   display: flex;
   align-items: flex-start;
-  margin-top: 16rpx;
+  gap: 16rpx;
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
 }
 
-.window-text-row .gantt-label {
-  height: auto;
-  min-height: 40rpx;
-  width: 120rpx;
-  flex-shrink: 0;
+.window-text-row:last-child {
   border-bottom: none;
-  line-height: 40rpx;
 }
 
 .window-text {
   flex: 1;
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #333;
-  line-height: 40rpx;
-  word-break: break-all;
 }
 
 .window-text.empty {
-  color: #bbb;
-}
-
-.gantt-toggle {
-  margin-top: 24rpx;
-  padding: 12rpx 0;
-  text-align: center;
-  font-size: 26rpx;
-  color: #ff6b35;
-}
-
-/* 甘特图（非均匀列：重叠日展开、其余折叠） */
-.gantt-scroll {
-  margin-top: 8rpx;
-  width: 100%;
-}
-
-.gantt {
-  position: relative;
-  padding-bottom: 8rpx;
-}
-
-.gantt-grid {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 每行 = 固定宽度名字列 + 变宽轨道（表头列与数据条共享同一列宽） */
-.gantt-head {
-  display: flex;
-  align-items: stretch;
-}
-
-.gantt-track {
-  position: relative;
-  display: flex;
-  flex: none;
-}
-
-/* 双类选择器提升优先级，避免被下方 .gantt-label 的 height:72rpx 覆盖 */
-.gantt-label.gantt-head-label {
-  height: 40rpx;
-  border-bottom: 2rpx solid #e5e5e5;
-  border-right: none;
-}
-
-.gantt-head-col {
-  height: 40rpx;
-  flex: none;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  font-size: 22rpx;
-  color: #999;
-  border-bottom: 2rpx solid #e5e5e5;
-  border-left: 2rpx solid #eee;
-  box-sizing: border-box;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.gantt-head-col.gap {
   color: #ccc;
 }
 
-.gantt-head-col.is-event {
-  color: #4a90d9;
-  font-weight: bold;
-}
-
-.gantt-head-col.green {
-  color: #2e7d32;
-  font-weight: bold;
-  border-bottom-color: #43a047;
-}
-
-.gantt-label {
-  width: 120rpx;
-  flex: none;
-  height: 72rpx;
-  display: flex;
-  align-items: center;
-  font-size: 24rpx;
-  color: #333;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-right: 12rpx;
-  box-sizing: border-box;
-  border-bottom: 2rpx solid #f0f0f0;
-}
-
-.gantt-label.mine {
-  color: #ff6b35;
-  font-weight: bold;
-}
-
-.gantt-cell {
-  position: relative;
-  height: 72rpx;
-  border-bottom: 2rpx solid #f0f0f0;
-  background: #fafafa;
-}
-
-.gantt-bar {
-  position: absolute;
-  top: 10rpx;
-  bottom: 10rpx;
-  background: rgba(255, 107, 53, 0.75);
-  border-radius: 6rpx;
-  font-size: 20rpx;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  padding: 0 8rpx;
-  overflow: hidden;
-  white-space: nowrap;
-  box-sizing: border-box;
-}
-
-.gantt-bar.mine {
-  background: #ff6b35;
-  font-weight: bold;
-}
-
-/* 折叠列/日期级列的小块：不显示时间文字 */
-.gantt-bar.tiny {
-  font-size: 0;
-  padding: 0;
-}
-
-/* 共同行 */
-.gantt-cell.common-cell {
-  background-color: #fff;
-}
-
-.gantt-label.common {
-  color: #43a047;
-  font-weight: bold;
-}
-
-.gantt-bar.common {
-  background: #43a047;
-  font-weight: bold;
-}
-
-.gantt-bar.common.best {
-  background: rgba(102, 187, 106, 0.85);
-}
-
-.gantt-common-sample {
-  display: inline-block;
-  width: 24rpx;
-  height: 12rpx;
-  background: #43a047;
-  border-radius: 4rpx;
-  vertical-align: middle;
-}
-
-.gantt-common-sample.best {
-  background: rgba(102, 187, 106, 0.85);
-}
-
-/* 共同可参加时间（文字区） */
+/* 共同时间 */
 .overlap-box {
   margin-top: 24rpx;
   padding: 20rpx 24rpx;
@@ -469,7 +338,121 @@
   color: #999;
 }
 
-/* 聚餐参考线：从表头下沿贯穿到网格底部 */
+/* 甘特图 */
+.gantt-toggle {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #ff6b35;
+}
+
+.gantt-scroll {
+  margin-top: 20rpx;
+}
+
+.gantt {
+  position: relative;
+}
+
+.gantt-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.gantt-head {
+  display: flex;
+  align-items: stretch;
+}
+
+.gantt-track {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.gantt-label.gantt-head-label {
+  height: 40rpx;
+  border-bottom: 2rpx solid #e5e5e5;
+}
+
+.gantt-head-col {
+  height: 40rpx;
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 22rpx;
+  color: #999;
+  border-bottom: 2rpx solid #e5e5e5;
+  border-left: 2rpx solid #eee;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gantt-head-col.gap { color: #ccc; }
+.gantt-head-col.is-event { color: #4a90d9; font-weight: bold; }
+.gantt-head-col.green { color: #2e7d32; font-weight: bold; border-bottom-color: #43a047; }
+
+.gantt-label {
+  width: 120rpx;
+  flex: none;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12rpx;
+  box-sizing: border-box;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.gantt-label.mine { color: #ff6b35; font-weight: bold; }
+
+.gantt-cell {
+  position: relative;
+  height: 72rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  background: #fafafa;
+}
+
+.gantt-bar {
+  position: absolute;
+  top: 10rpx;
+  bottom: 10rpx;
+  background: rgba(255, 107, 53, 0.75);
+  border-radius: 6rpx;
+  font-size: 20rpx;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 8rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.gantt-bar.mine { background: #ff6b35; font-weight: bold; }
+.gantt-bar.tiny { font-size: 0; padding: 0; }
+
+.gantt-cell.common-cell { background-color: #fff; }
+.gantt-label.common { color: #43a047; font-weight: bold; }
+.gantt-bar.common { background: #43a047; font-weight: bold; }
+.gantt-bar.common.best { background: rgba(102, 187, 106, 0.85); }
+
+.gantt-common-sample {
+  display: inline-block;
+  width: 24rpx;
+  height: 12rpx;
+  background: #43a047;
+  border-radius: 4rpx;
+  vertical-align: middle;
+}
+.gantt-common-sample.best { background: rgba(102, 187, 106, 0.85); }
+
 .gantt-event-line {
   position: absolute;
   top: 40rpx;
@@ -516,4 +499,45 @@
   display: flex;
   align-items: center;
   gap: 8rpx;
+}
+
+/* 底部操作栏 */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 24rpx;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
+  z-index: 100;
+}
+
+.btn-action {
+  flex: 1;
+  margin: 0;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 32rpx;
+  border-radius: 16rpx;
+}
+
+.btn-action.full {
+  flex: 1;
+}
+
+.btn-action.primary {
+  background: #ff6b35;
+  color: #fff;
+}
+
+.btn-action.secondary {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.btn-action::after {
+  border: none;
 }

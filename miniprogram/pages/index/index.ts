@@ -327,5 +327,10 @@ Page({
         `&group_name=${encodeURIComponent(group.name)}` +
         `&restaurant_id=${r.id}`
     })
+  },
+
+  goCategory(e: WechatMiniprogram.TouchEvent) {
+    const category = e.currentTarget.dataset.category as string
+    wx.navigateTo({ url: `/pages/event/list/index?category=${encodeURIComponent(category)}` })
   }
 })

@@ -1,33 +1,37 @@
-// 编辑用户资料页：修改昵称 + 选择头像（微信头像 / 预设头像）
+// 编辑用户资料页：修改昵称 + 选择头像（微信头像 / 预设头像）+ 个性签名 + 偏好设置
 import { getUserProfile, UserProfile } from '../../../utils/auth'
 import { patch } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
 
-/** 预设头像列表（与后端 PRESET_AVATARS 同步） */
 const PRESET_AVATARS = [
-  'preset://avatar/1',
-  'preset://avatar/2',
-  'preset://avatar/3',
-  'preset://avatar/4',
-  'preset://avatar/5',
-  'preset://avatar/6',
-  'preset://avatar/7',
-  'preset://avatar/8',
+  'preset://avatar/1', 'preset://avatar/2', 'preset://avatar/3', 'preset://avatar/4',
+  'preset://avatar/5', 'preset://avatar/6', 'preset://avatar/7', 'preset://avatar/8',
 ]
 
 const PRESET_AVATAR_SRCS = PRESET_AVATARS.map(resolveAvatarSrc)
+
+const FOOD_PREFS = ['火锅', '日料', '烧烤', '甜品', '川菜', '粤菜', '西餐', '东南亚']
+const PLAY_PREFS = ['电影', '桌游', '户外', '展览', '密室', 'KTV', '运动', '旅行']
 
 Page({
   data: {
     nickname: '',
     avatarUrl: '',
-    /** 用于展示的头像图片地址 */
     avatarSrc: '',
+    signature: '',
     presetAvatars: PRESET_AVATARS,
     presetAvatarSrcs: PRESET_AVATAR_SRCS,
-    /** 当前选中的预设头像 key（空串表示未选预设） */
     selectedPreset: '',
     submitting: false,
+    // 偏好
+    foodPrefs: FOOD_PREFS,
+    playPrefs: PLAY_PREFS,
+    selectedFoodPrefs: [] as string[],
+    selectedPlayPrefs: [] as string[],
+    // 其他设置
+    budget: '',
+    distance: '',
+    timePref: '',
   },
 
   onLoad() {
@@ -43,7 +47,6 @@ Page({
     }
   },
 
-  /** 选择微信头像（open-type="chooseAvatar" 回调） */
   onChooseAvatar(e: WechatMiniprogram.ButtonChooseAvatar) {
     this.setData({
       avatarUrl: e.detail.avatarUrl,
@@ -52,7 +55,6 @@ Page({
     })
   },
 
-  /** 选择预设头像 */
   onSelectPreset(e: WechatMiniprogram.TouchEvent) {
     const key = e.currentTarget.dataset.key as string
     this.setData({
@@ -64,6 +66,26 @@ Page({
 
   onNicknameInput(e: WechatMiniprogram.Input) {
     this.setData({ nickname: e.detail.value })
+  },
+
+  onSignatureInput(e: WechatMiniprogram.Input) {
+    this.setData({ signature: e.detail.value })
+  },
+
+  onTogglePref(e: WechatMiniprogram.TouchEvent) {
+    const tag = e.currentTarget.dataset.tag as string
+    const group = e.currentTarget.dataset.group as string
+    if (group === 'food') {
+      const list = this.data.selectedFoodPrefs
+      this.setData({
+        selectedFoodPrefs: list.includes(tag) ? list.filter((t) => t !== tag) : [...list, tag]
+      })
+    } else {
+      const list = this.data.selectedPlayPrefs
+      this.setData({
+        selectedPlayPrefs: list.includes(tag) ? list.filter((t) => t !== tag) : [...list, tag]
+      })
+    }
   },
 
   async onSave() {
