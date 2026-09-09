@@ -49,7 +49,7 @@ Page({
       setTimeout(() => wx.navigateBack(), 800)
       return
     }
-    this.setData({ groupId, groupName: options.group_name || '' })
+    this.setData({ groupId, groupName: decodeURIComponent(options.group_name || '') })
     this.fetchEvents()
   },
 

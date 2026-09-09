@@ -55,7 +55,7 @@ Page({
     }
     this.setData({
       groupId,
-      groupName: options.group_name || '',
+      groupName: decodeURIComponent(options.group_name || ''),
       restaurantId
     })
     this.load()
