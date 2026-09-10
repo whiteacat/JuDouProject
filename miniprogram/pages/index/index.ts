@@ -43,6 +43,40 @@ interface Marker {
   title: string
   width: number
   height: number
+  iconPath?: string
+  callout?: {
+    content: string
+    color: string
+    fontSize: number
+    bgColor: string
+    borderRadius: number
+    padding: number
+    display: string
+    textAlign: string
+  }
+}
+
+/** 按活动标题关键词归类，决定地图气泡配色（聚餐/游玩/组队） */
+const PLAY_KEYWORDS = ['电影', '展览', '密室', '桌游', '户外', 'KTV', '游乐', '剧本', '爬山', '徒步', '游泳', '运动']
+const DATE_KEYWORDS = ['约会', '咖啡', '下午茶', '看展']
+
+function eventCategoryOf(title: string): 'dine' | 'play' | 'team' {
+  const t = title || ''
+  if (PLAY_KEYWORDS.some((kw) => t.includes(kw))) return 'play'
+  if (DATE_KEYWORDS.some((kw) => t.includes(kw))) return 'play'
+  return 'dine'
+}
+
+const EVENT_MARKER_ICONS: Record<string, string> = {
+  dine: '/assets/icons/marker-event-dine.png',
+  play: '/assets/icons/marker-event-play.png',
+  team: '/assets/icons/marker-event-team.png',
+}
+
+const EVENT_MARKER_COLORS: Record<string, string> = {
+  dine: '#ff6b35',
+  play: '#ec6496',
+  team: '#4a90d9',
 }
 
 const DEFAULT_LNG = 116.4
@@ -70,6 +104,14 @@ function formatDistance(m: number): string {
   return `${(m / 1000).toFixed(1)}km`
 }
 
+interface SearchResult {
+  type: 'restaurant' | 'event'
+  id: number
+  name: string
+  sub: string
+  distance_text?: string
+}
+
 Page({
   data: {
     latitude: DEFAULT_LAT,
@@ -77,7 +119,7 @@ Page({
     markers: [] as Marker[],
     keyword: '',
     searching: false,
-    results: [] as Restaurant[],
+    results: [] as SearchResult[],
     showResults: false,
     selectedRestaurant: null as Restaurant | null,
     selectedEvent: null as EventBrief | null,
@@ -158,14 +200,29 @@ Page({
       this.events = events
       this.eventMarkers = events
         .filter((e) => e.latitude !== null && e.longitude !== null)
-        .map((e) => ({
-          id: EVENT_OFFSET + e.id,
-          latitude: e.latitude as number,
-          longitude: e.longitude as number,
-          title: e.title,
-          width: 24,
-          height: 30
-        }))
+        .map((e) => {
+          const cat = eventCategoryOf(e.title)
+          const color = EVENT_MARKER_COLORS[cat]
+          return {
+            id: EVENT_OFFSET + e.id,
+            latitude: e.latitude as number,
+            longitude: e.longitude as number,
+            title: e.title,
+            width: 36,
+            height: 44,
+            iconPath: EVENT_MARKER_ICONS[cat],
+            callout: {
+              content: `${e.title} ${e.current_members}/${e.max_members}人`,
+              color: '#ffffff',
+              fontSize: 12,
+              bgColor: color,
+              borderRadius: 12,
+              padding: 6,
+              display: 'ALWAYS',
+              textAlign: 'center',
+            },
+          }
+        })
       this._refreshMarkers()
     } catch (err) {
       console.error('加载组队 Marker 失败', err)
@@ -192,35 +249,73 @@ Page({
     }
     this.setData({ searching: true })
     try {
-      const restaurants = await get<Restaurant[]>('/restaurants/search', {
-        keyword,
-        longitude: this.data.longitude,
-        latitude: this.data.latitude,
-        radius: 3000
-      })
+      const group = this.data.currentGroup
+      // 并行搜餐厅 + 匹配当前群内活动标题
+      const [restaurants, groupEvents] = await Promise.all([
+        get<Restaurant[]>('/restaurants/search', {
+          keyword,
+          longitude: this.data.longitude,
+          latitude: this.data.latitude,
+          radius: 3000
+        }),
+        group
+          ? get<EventBrief[]>(`/groups/${group.id}/events/map`, {
+              longitude: this.data.longitude,
+              latitude: this.data.latitude,
+              radius: 50000
+            }).catch(() => [] as EventBrief[])
+          : Promise.resolve([] as EventBrief[])
+      ])
       this.restaurants = restaurants
       this.restaurantMarkers = restaurants.map((r) => ({
         id: r.id,
         latitude: r.latitude,
         longitude: r.longitude,
         title: r.name,
-        width: 24,
-        height: 30
+        width: 36,
+        height: 44,
+        iconPath: '/assets/icons/marker-event-team.png',
+        callout: {
+          content: r.name,
+          color: '#ffffff',
+          fontSize: 12,
+          bgColor: '#4a90d9',
+          borderRadius: 12,
+          padding: 6,
+          display: 'ALWAYS',
+          textAlign: 'center',
+        },
       }))
       this._refreshMarkers()
-      // 搜索结果显示为列表（店铺名 + 距离 + 分类/地址）
+      // 混合结果：餐厅（高德搜索）+ 群活动（标题包含关键字）
       const centerLat = this.data.latitude
       const centerLng = this.data.longitude
-      const results = restaurants.map((r) => ({
-        ...r,
+      const restaurantResults: SearchResult[] = restaurants.map((r) => ({
+        type: 'restaurant',
+        id: r.id,
+        name: r.name,
+        sub: [r.category, r.address].filter(Boolean).join(' · '),
         distance_text: formatDistance(distanceMeters(centerLat, centerLng, r.latitude, r.longitude))
       }))
+      const eventResults: SearchResult[] = groupEvents
+        .filter((e) => (e.title || '').toLowerCase().includes(keyword.toLowerCase()))
+        .map((e) => ({
+          type: 'event',
+          id: e.id,
+          name: e.title,
+          sub: `${this._statusText(e.status)} · ${e.current_members}/${e.max_members} 人${e.restaurant ? ' · ' + e.restaurant.name : ''}`,
+          distance_text:
+            e.latitude !== null && e.longitude !== null
+              ? formatDistance(distanceMeters(centerLat, centerLng, e.latitude, e.longitude))
+              : undefined
+        }))
+      const results = [...eventResults, ...restaurantResults]
       this.setData({ results, showResults: results.length > 0 })
-      if (restaurants.length === 0) {
-        wx.showToast({ title: '没有找到相关餐厅', icon: 'none' })
+      if (results.length === 0) {
+        wx.showToast({ title: '没有找到相关结果', icon: 'none' })
       }
     } catch (err) {
-      console.error('搜索餐厅失败', err)
+      console.error('搜索失败', err)
       wx.showModal({
         title: '搜索失败',
         content: '请求未成功。请在 详情→本地设置 勾选"不校验合法域名、web-view、TLS"，然后重试。',
@@ -266,6 +361,17 @@ Page({
 
   onResultTap(e: WechatMiniprogram.TouchEvent) {
     const id = Number(e.currentTarget.dataset.id)
+    const type = e.currentTarget.dataset.type as string
+    if (type === 'event') {
+      const target = this.events.find((ev) => ev.id === id)
+      if (target) {
+        this.setData({
+          selectedEvent: { ...target, event_time_display: formatTime(target.event_time) },
+          eventStatusText: this._statusText(target.status)
+        })
+      }
+      return
+    }
     const target = this.restaurants.find((r) => r.id === id)
     if (target) {
       this.setData({ selectedRestaurant: target })
@@ -331,6 +437,16 @@ Page({
 
   goCategory(e: WechatMiniprogram.TouchEvent) {
     const category = e.currentTarget.dataset.category as string
-    wx.navigateTo({ url: `/pages/event/list/index?category=${encodeURIComponent(category)}` })
+    const group = this.data.currentGroup
+    if (!group) {
+      wx.showToast({ title: '请先选择群组', icon: 'none' })
+      return
+    }
+    const params = [
+      `category=${encodeURIComponent(category)}`,
+      `group_id=${group.id}`,
+      `group_name=${encodeURIComponent(group.name)}`,
+    ]
+    wx.navigateTo({ url: `/pages/event/list/index?${params.join('&')}` })
   }
 })

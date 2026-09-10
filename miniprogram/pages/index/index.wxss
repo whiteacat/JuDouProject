@@ -137,6 +137,25 @@
   white-space: nowrap;
 }
 
+.result-type {
+  display: inline-block;
+  padding: 2rpx 12rpx;
+  margin-right: 12rpx;
+  font-size: 20rpx;
+  border-radius: 8rpx;
+  vertical-align: middle;
+}
+
+.result-type.event {
+  color: #ff6b35;
+  background: #fff3ee;
+}
+
+.result-type.restaurant {
+  color: #4a90d9;
+  background: #e8f1fb;
+}
+
 .result-dist {
   margin-left: 16rpx;
   font-size: 24rpx;

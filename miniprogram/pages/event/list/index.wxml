@@ -1,8 +1,8 @@
 <view class="container">
-  <!-- 顶部位置信息 -->
-  <view class="location-bar">
-    <text class="location-label">当前位置</text>
-    <text class="location-text">{{locationText || '定位中…'}}</text>
+  <!-- 群名信息 -->
+  <view class="group-bar" wx:if="{{groupName}}">
+    <text class="group-label">{{groupName}}</text>
+    <text class="group-count">{{events.length}} 个活动</text>
   </view>
 
   <!-- 分类标签栏 -->
@@ -18,7 +18,7 @@
 
   <!-- 空态 -->
   <view wx:if="{{events.length === 0 && !loading}}" class="empty">
-    暂无活动，去发起一个吧
+    暂无{{tabIndex > 0 ? tabs[tabIndex] : ''}}活动，去发起一个吧
   </view>
 
   <!-- 活动卡片列表 -->
@@ -27,38 +27,31 @@
       wx:for="{{events}}"
       wx:key="id"
       class="event-card"
+      hover-class="event-card-hover"
       data-id="{{item.id}}"
       bindtap="goDetail"
     >
-      <!-- 封面图 -->
-      <view class="card-cover" wx:if="{{item.cover_url}}">
-        <image class="cover-img" src="{{item.cover_url}}" mode="aspectFill" />
-        <view class="card-tag">{{item.category || '组队'}}</view>
-      </view>
-
       <view class="card-body">
         <!-- 标题行 -->
         <view class="card-header">
+          <view class="card-tag" wx:if="{{item.category}}">{{item.category}}</view>
           <view class="card-title">{{item.title}}</view>
           <view class="card-status">{{item.status_text}}</view>
         </view>
 
         <!-- 地点 + 时间 -->
         <view class="card-meta" wx:if="{{item.restaurant}}">
-          <image class="meta-icon" src="/assets/icons/restaurant.svg" mode="aspectFit" />{{item.restaurant.name}}{{item.distance ? ' · ' + item.distance : ''}}
+          <image class="meta-icon" src="/assets/icons/restaurant.svg" mode="aspectFit" />{{item.restaurant.name}}
         </view>
         <view class="card-meta">
           <image class="meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人
         </view>
-        <view class="card-meta" wx:if="{{item.budget}}">
-          <image class="meta-icon" src="/assets/icons/wallet.svg" mode="aspectFit" />人均 {{item.budget}}
-        </view>
 
-        <!-- 底部：头像 + 加入按钮 -->
+        <!-- 底部：人数 + 加入按钮 -->
         <view class="card-footer">
-          <view class="card-avatars">
-            <image wx:if="{{item.creator_avatar_src}}" class="mini-avatar" src="{{item.creator_avatar_src}}" mode="aspectFill" />
-            <view class="avatar-count" wx:if="{{item.current_members > 1}}">+{{item.current_members - 1}}</view>
+          <view class="card-participants">
+            <image class="meta-icon" src="/assets/icons/users.svg" mode="aspectFit" />
+            已加入 {{item.current_members}} 人
           </view>
           <button
             class="join-btn"

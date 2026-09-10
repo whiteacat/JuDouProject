@@ -1,6 +1,5 @@
-// 附近活动列表页：带分类筛选的活动列表
+// 群组活动列表页：带分类筛选（聚餐/游玩/约会/其他），数据来自当前群组
 import { get } from '../../../utils/request'
-import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface EventItem {
   id: number
@@ -10,17 +9,24 @@ interface EventItem {
   current_members: number
   max_members: number
   restaurant: { id: number; name: string } | null
-  category?: string
-  budget?: string
-  distance?: string
-  cover_url?: string
-  creator?: { nickname: string; avatar_url: string }
   time_display?: string
   status_text?: string
-  creator_avatar_src?: string
+  category?: string
 }
 
 const TABS = ['推荐', '聚餐', '游玩', '约会', '其他']
+
+// 分类关键词（后端暂无 category 字段，按标题归类）
+const PLAY_KEYWORDS = ['电影', '展览', '密室', '桌游', '户外', 'KTV', '游乐', '剧本', '爬山', '徒步', '游泳', '运动', '游玩']
+const DATE_KEYWORDS = ['约会', '咖啡', '下午茶', '看展', '双人']
+
+function categoryOf(title: string): string {
+  const t = title || ''
+  if (PLAY_KEYWORDS.some((kw) => t.includes(kw))) return '游玩'
+  if (DATE_KEYWORDS.some((kw) => t.includes(kw))) return '约会'
+  if (['火锅', '聚餐', '吃饭', '烧烤', '海鲜', '日料', '川菜', '西餐', '甜品', '宵夜', '早茶', '烤肉', '烤肉', '自助餐'].some((kw) => t.includes(kw))) return '聚餐'
+  return '其他'
+}
 
 const STATUS_TEXT: Record<string, string> = {
   RECRUITING: '招募中',
@@ -46,45 +52,79 @@ function formatTime(iso: string): string {
   return `${m}-${day} ${h}:${min}`
 }
 
+function safeDecode(value: string): string {
+  if (!value) return ''
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
 Page({
   data: {
     tabs: TABS,
     tabIndex: 0,
     events: [] as EventItem[],
     loading: false,
-    locationText: ''
+    groupName: '',
+    groupId: 0
+  },
+
+  onLoad(options: Record<string, string>) {
+    const groupId = Number(options.group_id || 0)
+    const groupName = safeDecode(options.group_name)
+    // 支持从首页快捷入口携带 category 参数定位初始 tab
+    let tabIndex = 0
+    if (options.category) {
+      const idx = TABS.indexOf(safeDecode(options.category))
+      if (idx > 0) tabIndex = idx
+    }
+    this.setData({ groupId, groupName, tabIndex })
   },
 
   onShow() {
-    this.fetchEvents()
+    if (this.data.groupId) {
+      this.fetchEvents()
+    }
   },
 
   onTabChange(e: WechatMiniprogram.TouchEvent) {
     const index = Number(e.currentTarget.dataset.index)
     this.setData({ tabIndex: index })
-    this.fetchEvents()
+    this.applyFilter()
   },
 
   async fetchEvents() {
+    const { groupId } = this.data
+    if (!groupId) return
     this.setData({ loading: true })
     try {
-      const tab = TABS[this.data.tabIndex]
-      const params: Record<string, string> = {}
-      if (tab !== '推荐') params.category = tab
-      const events = await get<EventItem[]>('/events/nearby', params)
-      this.setData({
-        events: events.map((e) => ({
-          ...e,
-          time_display: formatTime(e.event_time),
-          status_text: statusTextOf(e.status),
-          creator_avatar_src: resolveAvatarSrc(e.creator?.avatar_url || ''),
-        }))
-      })
+      const events = await get<EventItem[]>(`/groups/${groupId}/events`)
+      const all = events.map((e) => ({
+        ...e,
+        time_display: formatTime(e.event_time),
+        status_text: statusTextOf(e.status),
+        category: categoryOf(e.title),
+      }))
+      this.allEvents = all
+      this.applyFilter()
     } catch {
       wx.showToast({ title: '加载失败', icon: 'none' })
+      this.setData({ events: [] })
     } finally {
       this.setData({ loading: false })
     }
+  },
+
+  allEvents: [] as EventItem[],
+
+  applyFilter() {
+    const tab = TABS[this.data.tabIndex]
+    const events = tab === '推荐'
+      ? this.allEvents
+      : this.allEvents.filter((e) => e.category === tab)
+    this.setData({ events })
   },
 
   goDetail(e: WechatMiniprogram.TouchEvent) {
