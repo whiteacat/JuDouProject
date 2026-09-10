@@ -5,7 +5,9 @@
     <view class="section-title">头像</view>
     <view class="current-avatar">
       <image class="avatar-img" src="{{avatarSrc}}" mode="aspectFill" />
-      <view class="camera-badge">📷</view>
+      <view class="camera-badge">
+        <image class="camera-badge-img" src="/assets/icons/camera.svg" mode="aspectFit" />
+      </view>
     </view>
 
     <view class="sub-title">从微信选择</view>

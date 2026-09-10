@@ -14,7 +14,9 @@
     >
       <view class="item-top">
         <view class="item-name">{{item.restaurant.name}}</view>
-        <view class="item-score" wx:if="{{item.group_stats.score}}">⭐ {{item.group_stats.score}}</view>
+        <view class="item-score" wx:if="{{item.group_stats.score}}">
+          <image class="star-icon small" src="/assets/icons/star.svg" mode="aspectFit" />{{item.group_stats.score}}
+        </view>
       </view>
       <view class="score-track" wx:if="{{item.group_stats.score}}">
         <view class="score-fill" style="width: {{item.group_stats.score / 5 * 100}}%"></view>

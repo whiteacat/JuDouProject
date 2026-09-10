@@ -13,19 +13,27 @@
   <!-- 功能按钮行 -->
   <view class="action-row">
     <view class="action-item" bindtap="goCreateEvent">
-      <view class="action-icon">📝</view>
+      <view class="action-icon">
+        <image class="action-icon-img" src="/assets/icons/plus.svg" mode="aspectFit" />
+      </view>
       <text class="action-label">发起活动</text>
     </view>
     <view class="action-item" bindtap="toggleMembers">
-      <view class="action-icon">👥</view>
+      <view class="action-icon">
+        <image class="action-icon-img" src="/assets/icons/users.svg" mode="aspectFit" />
+      </view>
       <text class="action-label">成员列表</text>
     </view>
     <view class="action-item" bindtap="onAnnouncement">
-      <view class="action-icon">📢</view>
+      <view class="action-icon">
+        <image class="action-icon-img" src="/assets/icons/announcement.svg" mode="aspectFit" />
+      </view>
       <text class="action-label">群公告</text>
     </view>
     <view class="action-item" bindtap="onMore">
-      <view class="action-icon">⋯</view>
+      <view class="action-icon">
+        <image class="action-icon-img" src="/assets/icons/more.svg" mode="aspectFit" />
+      </view>
       <text class="action-label">更多</text>
     </view>
   </view>
@@ -51,7 +59,9 @@
         <view class="event-mini-title">{{item.title}}</view>
         <view class="event-mini-status">{{item.status_text}}</view>
       </view>
-      <view class="event-mini-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
+      <view class="event-mini-meta">
+        <image class="mini-meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人
+      </view>
     </view>
   </view>
 

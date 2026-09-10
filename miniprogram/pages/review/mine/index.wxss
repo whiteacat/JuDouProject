@@ -36,11 +36,19 @@
 }
 
 .item-score {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
   margin-left: 16rpx;
   font-size: 30rpx;
   color: #ff6b35;
   font-weight: bold;
   flex-shrink: 0;
+}
+
+.star-icon.small {
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .item-content {

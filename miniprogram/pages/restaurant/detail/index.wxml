@@ -3,7 +3,9 @@
     <view class="name">{{restaurant.name}}</view>
     <!-- 去过次数独立于评分展示：已去未评（score 为 null）时也能看到 -->
     <view class="score-row" wx:if="{{stats}}">
-      <text class="score" wx:if="{{stats.score}}">⭐ {{stats.score}}</text>
+      <view class="score" wx:if="{{stats.score}}">
+        <image class="star-icon" src="/assets/icons/star.svg" mode="aspectFit" />{{stats.score}}
+      </view>
       <text class="visits" wx:if="{{stats.visit_count}}">我们群去过 {{stats.visit_count}} 次</text>
       <text class="visits" wx:else>我们群还没去过这家店</text>
     </view>
@@ -34,7 +36,9 @@
     <view wx:for="{{reviews}}" wx:key="id" class="review-item">
       <view class="review-head">
         <text class="review-nickname">{{item.nickname}}</text>
-        <text class="review-score">⭐ {{item.overall_score}}</text>
+        <view class="review-score">
+          <image class="star-icon small" src="/assets/icons/star.svg" mode="aspectFit" />{{item.overall_score}}
+        </view>
       </view>
       <view class="review-content" wx:if="{{item.content}}">{{item.content}}</view>
     </view>

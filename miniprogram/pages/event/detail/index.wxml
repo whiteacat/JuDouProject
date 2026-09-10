@@ -4,8 +4,12 @@
     <image class="cover-img" src="{{event.cover_url || '/assets/icons/default-cover.png'}}" mode="aspectFill" />
     <view class="cover-overlay"></view>
     <view class="cover-actions">
-      <view class="action-icon" bindtap="onShare">📤</view>
-      <view class="action-icon" bindtap="onFavorite">⭐</view>
+      <view class="action-icon" bindtap="onShare">
+        <image class="action-icon-img" src="/assets/icons/location-arrow.svg" mode="aspectFit" />
+      </view>
+      <view class="action-icon" bindtap="onFavorite">
+        <image class="action-icon-img" src="/assets/icons/star.svg" mode="aspectFit" />
+      </view>
     </view>
   </view>
 
@@ -14,10 +18,18 @@
     <view class="card-tag">{{event.category || '聚餐'}}</view>
     <view class="info-title">{{event.title}}</view>
     <view class="info-meta">
-      <view class="meta-item">📍 {{event.restaurant ? event.restaurant.name : '待定'}}</view>
-      <view class="meta-item">🕐 {{event.time_display}}</view>
-      <view class="meta-item">👥 {{event.current_members}}/{{event.max_members}} 人</view>
-      <view class="meta-item" wx:if="{{event.budget}}">💰 人均 {{event.budget}}</view>
+      <view class="meta-item">
+        <image class="meta-icon" src="/assets/icons/map-pin.svg" mode="aspectFit" />{{event.restaurant ? event.restaurant.name : '待定'}}
+      </view>
+      <view class="meta-item">
+        <image class="meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{event.time_display}}
+      </view>
+      <view class="meta-item">
+        <image class="meta-icon" src="/assets/icons/users.svg" mode="aspectFit" />{{event.current_members}}/{{event.max_members}} 人
+      </view>
+      <view class="meta-item" wx:if="{{event.budget}}">
+        <image class="meta-icon" src="/assets/icons/wallet.svg" mode="aspectFit" />人均 {{event.budget}}
+      </view>
     </view>
     <view class="info-status {{event.status === 'CANCELLED' || event.status === 'EXPIRED' ? 'cancelled' : ''}}">{{statusText}}</view>
     <view class="info-expiry">⏳ {{event.expiry_display}}</view>

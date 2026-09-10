@@ -24,9 +24,22 @@
 }
 
 .score {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
   font-size: 40rpx;
   color: #ff6b35;
   font-weight: bold;
+}
+
+.star-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.star-icon.small {
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .visits {
@@ -121,6 +134,9 @@
 }
 
 .review-score {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
   font-size: 26rpx;
   color: #ff6b35;
 }

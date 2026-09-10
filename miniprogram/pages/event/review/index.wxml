@@ -1,7 +1,9 @@
 <view class="container">
   <view class="header" wx:if="{{event}}">
     <view class="title">{{event.title}}</view>
-    <view class="restaurant" wx:if="{{event.restaurant}}">🍽 {{event.restaurant.name}}</view>
+    <view class="restaurant" wx:if="{{event.restaurant}}">
+      <image class="meta-icon" src="/assets/icons/restaurant.svg" mode="aspectFit" />{{event.restaurant.name}}
+    </view>
   </view>
 
   <view class="card">

@@ -56,13 +56,25 @@
 }
 
 .item-meta {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-top: 12rpx;
   font-size: 26rpx;
   color: #666;
 }
 
 .item-restaurant {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #999;
+}
+
+.meta-icon {
+  width: 26rpx;
+  height: 26rpx;
+  flex-shrink: 0;
 }

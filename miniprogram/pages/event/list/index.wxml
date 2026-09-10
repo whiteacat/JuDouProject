@@ -45,10 +45,14 @@
 
         <!-- 地点 + 时间 -->
         <view class="card-meta" wx:if="{{item.restaurant}}">
-          🍽 {{item.restaurant.name}}{{item.distance ? ' · ' + item.distance : ''}}
+          <image class="meta-icon" src="/assets/icons/restaurant.svg" mode="aspectFit" />{{item.restaurant.name}}{{item.distance ? ' · ' + item.distance : ''}}
         </view>
-        <view class="card-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
-        <view class="card-meta" wx:if="{{item.budget}}">💰 人均 {{item.budget}}</view>
+        <view class="card-meta">
+          <image class="meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人
+        </view>
+        <view class="card-meta" wx:if="{{item.budget}}">
+          <image class="meta-icon" src="/assets/icons/wallet.svg" mode="aspectFit" />人均 {{item.budget}}
+        </view>
 
         <!-- 底部：头像 + 加入按钮 -->
         <view class="card-footer">

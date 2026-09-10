@@ -18,7 +18,7 @@
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-wrap">
-      <image class="search-icon" src="/assets/icons/search.png" mode="aspectFit" />
+      <image class="search-icon" src="/assets/icons/search.svg" mode="aspectFit" />
       <input
         class="search-input"
         placeholder="搜索餐厅、地点、活动…"
@@ -58,19 +58,27 @@
   <!-- 底部快捷入口卡片 -->
   <view class="quick-bar">
     <view class="quick-item" bindtap="goCategory" data-category="聚餐">
-      <view class="quick-icon quick-icon-eat">🍽</view>
+      <view class="quick-icon quick-icon-eat">
+        <image class="quick-icon-img" src="/assets/icons/restaurant.svg" mode="aspectFit" />
+      </view>
       <text class="quick-label">聚餐</text>
     </view>
     <view class="quick-item" bindtap="goCategory" data-category="游玩">
-      <view class="quick-icon quick-icon-play">🎮</view>
+      <view class="quick-icon quick-icon-play">
+        <image class="quick-icon-img" src="/assets/icons/travel.svg" mode="aspectFit" />
+      </view>
       <text class="quick-label">游玩</text>
     </view>
     <view class="quick-item" bindtap="goCategory" data-category="约会">
-      <view class="quick-icon quick-icon-date">💕</view>
+      <view class="quick-icon quick-icon-date">
+        <image class="quick-icon-img" src="/assets/icons/heart.svg" mode="aspectFit" />
+      </view>
       <text class="quick-label">约会</text>
     </view>
     <view class="quick-item" bindtap="goCreateEvent">
-      <view class="quick-icon quick-icon-team">👥</view>
+      <view class="quick-icon quick-icon-team">
+        <image class="quick-icon-img" src="/assets/icons/users.svg" mode="aspectFit" />
+      </view>
       <text class="quick-label">组队</text>
     </view>
   </view>
@@ -93,7 +101,9 @@
   <view wx:if="{{selectedEvent}}" class="sheet-mask" bindtap="closeSheets"></view>
   <view wx:if="{{selectedEvent}}" class="bottom-sheet">
     <view class="sheet-title">{{selectedEvent.title}}</view>
-    <view class="sheet-info">🕐 {{selectedEvent.event_time_display}} · {{selectedEvent.current_members}}/{{selectedEvent.max_members}} 人</view>
+    <view class="sheet-info">
+      <image class="sheet-meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{selectedEvent.event_time_display}} · {{selectedEvent.current_members}}/{{selectedEvent.max_members}} 人
+    </view>
     <view class="sheet-info" wx:if="{{selectedEvent.restaurant}}">餐厅：{{selectedEvent.restaurant.name}}</view>
     <view class="sheet-status">{{eventStatusText}}</view>
     <view class="sheet-row">

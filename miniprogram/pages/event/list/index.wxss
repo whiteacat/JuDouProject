@@ -125,9 +125,18 @@
 }
 
 .card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-top: 10rpx;
   font-size: 24rpx;
   color: #999;
+}
+
+.meta-icon {
+  width: 26rpx;
+  height: 26rpx;
+  flex-shrink: 0;
 }
 
 /* 底部栏 */

@@ -18,8 +18,12 @@
         <view class="item-title">{{item.title}}</view>
         <view class="item-status">{{item.status_text}}</view>
       </view>
-      <view class="item-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人</view>
-      <view class="item-restaurant" wx:if="{{item.restaurant}}">🍽 {{item.restaurant.name}}</view>
+      <view class="item-meta">
+        <image class="meta-icon" src="/assets/icons/clock.svg" mode="aspectFit" />{{item.time_display}} · {{item.current_members}}/{{item.max_members}} 人
+      </view>
+      <view class="item-restaurant" wx:if="{{item.restaurant}}">
+        <image class="meta-icon" src="/assets/icons/restaurant.svg" mode="aspectFit" />{{item.restaurant.name}}
+      </view>
     </view>
   </view>
 </view>

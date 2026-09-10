@@ -5,19 +5,27 @@
     <view class="section-label">活动类型</view>
     <view class="type-grid">
       <view class="type-item {{category === '聚餐' ? 'active' : ''}}" data-cat="聚餐" bindtap="onCategoryChange">
-        <view class="type-icon">🍽</view>
+        <view class="type-icon">
+          <image class="type-icon-img" src="/assets/icons/restaurant.svg" mode="aspectFit" />
+        </view>
         <text class="type-text">聚餐</text>
       </view>
       <view class="type-item {{category === '游玩' ? 'active' : ''}}" data-cat="游玩" bindtap="onCategoryChange">
-        <view class="type-icon">🎮</view>
+        <view class="type-icon">
+          <image class="type-icon-img" src="/assets/icons/travel.svg" mode="aspectFit" />
+        </view>
         <text class="type-text">游玩</text>
       </view>
       <view class="type-item {{category === '约会' ? 'active' : ''}}" data-cat="约会" bindtap="onCategoryChange">
-        <view class="type-icon">💕</view>
+        <view class="type-icon">
+          <image class="type-icon-img" src="/assets/icons/heart.svg" mode="aspectFit" />
+        </view>
         <text class="type-text">约会</text>
       </view>
       <view class="type-item {{category === '其他' ? 'active' : ''}}" data-cat="其他" bindtap="onCategoryChange">
-        <view class="type-icon">📌</view>
+        <view class="type-icon">
+          <image class="type-icon-img" src="/assets/icons/tag.svg" mode="aspectFit" />
+        </view>
         <text class="type-text">其他</text>
       </view>
     </view>

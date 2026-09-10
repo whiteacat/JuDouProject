@@ -42,7 +42,18 @@
 }
 
 .type-icon {
-  font-size: 48rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #fff3ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.type-icon-img {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .type-text {

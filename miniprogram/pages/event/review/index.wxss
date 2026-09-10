@@ -18,9 +18,18 @@
 }
 
 .restaurant {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-top: 8rpx;
   font-size: 28rpx;
   color: #666;
+}
+
+.meta-icon {
+  width: 28rpx;
+  height: 28rpx;
+  flex-shrink: 0;
 }
 
 .card {

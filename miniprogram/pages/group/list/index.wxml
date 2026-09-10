@@ -2,10 +2,12 @@
   <!-- 顶部操作栏 -->
   <view class="top-bar">
     <view class="search-wrap">
-      <image class="search-icon" src="/assets/icons/search.png" mode="aspectFit" />
+      <image class="search-icon" src="/assets/icons/search.svg" mode="aspectFit" />
       <input class="search-input" placeholder="搜索群组名称" placeholder-style="color: #bbb" value="{{keyword}}" bindinput="onSearch" />
     </view>
-    <view class="add-btn" bindtap="goCreate">+</view>
+    <view class="add-btn" bindtap="goCreate">
+      <image class="add-btn-img" src="/assets/icons/plus.svg" mode="aspectFit" />
+    </view>
   </view>
 
   <!-- 空态 -->

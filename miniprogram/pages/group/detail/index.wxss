@@ -73,7 +73,18 @@
 }
 
 .action-icon {
-  font-size: 40rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #fff3ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon-img {
+  width: 34rpx;
+  height: 34rpx;
 }
 
 .action-label {
@@ -179,9 +190,18 @@
 }
 
 .event-mini-meta {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-top: 8rpx;
   font-size: 24rpx;
   color: #999;
+}
+
+.mini-meta-icon {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
 }
 
 /* 成员网格 */
