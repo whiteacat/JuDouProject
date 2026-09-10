@@ -1,26 +1,85 @@
 .container {
   min-height: 100vh;
-  padding: 48rpx 32rpx;
+  padding: 32rpx;
   box-sizing: border-box;
+  background: #f7f7f7;
+}
+
+/* 顶部 Tab */
+.tabs {
+  display: flex;
   background: #fff;
+  border-radius: 16rpx;
+  padding: 8rpx;
+  margin-bottom: 32rpx;
 }
 
-.title {
-  font-size: 40rpx;
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+  color: #666;
+  border-radius: 12rpx;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: #ff6b35;
+  color: #fff;
   font-weight: bold;
-  margin-bottom: 40rpx;
 }
 
-.input {
+/* 表单卡片 */
+.form-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  margin-bottom: 48rpx;
+}
+
+.field-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+
+.form-input {
   border: 2rpx solid #eee;
   border-radius: 12rpx;
   padding: 24rpx;
   font-size: 30rpx;
-  margin-bottom: 48rpx;
 }
 
+.form-input.code {
+  letter-spacing: 8rpx;
+  font-weight: bold;
+}
+
+.field-hint {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 提交按钮 */
 .submit {
   background-color: #ff6b35;
   color: #fff;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 53, 0.3);
+}
+
+.submit::after {
+  border: none;
+}
+
+.submit[disabled] {
+  background-color: #ccc;
+  color: #999;
+  box-shadow: none;
 }

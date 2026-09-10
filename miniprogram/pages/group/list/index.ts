@@ -83,6 +83,6 @@ Page({
   },
 
   goJoin() {
-    wx.navigateTo({ url: '/pages/group/join/index' })
+    wx.navigateTo({ url: '/pages/group/create/index?tab=join' })
   }
 })

@@ -1,11 +1,41 @@
 <view class="container">
-  <view class="title">创建群组</view>
-  <input
-    class="input"
-    placeholder="群组名称，如：产品部"
-    value="{{name}}"
-    bindinput="onNameInput"
-    maxlength="64"
-  />
-  <button class="submit" bindtap="onSubmit">创建</button>
+  <!-- 顶部 Tab：创建 / 加入 -->
+  <view class="tabs">
+    <view class="tab {{tab === 'create' ? 'active' : ''}}" data-tab="create" bindtap="onTabChange">创建群组</view>
+    <view class="tab {{tab === 'join' ? 'active' : ''}}" data-tab="join" bindtap="onTabChange">加入群组</view>
+  </view>
+
+  <!-- 创建群组 -->
+  <block wx:if="{{tab === 'create'}}">
+    <view class="form-card">
+      <view class="field-label">群组名称</view>
+      <input
+        class="form-input"
+        placeholder="如：产品部、吃货小分队"
+        placeholder-style="color: #bbb"
+        value="{{name}}"
+        bindinput="onNameInput"
+        maxlength="64"
+      />
+      <view class="field-hint">创建后生成专属邀请码，可分享给群友加入</view>
+    </view>
+    <button class="submit" bindtap="onCreate" disabled="{{submitting || !name.trim()}}">创建群组</button>
+  </block>
+
+  <!-- 邀请码加入 -->
+  <block wx:else>
+    <view class="form-card">
+      <view class="field-label">邀请码</view>
+      <input
+        class="form-input code"
+        placeholder="输入 8 位邀请码"
+        placeholder-style="color: #bbb"
+        value="{{inviteCode}}"
+        bindinput="onCodeInput"
+        maxlength="16"
+      />
+      <view class="field-hint">向群主索取邀请码，即可加入已有群组</view>
+    </view>
+    <button class="submit" bindtap="onJoin" disabled="{{submitting || !inviteCode}}">加入群组</button>
+  </block>
 </view>
