@@ -1,4 +1,4 @@
-// 群组列表页：展示我加入的群组，入口：创建 / 加入
+// 群组列表页：展示我加入的群组，入口：创建 / 加入（自定义导航栏）
 import { get } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
 
@@ -14,10 +14,16 @@ interface GroupItem {
 
 Page({
   data: {
+    statusBarHeight: 20,
     groups: [] as GroupItem[],
     filteredGroups: [] as GroupItem[],
     keyword: '',
     loading: false
+  },
+
+  onLoad() {
+    const sysInfo = wx.getSystemInfoSync()
+    this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 })
   },
 
   onShow() {
@@ -42,11 +48,16 @@ Page({
   },
 
   onSearch(e: WechatMiniprogram.Input) {
-    const keyword = e.detail.value.toLowerCase()
-    const filtered = keyword
-      ? this.data.groups.filter((g) => g.name.toLowerCase().includes(keyword))
+    const keyword = e.detail.value
+    const kw = keyword.toLowerCase()
+    const filtered = kw
+      ? this.data.groups.filter((g) => g.name.toLowerCase().includes(kw))
       : this.data.groups
     this.setData({ keyword, filteredGroups: filtered })
+  },
+
+  onClearSearch() {
+    this.setData({ keyword: '', filteredGroups: this.data.groups })
   },
 
   goDetail(e: WechatMiniprogram.TouchEvent) {

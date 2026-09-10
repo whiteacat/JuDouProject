@@ -1,26 +1,49 @@
-<view class="container">
-  <!-- 顶部操作栏 -->
-  <view class="top-bar">
+<view class="page">
+  <!-- 自定义导航栏 -->
+  <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-row">
+      <view class="nav-title">我的群组</view>
+      <view class="nav-add" bindtap="goCreate">
+        <image class="nav-add-img" src="/assets/icons/plus.svg" mode="aspectFit" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
     <view class="search-wrap">
       <image class="search-icon" src="/assets/icons/search.svg" mode="aspectFit" />
-      <input class="search-input" placeholder="搜索群组名称" placeholder-style="color: #bbb" value="{{keyword}}" bindinput="onSearch" />
-    </view>
-    <view class="add-btn" bindtap="goCreate">
-      <image class="add-btn-img" src="/assets/icons/plus.svg" mode="aspectFit" />
+      <input
+        class="search-input"
+        placeholder="搜索群组名称"
+        placeholder-style="color: #bbb"
+        value="{{keyword}}"
+        bindinput="onSearch"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">×</text>
     </view>
   </view>
 
   <!-- 空态 -->
-  <view wx:if="{{groups.length === 0 && !loading}}" class="empty">
-    还没有加入任何群组，创建一个或输入邀请码加入
+  <view wx:if="{{filteredGroups.length === 0 && !loading}}" class="empty">
+    <view class="empty-icon">
+      <image class="empty-icon-img" src="/assets/icons/group.svg" mode="aspectFit" />
+    </view>
+    <view class="empty-text">{{keyword ? '没有找到相关群组' : '还没有加入任何群组'}}</view>
+    <view class="empty-sub" wx:if="{{!keyword}}">创建一个群组，邀请群友一起聚餐</view>
+    <view class="empty-actions" wx:if="{{!keyword}}">
+      <button class="empty-btn primary" bindtap="goCreate">创建群组</button>
+      <button class="empty-btn secondary" bindtap="goJoin">输入邀请码</button>
+    </view>
   </view>
 
   <!-- 群组列表 -->
-  <view class="group-list">
+  <scroll-view class="group-list" scroll-y>
     <view
       wx:for="{{filteredGroups}}"
       wx:key="id"
       class="group-card"
+      hover-class="group-card-hover"
       data-id="{{item.id}}"
       bindtap="goDetail"
     >
@@ -28,15 +51,13 @@
       <view wx:else class="group-avatar-text">{{item.name[0]}}</view>
       <view class="group-info">
         <view class="group-name">{{item.name}}</view>
-        <view class="group-meta">{{item.member_count}} 位成员</view>
+        <view class="group-meta">{{item.member_count}} 人 · 邀请码 {{item.invite_code}}</view>
       </view>
-      <view class="manage-btn" catchtap="goDetail" data-id="{{item.id}}">管理 ›</view>
+      <view class="manage-btn" catchtap="goDetail" data-id="{{item.id}}">
+        管理
+        <image class="manage-arrow" src="/assets/icons/location-arrow.svg" mode="aspectFit" />
+      </view>
     </view>
-  </view>
-
-  <!-- 底部入口 -->
-  <view class="footer">
-    <button class="btn primary" bindtap="goCreate">创建群组</button>
-    <button class="btn secondary" bindtap="goJoin">输入邀请码加入</button>
-  </view>
+    <view class="list-bottom-space"></view>
+  </scroll-view>
 </view>

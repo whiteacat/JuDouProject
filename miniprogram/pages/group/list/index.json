@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "我的群组"
+  "navigationStyle": "custom",
+  "usingComponents": {}
 }
