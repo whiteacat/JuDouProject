@@ -15,10 +15,9 @@
 }
 
 .nav-row {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 88rpx;
   padding: 0 32rpx;
 }
 
@@ -29,6 +28,9 @@
 }
 
 .nav-add {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;

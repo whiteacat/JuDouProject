@@ -15,6 +15,9 @@ interface GroupItem {
 Page({
   data: {
     statusBarHeight: 20,
+    navHeight: 44,
+    // 胶囊按钮位置：+ 号按钮右边界与胶囊左边对齐，避免重叠
+    addRightOffset: 170,
     groups: [] as GroupItem[],
     filteredGroups: [] as GroupItem[],
     keyword: '',
@@ -23,7 +26,17 @@ Page({
 
   onLoad() {
     const sysInfo = wx.getSystemInfoSync()
-    this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 })
+    let addRightOffset = 170
+    let navHeight = 44
+    try {
+      const menu = wx.getMenuButtonBoundingClientRect()
+      // 导航内容区高度与胶囊一致，+ 号距右侧 = 胶囊左边界到屏幕右缘 + 16rpx 间距
+      navHeight = menu.height
+      addRightOffset = Math.round(menu.right - menu.left + 8)
+    } catch (e) {
+      // 忽略，使用默认值
+    }
+    this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20, navHeight, addRightOffset })
   },
 
   onShow() {

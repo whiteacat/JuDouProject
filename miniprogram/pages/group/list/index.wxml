@@ -1,9 +1,9 @@
 <view class="page">
-  <!-- 自定义导航栏 -->
+  <!-- 自定义导航栏：避开右上角胶囊按钮 -->
   <view class="nav-bar" style="padding-top: {{statusBarHeight}}px;">
-    <view class="nav-row">
+    <view class="nav-row" style="height: {{navHeight}}px;">
       <view class="nav-title">我的群组</view>
-      <view class="nav-add" bindtap="goCreate">
+      <view class="nav-add" style="right: {{addRightOffset}}px;" bindtap="goCreate">
         <image class="nav-add-img" src="/assets/icons/plus.svg" mode="aspectFit" />
       </view>
     </view>
