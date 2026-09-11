@@ -78,6 +78,22 @@
     </view>
 
     <view class="field">
+      <view class="label">人均预算</view>
+      <view class="budget-row">
+        <input
+          class="input budget-input"
+          type="digit"
+          placeholder="选填，如 88"
+          placeholder-style="color: #bbb"
+          value="{{budget}}"
+          bindinput="onBudgetInput"
+          maxlength="8"
+        />
+        <text class="budget-unit">元/人</text>
+      </view>
+    </view>
+
+    <view class="field">
       <view class="label">参与人数</view>
       <view class="member-row">
         <text class="member-label">最少</text>

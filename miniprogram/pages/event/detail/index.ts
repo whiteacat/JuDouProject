@@ -17,6 +17,7 @@ interface EventDetail {
   title: string
   cover_url: string | null
   cover_src?: string
+  budget?: number | null
   event_time: string
   time_display?: string
   status: string

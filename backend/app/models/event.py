@@ -48,6 +48,8 @@ class GroupEvent(Base):
     title: Mapped[str] = mapped_column(String(64))
     # 封面图：仅允许预设白名单（preset://cover/X），不允许用户上传
     cover_url: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    # 人均预算（元），可空
+    budget: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
     event_time: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
     min_members: Mapped[int] = mapped_column(Integer, default=1)
     max_members: Mapped[int] = mapped_column(Integer)

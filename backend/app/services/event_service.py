@@ -217,6 +217,7 @@ async def create_event(
         restaurant_id=restaurant_id,
         title=payload["title"],
         cover_url=cover_service.validate_cover_url(payload.get("cover_url")),
+        budget=payload.get("budget"),
         event_time=event_time,
         min_members=min_members,
         max_members=max_members,

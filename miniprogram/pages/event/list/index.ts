@@ -11,10 +11,12 @@ interface EventItem {
   max_members: number
   restaurant: { id: number; name: string } | null
   cover_url?: string
+  budget?: number | null
   time_display?: string
   status_text?: string
   category?: string
   cover_src?: string
+  budget_text?: string
 }
 
 const TABS = ['推荐', '聚餐', '游玩', '约会', '其他']
@@ -110,6 +112,7 @@ Page({
         status_text: statusTextOf(e.status),
         category: categoryOf(e.title),
         cover_src: resolveCoverSrc(e.cover_url),
+        budget_text: e.budget != null ? `¥${e.budget}/人` : '',
       }))
       this.allEvents = all
       this.applyFilter()

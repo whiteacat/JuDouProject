@@ -161,6 +161,23 @@
   color: #333;
 }
 
+/* 人均预算输入行 */
+.budget-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.budget-input {
+  flex: 1;
+}
+
+.budget-unit {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #666;
+}
+
 .textarea {
   width: 100%;
   font-size: 28rpx;

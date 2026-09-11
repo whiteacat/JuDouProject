@@ -41,6 +41,7 @@
         <!-- 标题行 -->
         <view class="card-header">
           <view class="card-title">{{item.title}}</view>
+          <view class="card-budget" wx:if="{{item.budget_text}}">{{item.budget_text}}</view>
           <view class="card-status">{{item.status_text}}</view>
         </view>
 

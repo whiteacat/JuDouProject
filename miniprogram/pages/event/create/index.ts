@@ -71,6 +71,8 @@ Page({
     coverSrc: '',
     presetCovers: PRESET_COVERS,
     coverLocked: false,
+    // 人均预算（元），可空
+    budget: '',
     // 标签
     selectedTags: [] as string[],
     // 失效策略
@@ -153,6 +155,10 @@ Page({
   onCoverSelect(e: WechatMiniprogram.TouchEvent) {
     const key = e.currentTarget.dataset.key as string
     this.setData({ coverUrl: key, coverSrc: resolveCoverSrc(key), coverLocked: true })
+  },
+
+  onBudgetInput(e: WechatMiniprogram.Input) {
+    this.setData({ budget: e.detail.value })
   },
 
   onRemarkInput(e: WechatMiniprogram.Input) {
@@ -346,11 +352,22 @@ Page({
     if (windowEnabled && windows === null) {
       return
     }
+    // 人均预算：可空，填写时必须是合法数字
+    const budgetRaw = (this.data.budget || '').trim()
+    let budget: number | null = null
+    if (budgetRaw) {
+      budget = Number(budgetRaw)
+      if (!Number.isFinite(budget) || budget < 0) {
+        wx.showToast({ title: '人均预算格式不正确', icon: 'none' })
+        return
+      }
+    }
     this.setData({ submitting: true })
     try {
       const payload: Record<string, unknown> = {
         title: title.trim(),
         cover_url: this.data.coverUrl || defaultCoverOf(title.trim()),
+        budget,
         event_time: `${date}T${time}:00+08:00`,
         min_members: minMembers,
         max_members: maxMembers,
