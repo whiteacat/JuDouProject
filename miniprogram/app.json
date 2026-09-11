@@ -54,6 +54,6 @@
       "desc": "用于在地图上显示你的位置并查找附近餐厅"
     }
   },
-  "requiredPrivateInfos": ["getLocation"],
+  "requiredPrivateInfos": ["getLocation", "chooseLocation"],
   "sitemapLocation": "sitemap.json"
 }

@@ -1,5 +1,5 @@
 // 组队创建页：可从群组主页（无餐厅）或地图餐厅弹层（携带餐厅）进入
-import { post } from '../../../utils/request'
+import { get, post } from '../../../utils/request'
 import { PRESET_COVERS, defaultCoverOf, resolveCoverSrc } from '../../../utils/cover'
 
 /** 安全解码 URL 参数：onLoad 拿到的 query 参数是 encodeURIComponent 编码后的原样值。 */
@@ -73,6 +73,12 @@ Page({
     coverLocked: false,
     // 人均预算（元），可空
     budget: '',
+    // 地点选择面板状态
+    showLocPanel: false,
+    locKeyword: '',
+    locSearching: false,
+    locSearched: false,
+    locResults: [] as Array<{ id: number; name: string; address?: string; latitude: number; longitude: number }>,
     // 标签
     selectedTags: [] as string[],
     // 失效策略
@@ -159,6 +165,86 @@ Page({
 
   onBudgetInput(e: WechatMiniprogram.Input) {
     this.setData({ budget: e.detail.value })
+  },
+
+  /* ===== 地点选择面板 ===== */
+
+  onPickLocation() {
+    this.setData({ showLocPanel: true, locSearched: false, locResults: [] })
+  },
+
+  onCancelLocPanel() {
+    this.setData({ showLocPanel: false })
+  },
+
+  onLocKeywordInput(e: WechatMiniprogram.Input) {
+    this.setData({ locKeyword: e.detail.value })
+  },
+
+  /** 搜索库内餐厅 */
+  async onSearchRestaurant() {
+    const keyword = (this.data.locKeyword || '').trim()
+    if (!keyword) {
+      wx.showToast({ title: '请输入餐厅名称', icon: 'none' })
+      return
+    }
+    this.setData({ locSearching: true })
+    try {
+      const results = await get<Array<{ id: number; name: string; address?: string; latitude: number; longitude: number }>>(
+        '/restaurants/search',
+        {
+          keyword,
+          // 当前无定位时省略坐标参数，由后端按默认范围搜索
+          ...(this.data.lat != null && this.data.lng != null
+            ? { latitude: this.data.lat, longitude: this.data.lng }
+            : {}),
+          radius: 5000
+        }
+      )
+      this.setData({ locResults: results, locSearched: true })
+    } catch (err) {
+      console.error('搜索餐厅失败', err)
+      wx.showToast({ title: '搜索失败', icon: 'none' })
+    } finally {
+      this.setData({ locSearching: false })
+    }
+  },
+
+  /** 选中库内餐厅：绑定 restaurant_id */
+  onSelectRestaurant(e: WechatMiniprogram.TouchEvent) {
+    const { id, name } = e.currentTarget.dataset
+    const lat = Number(e.currentTarget.dataset.lat)
+    const lng = Number(e.currentTarget.dataset.lng)
+    this.setData({
+      restaurantId: Number(id) || null,
+      restaurantName: String(name || ''),
+      lat: lat || null,
+      lng: lng || null,
+      showLocPanel: false
+    })
+  },
+
+  /** 地图选点：不绑定餐厅，仅记录自定义坐标（名称用选点地址） */
+  onChooseOnMap() {
+    wx.chooseLocation({
+      latitude: this.data.lat || undefined,
+      longitude: this.data.lng || undefined,
+      success: (res) => {
+        this.setData({
+          restaurantId: null,
+          restaurantName: res.name || res.address || '自定义地点',
+          lat: res.latitude,
+          lng: res.longitude,
+          showLocPanel: false
+        })
+      },
+      fail: (err) => {
+        // 用户取消选点不算错误
+        if (err?.errMsg?.includes('cancel')) return
+        console.error('地图选点失败', err)
+        wx.showToast({ title: '未授权位置权限，无法选点', icon: 'none' })
+      }
+    })
   },
 
   onRemarkInput(e: WechatMiniprogram.Input) {

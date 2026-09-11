@@ -61,8 +61,48 @@
 
     <view class="field">
       <view class="label">选择地点</view>
-      <view class="picker-value placeholder" wx:if="{{!restaurantName}}">请选择餐厅或地点</view>
-      <view class="picker-value" wx:else>{{restaurantName}}</view>
+      <view class="picker-value {{restaurantName ? '' : 'placeholder'}}" bindtap="onPickLocation">
+        {{restaurantName || '请选择餐厅或地点'}}
+        <text class="picker-arrow">❯</text>
+      </view>
+      <!-- 地点选择方式面板 -->
+      <view class="loc-sheet-mask" wx:if="{{showLocPanel}}" bindtap="onCancelLocPanel"></view>
+      <view class="loc-sheet" wx:if="{{showLocPanel}}">
+        <view class="loc-sheet-title">选择组队地点</view>
+        <view class="loc-search-row">
+          <input
+            class="loc-search-input"
+            placeholder="搜索餐厅名称"
+            placeholder-style="color: #bbb"
+            value="{{locKeyword}}"
+            bindinput="onLocKeywordInput"
+            bindconfirm="onSearchRestaurant"
+            confirm-type="search"
+          />
+          <button class="loc-search-btn" size="mini" bindtap="onSearchRestaurant" disabled="{{locSearching}}">
+            {{locSearching ? '搜索中' : '搜索'}}
+          </button>
+        </view>
+        <scroll-view class="loc-results" scroll-y wx:if="{{locResults.length > 0}}">
+          <view
+            class="loc-result-item"
+            wx:for="{{locResults}}"
+            wx:key="id"
+            hover-class="loc-result-hover"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}"
+            data-lat="{{item.latitude}}"
+            data-lng="{{item.longitude}}"
+            bindtap="onSelectRestaurant"
+          >
+            <view class="loc-result-name">{{item.name}}</view>
+            <view class="loc-result-addr" wx:if="{{item.address}}">{{item.address}}</view>
+          </view>
+        </scroll-view>
+        <view class="loc-empty" wx:elif="{{locSearched}}">未找到相关餐厅</view>
+        <button class="loc-map-btn" bindtap="onChooseOnMap">📍 在地图上选点</button>
+        <button class="loc-cancel" bindtap="onCancelLocPanel">取消</button>
+      </view>
     </view>
 
     <view class="field">
