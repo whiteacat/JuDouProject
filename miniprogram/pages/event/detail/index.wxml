@@ -1,7 +1,7 @@
 <view class="container" wx:if="{{event}}">
   <!-- 顶部封面区 -->
   <view class="cover-section">
-    <image class="cover-img" src="{{event.cover_url || '/assets/icons/default-cover.png'}}" mode="aspectFill" />
+    <image class="cover-img" src="{{event.cover_src || '/assets/activity_cover_assets/activity_cover_01.png'}}" mode="aspectFill" />
     <view class="cover-overlay"></view>
     <view class="cover-actions">
       <view class="action-icon" bindtap="onShare">
@@ -11,12 +11,15 @@
         <image class="action-icon-img" src="/assets/icons/star.svg" mode="aspectFit" />
       </view>
     </view>
+    <!-- 封面下方叠加标题 -->
+    <view class="cover-title-bar">
+      <view class="cover-title">{{event.title}}</view>
+      <view class="cover-status">{{statusText}}</view>
+    </view>
   </view>
 
   <!-- 核心信息卡片 -->
   <view class="info-card">
-    <view class="card-tag">{{event.category || '聚餐'}}</view>
-    <view class="info-title">{{event.title}}</view>
     <view class="info-meta">
       <view class="meta-item">
         <image class="meta-icon" src="/assets/icons/map-pin.svg" mode="aspectFit" />{{event.restaurant ? event.restaurant.name : '待定'}}

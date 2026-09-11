@@ -31,6 +31,27 @@
     </view>
   </view>
 
+  <!-- 封面图选择（按主题默认，可更换，不可上传） -->
+  <view class="form-card">
+    <view class="label">封面图</view>
+    <view class="cover-preview">
+      <image class="cover-preview-img" src="{{coverSrc}}" mode="aspectFill" />
+      <view class="cover-preview-tag">仅支持预设封面</view>
+    </view>
+    <scroll-view class="cover-list" scroll-x enhanced show-scrollbar="{{false}}">
+      <view
+        wx:for="{{presetCovers}}"
+        wx:key="key"
+        class="cover-item {{coverUrl === item.key ? 'active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="onCoverSelect"
+      >
+        <image class="cover-item-img" src="{{item.image}}" mode="aspectFill" />
+        <view wx:if="{{coverUrl === item.key}}" class="cover-item-check">✓</view>
+      </view>
+    </scroll-view>
+  </view>
+
   <!-- 基本信息 -->
   <view class="form-card">
     <view class="field">

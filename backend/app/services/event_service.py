@@ -15,6 +15,7 @@ from app.models.event_member import EventMember, EventMemberStatus
 from app.models.member import GroupMember
 from app.models.restaurant import Restaurant
 from app.models.user import User
+from app.services import cover as cover_service
 from app.services import group_restaurant_service
 
 EVENT_NOT_FOUND = "组队不存在或无权访问"
@@ -215,6 +216,7 @@ async def create_event(
         creator_id=user_id,
         restaurant_id=restaurant_id,
         title=payload["title"],
+        cover_url=cover_service.validate_cover_url(payload.get("cover_url")),
         event_time=event_time,
         min_members=min_members,
         max_members=max_members,

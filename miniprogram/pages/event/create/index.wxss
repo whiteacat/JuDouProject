@@ -62,6 +62,78 @@
   font-weight: 500;
 }
 
+/* 封面图选择 */
+.cover-preview {
+  position: relative;
+  width: 100%;
+  height: 300rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+
+.cover-preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+.cover-preview-tag {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 6rpx 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.45);
+  border-top-left-radius: 12rpx;
+}
+
+.cover-list {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.cover-item {
+  position: relative;
+  display: inline-block;
+  width: 220rpx;
+  margin-right: 16rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  border: 4rpx solid transparent;
+  vertical-align: top;
+  transition: all 0.2s;
+}
+
+.cover-item:last-child {
+  margin-right: 0;
+}
+
+.cover-item.active {
+  border-color: #ff6b35;
+}
+
+.cover-item-img {
+  width: 220rpx;
+  height: 90rpx;
+  display: block;
+}
+
+.cover-item-check {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* 表单卡片 */
 .form-card {
   background: #fff;

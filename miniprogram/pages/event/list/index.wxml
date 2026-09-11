@@ -32,9 +32,14 @@
       bindtap="goDetail"
     >
       <view class="card-body">
+        <!-- 封面图 -->
+        <view class="card-cover">
+          <image class="cover-img" src="{{item.cover_src}}" mode="aspectFill" />
+          <view class="card-tag">{{item.category}}</view>
+        </view>
+
         <!-- 标题行 -->
         <view class="card-header">
-          <view class="card-tag" wx:if="{{item.category}}">{{item.category}}</view>
           <view class="card-title">{{item.title}}</view>
           <view class="card-status">{{item.status_text}}</view>
         </view>

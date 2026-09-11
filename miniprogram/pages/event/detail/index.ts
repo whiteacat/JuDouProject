@@ -1,6 +1,7 @@
 // 组队详情页：信息、餐厅、成员、操作栏
 import { get, post } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
+import { resolveCoverSrc } from '../../../utils/cover'
 
 interface RestaurantBrief {
   id: number
@@ -14,6 +15,8 @@ interface EventDetail {
   group_id: number
   creator_id: number
   title: string
+  cover_url: string | null
+  cover_src?: string
   event_time: string
   time_display?: string
   status: string
@@ -562,7 +565,7 @@ Page({
       const full = { ...event, time_display: formatTime(event.event_time) }
       const overlap = buildOverlaps(members)
       this.setData({
-        event: { ...full, expiry_display: expiryDisplayOf(full) },
+        event: { ...full, expiry_display: expiryDisplayOf(full), cover_src: resolveCoverSrc(full.cover_url) },
         members: members.map((m) => ({ ...m, short: m.nickname ? m.nickname[0] : '?', avatar_src: resolveAvatarSrc(m.avatar_url || '') })),
         userId,
         joined,

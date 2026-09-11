@@ -1,5 +1,6 @@
 // 组队创建页：可从群组主页（无餐厅）或地图餐厅弹层（携带餐厅）进入
 import { post } from '../../../utils/request'
+import { PRESET_COVERS, defaultCoverOf, resolveCoverSrc } from '../../../utils/cover'
 
 /** 安全解码 URL 参数：onLoad 拿到的 query 参数是 encodeURIComponent 编码后的原样值。 */
 function safeDecode(value: string): string {
@@ -65,6 +66,11 @@ Page({
     submitting: false,
     // 活动类型
     category: '聚餐',
+    // 封面图（仅预设，不可上传）：key 为 preset://cover/X，coverSrc 为展示用本地路径
+    coverUrl: '',
+    coverSrc: '',
+    presetCovers: PRESET_COVERS,
+    coverLocked: false,
     // 标签
     selectedTags: [] as string[],
     // 失效策略
@@ -108,10 +114,18 @@ Page({
       expiryDate: `${expiryDate.getFullYear()}-${pad(expiryDate.getMonth() + 1)}-${pad(expiryDate.getDate())}`,
       expiryTime: time
     })
+    // 封面按主题（标题/类型）取默认值，可手动更换
+    this.applyDefaultCover()
     // 未指定餐厅且未携带坐标时，尝试用当前位置作为组队地点（否则组队不会显示在地图上）
     if (!restaurantId && (!lat || !lng)) {
       this.locateForEvent()
     }
+  },
+
+  /** 按当前标题（或类型）设置默认封面。用户手动选择后不再自动覆盖。 */
+  applyDefaultCover() {
+    const key = defaultCoverOf(this.data.title || this.data.category)
+    this.setData({ coverUrl: key, coverSrc: resolveCoverSrc(key), coverLocked: false })
   },
 
   locateForEvent() {
@@ -127,7 +141,18 @@ Page({
   },
 
   onTitleInput(e: WechatMiniprogram.Input) {
-    this.setData({ title: e.detail.value })
+    const title = e.detail.value
+    this.setData({ title })
+    // 标题变化时按新主题刷新默认封面（用户手动选过则不覆盖）
+    if (!this.data.coverLocked) {
+      const key = defaultCoverOf(title || this.data.category)
+      this.setData({ coverUrl: key, coverSrc: resolveCoverSrc(key) })
+    }
+  },
+
+  onCoverSelect(e: WechatMiniprogram.TouchEvent) {
+    const key = e.currentTarget.dataset.key as string
+    this.setData({ coverUrl: key, coverSrc: resolveCoverSrc(key), coverLocked: true })
   },
 
   onRemarkInput(e: WechatMiniprogram.Input) {
@@ -160,6 +185,11 @@ Page({
   onCategoryChange(e: WechatMiniprogram.TouchEvent) {
     const cat = e.currentTarget.dataset.cat as string
     this.setData({ category: cat })
+    // 切换类型时若用户未手动选过封面，按类型刷新默认封面
+    if (!this.data.coverLocked) {
+      const key = defaultCoverOf(this.data.title || cat)
+      this.setData({ coverUrl: key, coverSrc: resolveCoverSrc(key) })
+    }
   },
 
   onAddTag() {
@@ -320,6 +350,7 @@ Page({
     try {
       const payload: Record<string, unknown> = {
         title: title.trim(),
+        cover_url: this.data.coverUrl || defaultCoverOf(title.trim()),
         event_time: `${date}T${time}:00+08:00`,
         min_members: minMembers,
         max_members: maxMembers,

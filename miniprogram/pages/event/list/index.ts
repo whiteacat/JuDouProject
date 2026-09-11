@@ -1,5 +1,6 @@
 // 群组活动列表页：带分类筛选（聚餐/游玩/约会/其他），数据来自当前群组
 import { get } from '../../../utils/request'
+import { resolveCoverSrc } from '../../../utils/cover'
 
 interface EventItem {
   id: number
@@ -9,9 +10,11 @@ interface EventItem {
   current_members: number
   max_members: number
   restaurant: { id: number; name: string } | null
+  cover_url?: string
   time_display?: string
   status_text?: string
   category?: string
+  cover_src?: string
 }
 
 const TABS = ['推荐', '聚餐', '游玩', '约会', '其他']
@@ -106,6 +109,7 @@ Page({
         time_display: formatTime(e.event_time),
         status_text: statusTextOf(e.status),
         category: categoryOf(e.title),
+        cover_src: resolveCoverSrc(e.cover_url),
       }))
       this.allEvents = all
       this.applyFilter()

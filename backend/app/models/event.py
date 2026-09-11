@@ -46,6 +46,8 @@ class GroupEvent(Base):
     creator_id: Mapped[int] = mapped_column(BigInteger)
     restaurant_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     title: Mapped[str] = mapped_column(String(64))
+    # 封面图：仅允许预设白名单（preset://cover/X），不允许用户上传
+    cover_url: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     event_time: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
     min_members: Mapped[int] = mapped_column(Integer, default=1)
     max_members: Mapped[int] = mapped_column(Integer)

@@ -54,6 +54,9 @@ def _validate_window_list(windows: list[TimeWindow]):
 
 class EventCreate(BaseModel):
     title: str = Field(min_length=1, max_length=64, description="组队标题")
+    cover_url: Optional[str] = Field(
+        default=None, max_length=64, description="封面图（仅预设白名单，不可上传）"
+    )
     restaurant_id: Optional[int] = Field(default=None, description="指定餐厅（可空）")
     event_time: dt.datetime = Field(description="聚餐时间")
     min_members: int = Field(default=1, ge=1, le=100)
@@ -120,6 +123,7 @@ class EventOut(BaseModel):
     group_id: int
     creator_id: int
     title: str
+    cover_url: Optional[str] = None
     event_time: dt.datetime
     status: str
     min_members: int
