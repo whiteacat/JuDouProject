@@ -236,8 +236,11 @@ Page({
   },
 
   onBallTouchEnd() {
-    // 松手后吸附到较近的左右边缘
-    if (!this._ballMoved) return
+    // 未拖动视为点击：展开快捷栏；拖动则吸附到较近的左右边缘
+    if (!this._ballMoved) {
+      this.setData({ quickCollapsed: false })
+      return
+    }
     const { w } = this._screenInfo
     const midX = (w - this.BALL_SIZE) / 2
     const targetX = this.data.ballX < midX ? this.BALL_MARGIN : w - this.BALL_SIZE - this.BALL_MARGIN
