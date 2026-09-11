@@ -234,7 +234,19 @@ Page({
   },
 
   onKeywordInput(e: WechatMiniprogram.Input) {
-    this.setData({ keyword: e.detail.value })
+    const keyword = e.detail.value
+    this.setData({ keyword })
+    // 关键字被清空时自动收起结果面板
+    if (!keyword.trim() && this.data.showResults) {
+      this.setData({ showResults: false, results: [] })
+    }
+  },
+
+  /** 点击地图空白处：收起搜索结果 */
+  onMapTap() {
+    if (this.data.showResults) {
+      this.setData({ showResults: false })
+    }
   },
 
   async onSearch() {

@@ -81,20 +81,24 @@
   border: none;
 }
 
-/* 搜索结果面板 */
+/* 搜索结果面板：头部固定 + 列表区滚动 */
 .results-panel {
   position: absolute;
   left: 24rpx;
   right: 24rpx;
   top: 200rpx;
   max-height: 45vh;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 16rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
   z-index: 12;
+  overflow: hidden;
 }
 
 .results-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -108,8 +112,15 @@
 }
 
 .results-close {
+  padding: 8rpx 16rpx;
+  margin-right: -8rpx;
   font-size: 26rpx;
   color: #ff6b35;
+}
+
+.results-list {
+  flex: 1;
+  min-height: 0;
 }
 
 .result-item {

@@ -7,6 +7,7 @@
     markers="{{markers}}"
     show-location
     bindmarkertap="onMarkerTap"
+    bindmaptap="onMapTap"
   />
 
   <!-- 顶部标题栏 -->
@@ -32,30 +33,32 @@
     <button class="search-btn" bindtap="onSearch" disabled="{{searching}}">搜索</button>
   </view>
 
-  <!-- 搜索结果列表（活动 + 餐厅混合） -->
-  <scroll-view wx:if="{{showResults && results.length > 0}}" class="results-panel" scroll-y>
+  <!-- 搜索结果列表（活动 + 餐厅混合）：头部固定，列表可滚动，支持点地图/收起/清空关键字关闭 -->
+  <view wx:if="{{showResults && results.length > 0}}" class="results-panel">
     <view class="results-header">
       <text class="results-count">共 {{results.length}} 条结果</text>
-      <text class="results-close" bindtap="hideResults">收起</text>
+      <view class="results-close" bindtap="hideResults">收起 ✕</view>
     </view>
-    <view
-      class="result-item"
-      wx:for="{{results}}"
-      wx:key="id"
-      data-id="{{item.id}}"
-      data-type="{{item.type}}"
-      bindtap="onResultTap"
-    >
-      <view class="result-top">
-        <view class="result-name">
-          <text class="result-type {{item.type}}">{{item.type === 'event' ? '活动' : '餐厅'}}</text>
-          {{item.name}}
+    <scroll-view class="results-list" scroll-y>
+      <view
+        class="result-item"
+        wx:for="{{results}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        data-type="{{item.type}}"
+        bindtap="onResultTap"
+      >
+        <view class="result-top">
+          <view class="result-name">
+            <text class="result-type {{item.type}}">{{item.type === 'event' ? '活动' : '餐厅'}}</text>
+            {{item.name}}
+          </view>
+          <view class="result-dist" wx:if="{{item.distance_text}}">{{item.distance_text}}</view>
         </view>
-        <view class="result-dist" wx:if="{{item.distance_text}}">{{item.distance_text}}</view>
+        <view class="result-meta" wx:if="{{item.sub}}">{{item.sub}}</view>
       </view>
-      <view class="result-meta" wx:if="{{item.sub}}">{{item.sub}}</view>
-    </view>
-  </scroll-view>
+    </scroll-view>
+  </view>
 
   <!-- 底部快捷入口卡片 -->
   <view class="quick-bar">
