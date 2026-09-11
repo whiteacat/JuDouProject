@@ -60,31 +60,36 @@
     </scroll-view>
   </view>
 
-  <!-- 底部快捷入口卡片 -->
-  <view class="quick-bar">
-    <view class="quick-item" bindtap="goCategory" data-category="聚餐">
-      <view class="quick-icon quick-icon-eat">
-        <image class="quick-icon-img" src="/assets/icons/restaurant.svg" mode="aspectFit" />
-      </view>
-      <text class="quick-label">聚餐</text>
+  <!-- 底部快捷入口卡片：可收起，避免遮挡地图 -->
+  <view class="quick-bar {{quickCollapsed ? 'collapsed' : ''}}">
+    <view class="quick-toggle" bindtap="toggleQuickBar">
+      <text class="quick-toggle-text">{{quickCollapsed ? '快捷入口 ▲' : '收起 ▼'}}</text>
     </view>
-    <view class="quick-item" bindtap="goCategory" data-category="游玩">
-      <view class="quick-icon quick-icon-play">
-        <image class="quick-icon-img" src="/assets/icons/travel.svg" mode="aspectFit" />
+    <view class="quick-items" wx:if="{{!quickCollapsed}}">
+      <view class="quick-item" bindtap="goCategory" data-category="聚餐">
+        <view class="quick-icon quick-icon-eat">
+          <image class="quick-icon-img" src="/assets/icons/restaurant.svg" mode="aspectFit" />
+        </view>
+        <text class="quick-label">聚餐</text>
       </view>
-      <text class="quick-label">游玩</text>
-    </view>
-    <view class="quick-item" bindtap="goCategory" data-category="约会">
-      <view class="quick-icon quick-icon-date">
-        <image class="quick-icon-img" src="/assets/icons/heart.svg" mode="aspectFit" />
+      <view class="quick-item" bindtap="goCategory" data-category="游玩">
+        <view class="quick-icon quick-icon-play">
+          <image class="quick-icon-img" src="/assets/icons/travel.svg" mode="aspectFit" />
+        </view>
+        <text class="quick-label">游玩</text>
       </view>
-      <text class="quick-label">约会</text>
-    </view>
-    <view class="quick-item" bindtap="goCreateEvent">
-      <view class="quick-icon quick-icon-team">
-        <image class="quick-icon-img" src="/assets/icons/users.svg" mode="aspectFit" />
+      <view class="quick-item" bindtap="goCategory" data-category="约会">
+        <view class="quick-icon quick-icon-date">
+          <image class="quick-icon-img" src="/assets/icons/heart.svg" mode="aspectFit" />
+        </view>
+        <text class="quick-label">约会</text>
       </view>
-      <text class="quick-label">组队</text>
+      <view class="quick-item" bindtap="goCreateEvent">
+        <view class="quick-icon quick-icon-team">
+          <image class="quick-icon-img" src="/assets/icons/users.svg" mode="aspectFit" />
+        </view>
+        <text class="quick-label">组队</text>
+      </view>
     </view>
   </view>
 

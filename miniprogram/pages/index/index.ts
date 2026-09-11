@@ -127,7 +127,9 @@ Page({
     groupNames: [] as string[],
     groupIndex: -1,
     currentGroup: null as GroupItem | null,
-    eventStatusText: ''
+    eventStatusText: '',
+    // 底部快捷入口是否收起（收起后地图视野更大）
+    quickCollapsed: false
   },
 
   restaurantMarkers: [] as Marker[],
@@ -181,6 +183,11 @@ Page({
 
   goGroupList() {
     wx.switchTab({ url: '/pages/group/list/index' })
+  },
+
+  /** 收起/展开底部快捷入口 */
+  toggleQuickBar() {
+    this.setData({ quickCollapsed: !this.data.quickCollapsed })
   },
 
   async loadEvents() {
