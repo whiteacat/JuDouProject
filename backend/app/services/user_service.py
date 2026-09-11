@@ -60,8 +60,9 @@ async def update_user_profile(
     user: User,
     nickname: Optional[str] = None,
     avatar_url: Optional[str] = None,
+    signature: Optional[str] = None,
 ) -> User:
-    """修改用户昵称/头像，含敏感词校验。
+    """修改用户昵称/头像/个性签名，含敏感词校验。
 
     Raises:
         ProfileUpdateError: 校验不通过时抛出。
@@ -81,6 +82,14 @@ async def update_user_profile(
             raise ProfileUpdateError("头像 URL 过长")
         if avatar_url != user.avatar_url:
             user.avatar_url = avatar_url
+            changed = True
+
+    if signature is not None:
+        signature = signature.strip()
+        if len(signature) > 100:
+            raise ProfileUpdateError("个性签名最长 100 字")
+        if signature != (user.signature or ""):
+            user.signature = signature or None
             changed = True
 
     if changed:

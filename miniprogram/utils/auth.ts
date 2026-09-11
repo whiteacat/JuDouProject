@@ -5,6 +5,7 @@ export interface UserProfile {
   id: number
   nickname: string
   avatar_url: string
+  signature?: string | null
 }
 
 export interface LoginResponse {

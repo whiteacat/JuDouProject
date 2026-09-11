@@ -29,12 +29,13 @@ async def update_me(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    """修改当前用户的昵称/头像。"""
+    """修改当前用户的昵称/头像/个性签名。"""
     try:
         return await update_user_profile(
             db, current_user,
             nickname=body.nickname,
             avatar_url=body.avatar_url,
+            signature=body.signature,
         )
     except ProfileUpdateError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message) from e

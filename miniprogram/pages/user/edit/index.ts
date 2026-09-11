@@ -43,6 +43,7 @@ Page({
         avatarUrl: profile.avatar_url || '',
         avatarSrc: resolveAvatarSrc(profile.avatar_url || ''),
         selectedPreset: isPreset ? profile.avatar_url : '',
+        signature: profile.signature || '',
       })
     }
   },
@@ -89,7 +90,7 @@ Page({
   },
 
   async onSave() {
-    const { nickname, avatarUrl } = this.data
+    const { nickname, avatarUrl, signature } = this.data
     if (!nickname.trim()) {
       wx.showToast({ title: '请输入昵称', icon: 'none' })
       return
@@ -105,6 +106,7 @@ Page({
       const user = await patch<UserProfile>('/users/me', {
         nickname: nickname.trim(),
         avatar_url: avatarUrl,
+        signature: (signature || '').trim(),
       })
       wx.setStorageSync('userInfo', user)
       wx.showToast({ title: '保存成功' })

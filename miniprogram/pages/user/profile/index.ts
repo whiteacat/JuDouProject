@@ -33,7 +33,7 @@ Page({
             ...profile,
             short: profile.nickname ? profile.nickname[0] : '聚',
             avatar_src: resolveAvatarSrc(profile.avatar_url || ''),
-            signature: '',
+            signature: profile.signature || '',
           }
         : null
     })

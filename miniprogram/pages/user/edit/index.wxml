@@ -51,10 +51,10 @@
       placeholder="介绍一下自己吧…"
       value="{{signature}}"
       bindinput="onSignatureInput"
-      maxlength="50"
+      maxlength="100"
       auto-height
     />
-    <view class="char-hint">{{s.len(signature)}}/50</view>
+    <view class="char-hint">{{s.len(signature)}}/100</view>
   </view>
 
   <!-- 我的偏好 -->
