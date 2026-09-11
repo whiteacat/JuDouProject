@@ -128,9 +128,19 @@ Page({
     groupIndex: -1,
     currentGroup: null as GroupItem | null,
     eventStatusText: '',
-    // 底部快捷入口是否收起（收起后地图视野更大）
-    quickCollapsed: false
+    // 底部快捷入口是否收起（收起后变为可拖动悬浮球）
+    quickCollapsed: false,
+    // 悬浮球位置（px），onReady 时按屏幕初始化
+    ballX: 0,
+    ballY: 0
   },
+
+  // 悬浮球拖动状态（不参与渲染，不放在 data）
+  _ballStart: { x: 0, y: 0, ballX: 0, ballY: 0 },
+  _ballMoved: false,
+  _screenInfo: { w: 375, h: 667 },
+  BALL_SIZE: 52,
+  BALL_MARGIN: 12,
 
   restaurantMarkers: [] as Marker[],
   eventMarkers: [] as Marker[],
@@ -139,6 +149,11 @@ Page({
 
   onLoad() {
     this.locate()
+  },
+
+  onReady() {
+    const info = wx.getSystemInfoSync()
+    this._screenInfo = { w: info.windowWidth || 375, h: info.windowHeight || 667 }
   },
 
   onShow() {
@@ -185,9 +200,48 @@ Page({
     wx.switchTab({ url: '/pages/group/list/index' })
   },
 
-  /** 收起/展开底部快捷入口 */
+  /** 收起快捷栏为悬浮球 / 展开回快捷栏 */
   toggleQuickBar() {
-    this.setData({ quickCollapsed: !this.data.quickCollapsed })
+    if (!this.data.quickCollapsed) {
+      // 收起：把球放到快捷栏原位置附近（右侧中部）
+      const { h } = this._screenInfo
+      this.setData({
+        quickCollapsed: true,
+        ballX: this._screenInfo.w - this.BALL_SIZE - this.BALL_MARGIN,
+        ballY: Math.round(h * 0.55)
+      })
+    } else {
+      this.setData({ quickCollapsed: false })
+    }
+  },
+
+  onBallTouchStart(e: WechatMiniprogram.TouchEvent) {
+    const t = e.touches[0]
+    this._ballStart = { x: t.clientX, y: t.clientY, ballX: this.data.ballX, ballY: this.data.ballY }
+    this._ballMoved = false
+  },
+
+  onBallTouchMove(e: WechatMiniprogram.TouchEvent) {
+    const t = e.touches[0]
+    const dx = t.clientX - this._ballStart.x
+    const dy = t.clientY - this._ballStart.y
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      this._ballMoved = true
+    }
+    const maxX = this._screenInfo.w - this.BALL_SIZE - this.BALL_MARGIN
+    const maxY = this._screenInfo.h - this.BALL_SIZE - this.BALL_MARGIN
+    const ballX = Math.min(maxX, Math.max(this.BALL_MARGIN, this._ballStart.ballX + dx))
+    const ballY = Math.min(maxY, Math.max(this.BALL_MARGIN, this._ballStart.ballY + dy))
+    this.setData({ ballX, ballY })
+  },
+
+  onBallTouchEnd() {
+    // 松手后吸附到较近的左右边缘
+    if (!this._ballMoved) return
+    const { w } = this._screenInfo
+    const midX = (w - this.BALL_SIZE) / 2
+    const targetX = this.data.ballX < midX ? this.BALL_MARGIN : w - this.BALL_SIZE - this.BALL_MARGIN
+    this.setData({ ballX: targetX })
   },
 
   async loadEvents() {

@@ -183,45 +183,74 @@
   white-space: nowrap;
 }
 
-/* 底部快捷入口（可收起） */
+/* 底部快捷入口（横向布局 + 右侧收起按钮） */
 .quick-bar {
   position: absolute;
   bottom: calc(180rpx + env(safe-area-inset-bottom));
   left: 24rpx;
   right: 24rpx;
+  display: flex;
+  align-items: center;
   background: #fff;
   border-radius: 24rpx;
-  padding: 20rpx 16rpx 28rpx;
+  padding: 28rpx 16rpx;
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
   z-index: 10;
 }
 
-.quick-bar.collapsed {
-  padding: 0 16rpx;
+.quick-items {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
 }
 
-.quick-toggle {
+.quick-collapse-btn {
+  flex-shrink: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 16rpx 0;
-  font-size: 24rpx;
+  justify-content: center;
+  gap: 4rpx;
+  margin-left: 12rpx;
+  padding: 0 12rpx;
+  height: 100rpx;
+  border-left: 2rpx solid #f0f0f0;
   color: #999;
 }
 
-.quick-bar:not(.collapsed) .quick-toggle {
-  border-bottom: 2rpx solid #f5f5f5;
+.quick-collapse-arrow {
+  font-size: 24rpx;
 }
 
-.quick-toggle-text {
-  font-weight: 500;
+.quick-collapse-text {
+  font-size: 20rpx;
 }
 
-.quick-items {
+/* 收起后的可拖动悬浮球 */
+.quick-ball {
+  position: fixed;
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.95);
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 53, 0.4);
   display: flex;
-  justify-content: space-around;
-  padding-top: 8rpx;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rpx;
+  z-index: 15;
+}
+
+.quick-ball-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.quick-ball-text {
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 500;
 }
 
 .quick-item {

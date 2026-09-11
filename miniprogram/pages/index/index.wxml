@@ -60,12 +60,9 @@
     </scroll-view>
   </view>
 
-  <!-- 底部快捷入口卡片：可收起，避免遮挡地图 -->
-  <view class="quick-bar {{quickCollapsed ? 'collapsed' : ''}}">
-    <view class="quick-toggle" bindtap="toggleQuickBar">
-      <text class="quick-toggle-text">{{quickCollapsed ? '快捷入口 ▲' : '收起 ▼'}}</text>
-    </view>
-    <view class="quick-items" wx:if="{{!quickCollapsed}}">
+  <!-- 底部快捷入口卡片：可横向收起为悬浮球，悬浮球可拖动 -->
+  <view class="quick-bar" wx:if="{{!quickCollapsed}}">
+    <view class="quick-items">
       <view class="quick-item" bindtap="goCategory" data-category="聚餐">
         <view class="quick-icon quick-icon-eat">
           <image class="quick-icon-img" src="/assets/icons/restaurant.svg" mode="aspectFit" />
@@ -91,6 +88,23 @@
         <text class="quick-label">组队</text>
       </view>
     </view>
+    <view class="quick-collapse-btn" bindtap="toggleQuickBar">
+      <text class="quick-collapse-arrow">❯</text>
+      <text class="quick-collapse-text">收起</text>
+    </view>
+  </view>
+
+  <!-- 收起后的可拖动悬浮球：点击展开，拖动换位置，自动吸附左右边缘 -->
+  <view
+    wx:if="{{quickCollapsed}}"
+    class="quick-ball"
+    style="left: {{ballX}}px; top: {{ballY}}px;"
+    bindtouchstart="onBallTouchStart"
+    catchtouchmove="onBallTouchMove"
+    bindtouchend="onBallTouchEnd"
+  >
+    <image class="quick-ball-icon" src="/assets/icons/menu.svg" mode="aspectFit" />
+    <text class="quick-ball-text">快捷</text>
   </view>
 
   <!-- 餐厅详情弹层 -->
