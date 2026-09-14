@@ -18,9 +18,29 @@ from app.models.user import User
 from app.services import app_setting_service
 from app.services import cover as cover_service
 from app.services import group_restaurant_service
+from app.services.notification_service import notify
 
 EVENT_NOT_FOUND = "组队不存在或无权访问"
 GROUP_MEMBER_REQUIRED = "仅群组成员可操作"
+
+
+def _time_text(event: GroupEvent) -> str:
+    """通知文案用的时间格式：周X HH:mm。"""
+    d = event.event_time
+    weekdays = "一二三四五六日"
+    return f"周{weekdays[d.weekday()]} {d.strftime('%H:%M')}"
+
+
+def _event_notify_ctx(event: GroupEvent, restaurant: Restaurant | None) -> dict:
+    return {
+        "title": event.title,
+        "time_text": _time_text(event),
+        "location": restaurant.name if restaurant else "待定地点",
+    }
+
+
+def _member_ids(members) -> list[int]:
+    return [m.user_id for m in members]
 
 
 def _distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -385,6 +405,42 @@ async def join_event(
 
     if current + 1 >= event.max_members:
         event.status = EventStatus.CONFIRMED  # 满员自动确认
+        await db.flush()
+        # 通知所有已加入成员（含刚加入者）：活动已确认
+        m_result = await db.execute(
+            select(EventMember).where(
+                EventMember.event_id == event_id,
+                EventMember.status == EventMemberStatus.JOINED,
+            )
+        )
+        members = list(m_result.scalars().all())
+        actor = await db.get(User, user_id)
+        await notify(
+            db,
+            _member_ids(members),
+            "event_confirmed",
+            event=_event_notify_ctx(event, None),
+            actor_id=user_id,
+            actor_name=actor.nickname if actor else None,
+            target_id=event_id,
+        )
+    else:
+        # 通知活动创建者：新成员加入
+        switch = await app_setting_service.get_setting_bool(
+            db, "notify_member_join"
+        )
+        if switch == "true":
+            actor = await db.get(User, user_id)
+            await notify(
+                db,
+                [event.creator_id],
+                "member_joined",
+                event=_event_notify_ctx(event, None),
+                actor_id=user_id,
+                actor_name=actor.nickname if actor else None,
+                count_text=f"{current + 1}/{event.max_members}",
+                target_id=event_id,
+            )
     await db.commit()
     await db.refresh(event)
     return event
@@ -406,6 +462,23 @@ async def leave_event(db: AsyncSession, event_id: int, user_id: int) -> None:
     membership.status = EventMemberStatus.LEFT
     if event.status == EventStatus.CONFIRMED:
         event.status = EventStatus.RECRUITING  # 有人退出则回到招募中，允许他人加入
+    # 通知活动创建者：成员退出
+    switch = await app_setting_service.get_setting_bool(
+        db, "notify_member_join"
+    )
+    if switch == "true":
+        actor = await db.get(User, user_id)
+        remaining = await count_active_members(db, event_id)
+        await notify(
+            db,
+            [event.creator_id],
+            "member_left",
+            event=_event_notify_ctx(event, None),
+            actor_id=user_id,
+            actor_name=actor.nickname if actor else None,
+            count_text=f"{remaining}/{event.max_members}",
+            target_id=event_id,
+        )
     await db.commit()
 
 
@@ -426,10 +499,28 @@ async def complete_event(db: AsyncSession, event_id: int, user_id: int) -> None:
         await group_restaurant_service.record_visit(
             db, event.group_id, event.restaurant_id, event.completed_at
         )
+    # 通知全体参与成员：活动已完成，引导写评价
+    m_result = await db.execute(
+        select(EventMember).where(
+            EventMember.event_id == event_id,
+            EventMember.status == EventMemberStatus.JOINED,
+        )
+    )
+    members = list(m_result.scalars().all())
+    await notify(
+        db,
+        _member_ids(members),
+        "event_completed",
+        event=_event_notify_ctx(event, None),
+        actor_id=user_id,
+        target_id=event_id,
+    )
     await db.commit()
 
 
-async def cancel_event(db: AsyncSession, event_id: int, user_id: int) -> None:
+async def cancel_event(
+    db: AsyncSession, event_id: int, user_id: int, reason: str | None = None
+) -> None:
     event = await _get_event(db, event_id, user_id, for_update=True)
     if event.creator_id != user_id:
         raise HTTPException(
@@ -440,6 +531,25 @@ async def cancel_event(db: AsyncSession, event_id: int, user_id: int) -> None:
             status_code=status.HTTP_400_BAD_REQUEST, detail="当前状态不可取消"
         )
     event.status = EventStatus.CANCELLED
+    # 通知全体已加入成员：活动已取消（带原因）
+    m_result = await db.execute(
+        select(EventMember).where(
+            EventMember.event_id == event_id,
+            EventMember.status == EventMemberStatus.JOINED,
+        )
+    )
+    members = list(m_result.scalars().all())
+    actor = await db.get(User, user_id)
+    await notify(
+        db,
+        _member_ids(members),
+        "event_cancelled",
+        event=_event_notify_ctx(event, None),
+        actor_id=user_id,
+        actor_name=actor.nickname if actor else None,
+        reason=reason,
+        target_id=event_id,
+    )
     await db.commit()
 
 

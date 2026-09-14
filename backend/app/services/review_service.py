@@ -15,6 +15,7 @@ from app.models.user import User
 from app.services import app_setting_service
 from app.services import group_restaurant_service, group_service
 from app.services.event_service import _get_event
+from app.services.notification_service import notify
 
 ALREADY_REVIEWED = "该聚餐已评价过"
 NOT_ELIGIBLE = "仅参与聚餐的成员可评价"
@@ -92,6 +93,33 @@ async def submit_review(
     await group_restaurant_service.recompute_scores(
         db, event.group_id, event.restaurant_id
     )
+    # 通知活动创建者 + 其他参与成员：新评价
+    switch = await app_setting_service.get_setting_bool(
+        db, "notify_review"
+    )
+    if switch == "true":
+        m_result = await db.execute(
+            select(EventMember.user_id).where(
+                EventMember.event_id == event_id,
+                EventMember.status == EventMemberStatus.JOINED,
+            )
+        )
+        recipients = [uid for (uid,) in m_result.all()]
+        actor = await db.get(User, user_id)
+        snippet = (review.content or "").strip()
+        if len(snippet) > 30:
+            snippet = snippet[:30] + "…"
+        await notify(
+            db,
+            recipients,
+            "new_review",
+            event={"title": event.title},
+            actor_id=user_id,
+            actor_name=actor.nickname if actor else None,
+            score_text=f"{review.overall_score} 星",
+            snippet=snippet,
+            target_id=event_id,
+        )
     await db.commit()
     await db.refresh(review)
     return review

@@ -3,7 +3,7 @@
 import datetime as dt
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user
@@ -174,7 +174,10 @@ async def complete_event(
 @router.post("/events/{event_id}/cancel", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_event(
     event_id: int,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> None:
-    await event_service.cancel_event(db, event_id, current_user.id)
+    # 取消原因由前端弹窗输入后以 ?reason= 传入（可选，通知文案展示用）
+    reason = request.query_params.get("reason")
+    await event_service.cancel_event(db, event_id, current_user.id, reason)
