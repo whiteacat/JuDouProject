@@ -1,5 +1,5 @@
 // 组队详情页：信息、餐厅、成员、操作栏
-import { get, post } from '../../../utils/request'
+import { get, post, put, del } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
 import { resolveCoverSrc } from '../../../utils/cover'
 
@@ -505,7 +505,10 @@ Page({
     windowTexts: [] as { label: string; mine: boolean; text: string }[],
     // 我的可参加时段编辑（未加入时随 join 提交；已加入时通过 my-windows 保存）
     myWindows: [] as { date: string; start: string; end: string }[],
-    windowSaving: false
+    windowSaving: false,
+    // 收藏状态
+    favorited: false,
+    favToggling: false
   },
 
   _redirecting: false,
@@ -519,6 +522,7 @@ Page({
     }
     this.setData({ eventId })
     this.load()
+    this.loadFavoriteStatus()
   },
 
   onShow() {
@@ -713,6 +717,35 @@ Page({
     return {
       title: ev ? `「${ev.title}」组队中，快来加入` : '聚豆·组队聚餐',
       path: ev ? `/pages/event/detail/index?id=${ev.id}` : '/pages/index/index'
+    }
+  },
+
+  /** 查询当前活动收藏状态 */
+  async loadFavoriteStatus() {
+    try {
+      const res = await get<{ favorited: boolean }>(`/favorites/${this.data.eventId}`)
+      this.setData({ favorited: res.favorited })
+    } catch {
+      // 未登录或查询失败时静默，按钮按未收藏展示
+    }
+  },
+
+  /** 收藏/取消收藏切换 */
+  async onFavorite() {
+    if (this.data.favToggling) return
+    this.setData({ favToggling: true })
+    const target = !this.data.favorited
+    try {
+      const res = target
+        ? await put<{ favorited: boolean }>(`/favorites/${this.data.eventId}`)
+        : await del<{ favorited: boolean }>(`/favorites/${this.data.eventId}`)
+      this.setData({ favorited: res.favorited })
+      wx.showToast({ title: target ? '已收藏' : '已取消收藏', icon: 'none' })
+    } catch (err) {
+      console.error('收藏操作失败', err)
+      wx.showToast({ title: '操作失败，请先登录', icon: 'none' })
+    } finally {
+      this.setData({ favToggling: false })
     }
   },
 

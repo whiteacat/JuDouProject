@@ -70,7 +70,7 @@ Page({
   },
 
   goFavorites() {
-    wx.showToast({ title: '收藏功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/user/favorites/index' })
   },
 
   goPreferences() {

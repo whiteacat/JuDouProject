@@ -1,0 +1,40 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view class="empty" wx:if="{{loading && !loaded}}">
+    <view class="empty-text">加载中…</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:elif="{{items.length === 0}}">
+    <image class="empty-icon" src="/assets/icons/star.svg" mode="aspectFit" />
+    <view class="empty-text">还没有收藏的活动</view>
+    <view class="empty-sub">在活动详情页点击 ☆ 收藏感兴趣的活动</view>
+    <button class="empty-btn" bindtap="goHome">去逛逛</button>
+  </view>
+
+  <!-- 收藏列表 -->
+  <block wx:else>
+    <view
+      class="fav-card"
+      wx:for="{{items}}"
+      wx:key="id"
+      hover-class="fav-card-hover"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <image class="fav-cover" src="{{item.cover_src}}" mode="aspectFill" />
+      <view class="fav-body">
+        <view class="fav-title-row">
+          <view class="fav-title">{{item.title}}</view>
+          <view class="fav-status">{{item.status_text}}</view>
+        </view>
+        <view class="fav-meta" wx:if="{{item.restaurant_name}}">📍 {{item.restaurant_name}}</view>
+        <view class="fav-meta">🕐 {{item.time_display}}</view>
+        <view class="fav-bottom">
+          <view class="fav-budget" wx:if="{{item.budget_text}}">{{item.budget_text}}</view>
+          <view class="fav-remove" catchtap="onRemove" data-id="{{item.id}}">取消收藏</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

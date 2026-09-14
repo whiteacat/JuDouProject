@@ -7,7 +7,7 @@
       <view class="action-icon" bindtap="onShare">
         <image class="action-icon-img" src="/assets/icons/location-arrow.svg" mode="aspectFit" />
       </view>
-      <view class="action-icon" bindtap="onFavorite">
+      <view class="action-icon {{favorited ? 'action-icon-active' : ''}}" bindtap="onFavorite">
         <image class="action-icon-img" src="/assets/icons/star.svg" mode="aspectFit" />
       </view>
     </view>

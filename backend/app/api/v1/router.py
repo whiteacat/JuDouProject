@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1 import (
     auth,
     events,
+    favorites,
     groups,
     health,
     restaurants,
@@ -20,3 +21,4 @@ api_router.include_router(groups.router)
 api_router.include_router(restaurants.router)
 api_router.include_router(events.router)
 api_router.include_router(reviews.router)
+api_router.include_router(favorites.router)

@@ -117,3 +117,9 @@ export const post = <T = unknown>(url: string, data?: Record<string, unknown>) =
 
 export const patch = <T = unknown>(url: string, data?: Record<string, unknown>) =>
   request<T>({ url, method: 'PATCH', data })
+
+export const put = <T = unknown>(url: string, data?: Record<string, unknown>) =>
+  request<T>({ url, method: 'PUT', data })
+
+export const del = <T = unknown>(url: string) =>
+  request<T>({ url, method: 'DELETE' })

@@ -45,6 +45,15 @@
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.15);
 }
 
+/* 已收藏高亮 */
+.action-icon.action-icon-active {
+  background: #ff6b35;
+}
+
+.action-icon.action-icon-active .action-icon-img {
+  filter: brightness(0) invert(1);
+}
+
 .action-icon-img {
   width: 32rpx;
   height: 32rpx;
