@@ -1,3 +1,4 @@
+from app.models.app_setting import AppSetting
 from app.models.event import EventStatus, GroupEvent
 from app.models.event_member import EventMember, EventMemberStatus
 from app.models.favorite import Favorite
@@ -9,6 +10,7 @@ from app.models.review import Review
 from app.models.user import User
 
 __all__ = [
+    "AppSetting",
     "EventMember",
     "EventMemberStatus",
     "EventStatus",

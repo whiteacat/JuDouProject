@@ -2,6 +2,7 @@
 import { getUserProfile, UserProfile } from '../../../utils/auth'
 import { patch } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
+import { isContentEditEnabled, CONTENT_EDIT_DISABLED_TIP } from '../../../utils/appSetting'
 
 const PRESET_AVATARS = [
   'preset://avatar/1', 'preset://avatar/2', 'preset://avatar/3', 'preset://avatar/4',
@@ -91,6 +92,11 @@ Page({
 
   async onSave() {
     const { nickname, avatarUrl, signature } = this.data
+    // 内容编辑开关预检（提交包含文本字段，与后端守卫一致）
+    if (!(await isContentEditEnabled())) {
+      wx.showToast({ title: CONTENT_EDIT_DISABLED_TIP, icon: 'none' })
+      return
+    }
     if (!nickname.trim()) {
       wx.showToast({ title: '请输入昵称', icon: 'none' })
       return

@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.group import Group
 from app.models.member import GroupMember, GroupRole
 from app.models.user import User
+from app.services import app_setting_service
 
 GROUP_NOT_FOUND = "群组不存在或无权访问"
 
@@ -55,6 +56,7 @@ async def get_membership(
 async def create_group(
     db: AsyncSession, user_id: int, name: str, avatar_url: str = ""
 ) -> Group:
+    await app_setting_service.ensure_content_edit_enabled(db)
     group = Group(name=name, avatar_url=avatar_url, owner_id=user_id, invite_code="")
     # 邀请码唯一性：极低概率冲突时重试
     for _ in range(5):

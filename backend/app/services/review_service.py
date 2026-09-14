@@ -12,6 +12,7 @@ from app.models.group import Group
 from app.models.restaurant import Restaurant
 from app.models.review import Review
 from app.models.user import User
+from app.services import app_setting_service
 from app.services import group_restaurant_service, group_service
 from app.services.event_service import _get_event
 
@@ -43,6 +44,7 @@ def compute_overall_score(scores: dict) -> float:
 async def submit_review(
     db: AsyncSession, event_id: int, user_id: int, payload: dict
 ) -> Review:
+    await app_setting_service.ensure_content_edit_enabled(db)
     event = await _get_event(db, event_id, user_id)
     if event.status != EventStatus.COMPLETED:
         raise HTTPException(

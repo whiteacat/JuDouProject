@@ -1,6 +1,7 @@
 // 组队创建页：可从群组主页（无餐厅）或地图餐厅弹层（携带餐厅）进入
 import { get, post } from '../../../utils/request'
 import { PRESET_COVERS, defaultCoverOf, resolveCoverSrc } from '../../../utils/cover'
+import { isContentEditEnabled, CONTENT_EDIT_DISABLED_TIP } from '../../../utils/appSetting'
 
 /** 安全解码 URL 参数：onLoad 拿到的 query 参数是 encodeURIComponent 编码后的原样值。 */
 function safeDecode(value: string): string {
@@ -410,6 +411,10 @@ Page({
   },
 
   async onSubmit() {
+    if (!(await isContentEditEnabled())) {
+      wx.showToast({ title: CONTENT_EDIT_DISABLED_TIP, icon: 'none' })
+      return
+    }
     const {
       groupId, title, date, time, minMembers, maxMembers,
       expiryMode, expiryDate, expiryTime, expiresAfterHours, windowEnabled

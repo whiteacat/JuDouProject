@@ -15,6 +15,7 @@ from app.models.event_member import EventMember, EventMemberStatus
 from app.models.member import GroupMember
 from app.models.restaurant import Restaurant
 from app.models.user import User
+from app.services import app_setting_service
 from app.services import cover as cover_service
 from app.services import group_restaurant_service
 
@@ -171,6 +172,7 @@ def _event_dict(event: GroupEvent, current_members: int, restaurant: Optional[Re
 async def create_event(
     db: AsyncSession, group_id: int, user_id: int, payload: dict
 ) -> GroupEvent:
+    await app_setting_service.ensure_content_edit_enabled(db)
     await _require_group_member(db, group_id, user_id)
 
     event_time = payload["event_time"]

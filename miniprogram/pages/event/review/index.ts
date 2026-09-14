@@ -1,5 +1,6 @@
 // 评价页：六维评分（五颗星点选）+ 文字评价
 import { get, post } from '../../../utils/request'
+import { isContentEditEnabled, CONTENT_EDIT_DISABLED_TIP } from '../../../utils/appSetting'
 
 interface EventDetail {
   id: number
@@ -124,6 +125,10 @@ Page({
   },
 
   async onSubmit() {
+    if (!(await isContentEditEnabled())) {
+      wx.showToast({ title: CONTENT_EDIT_DISABLED_TIP, icon: 'none' })
+      return
+    }
     const { eventId, dims, content } = this.data
     this.setData({ submitting: true })
     try {

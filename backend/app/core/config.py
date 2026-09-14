@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     wechat_secret: str = ""
     amap_key: str = ""
 
+    # 管理端密钥（X-Admin-Key 请求头）；未配置时管理 API 一律拒绝
+    admin_key: str = ""
+
     @property
     def wechat_enabled(self) -> bool:
         """微信登录可用性：appid + secret 均已配置。"""

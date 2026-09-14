@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
+from app.services import app_setting_service
 from app.services.sensitive import check_nickname
 
 
@@ -67,6 +68,8 @@ async def update_user_profile(
     Raises:
         ProfileUpdateError: 校验不通过时抛出。
     """
+    if nickname is not None or signature is not None:
+        await app_setting_service.ensure_content_edit_enabled(db)
     changed = False
 
     if nickname is not None:

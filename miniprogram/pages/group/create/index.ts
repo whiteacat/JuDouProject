@@ -1,5 +1,6 @@
 // 群组入口页：创建新群组 / 邀请码加入已有群组
 import { post } from '../../../utils/request'
+import { isContentEditEnabled, CONTENT_EDIT_DISABLED_TIP } from '../../../utils/appSetting'
 
 interface JoinResult {
   id: number
@@ -36,6 +37,10 @@ Page({
 
   /** 创建群组 */
   async onCreate() {
+    if (!(await isContentEditEnabled())) {
+      wx.showToast({ title: CONTENT_EDIT_DISABLED_TIP, icon: 'none' })
+      return
+    }
     const name = (this.data.name || '').trim()
     if (!name) {
       wx.showToast({ title: '请输入群组名称', icon: 'none' })
