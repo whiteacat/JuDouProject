@@ -1,5 +1,5 @@
 // 群组详情页：群信息、邀请码、成员列表、群公告、功能入口
-import { get, put, del } from '../../../utils/request'
+import { get, post, put, del } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface Member {
@@ -75,8 +75,15 @@ Page({
     // 公告编辑弹窗
     showAnnouncementEditor: false,
     announcementDraft: '',
-    announcementSaving: false
+    announcementSaving: false,
+    // 邀请落地：分享卡片携带 invite=1 时启用引导（未登录→登录→带码入群）
+    inviteMode: false,
+    inviteJoining: false,
+    inviteJoinReady: false,
+    inviteCode: ''
   },
+
+  _redirecting: false,
 
   onLoad(options: Record<string, string>) {
     const groupId = Number(options.id || 0)
@@ -86,14 +93,29 @@ Page({
       return
     }
     this.setData({ groupId })
+    if (options.invite === '1') {
+      this.setData({
+        inviteMode: true,
+        inviteCode: options.code || '',
+        inviteJoinReady: !!options.code
+      })
+    }
     this.fetchDetail()
   },
 
   onShareAppMessage() {
     const group = this.data.group
+    if (!group) {
+      return { title: '聚豆·群组聚餐组队', path: '/pages/index/index' }
+    }
+    // 邀请落地链路：好友点开 → 登录 → 带邀请码一键入群
+    const params = [`id=${group.id}`, 'invite=1']
+    if (group.invite_code) {
+      params.push(`code=${encodeURIComponent(group.invite_code)}`)
+    }
     return {
-      title: group ? `「${group.name}」邀请你一起聚餐` : '聚豆·群组聚餐组队',
-      path: group ? `/pages/group/detail/index?id=${group.id}` : '/pages/index/index'
+      title: `「${group.name}」邀请你一起聚餐`,
+      path: `/pages/group/detail/index?${params.join('&')}`
     }
   },
 
@@ -138,11 +160,75 @@ Page({
       console.error('加载群组失败', err)
       const statusCode = (err as { statusCode?: number })?.statusCode
       if (statusCode === 401) {
-        wx.showToast({ title: '请先登录', icon: 'none' })
-        wx.navigateTo({ url: '/pages/login/index' })
+        if (!this._redirecting) {
+          this._redirecting = true
+          // 未登录：邀请落地链接回跳本页（携带邀请码），登录后自动入群
+          const redirect = this.data.inviteMode
+            ? `/pages/login/index?redirect=${encodeURIComponent(
+                `/pages/group/detail/index?id=${this.data.groupId}&invite=1&code=${encodeURIComponent(this.data.inviteCode)}`
+              )}`
+            : '/pages/login/index'
+          wx.showToast({ title: '请先登录', icon: 'none' })
+          wx.navigateTo({ url: redirect })
+        }
+        return
+      }
+      if (statusCode === 404) {
+        // 非成员：邀请落地时保留引导横幅，避免死胡同
+        if (this.data.inviteMode && this.data.inviteCode) {
+          return
+        }
+        wx.showToast({ title: '群组不存在或已失效', icon: 'none' })
         return
       }
       wx.showToast({ title: '加载失败', icon: 'none' })
+    }
+  },
+
+  /** 邀请落地入口：未登录跳登录页（登录后回跳本页），已登录直接带码入群 */
+  onInviteEnter() {
+    if (this.data.inviteJoining) return
+    const info = wx.getStorageSync('userInfo') as { id?: number } | null
+    if (!info || !info.id) {
+      wx.navigateTo({
+        url: `/pages/login/index?redirect=${encodeURIComponent(
+          `/pages/group/detail/index?id=${this.data.groupId}&invite=1&code=${encodeURIComponent(this.data.inviteCode)}`
+        )}`
+      })
+      return
+    }
+    this.joinFromInvite()
+  },
+
+  /** 已登录的邀请落地：带邀请码加入群组，成功后刷新页面 */
+  async joinFromInvite() {
+    const code = this.data.inviteCode
+    if (!code) {
+      wx.showModal({
+        title: '缺少邀请码',
+        content: '该分享链接未携带邀请码，请向群友索取邀请码后从「群组列表-输入邀请码」加入。',
+        showCancel: false
+      })
+      return
+    }
+    this.setData({ inviteJoining: true })
+    wx.showLoading({ title: '加入中' })
+    try {
+      const group = await post<{ id: number; name: string }>('/groups/join-by-code', {
+        invite_code: code
+      })
+      wx.hideLoading()
+      this._redirecting = false
+      await this.fetchDetail()
+      this.setData({ inviteMode: false })
+      wx.showToast({ title: `已加入「${group.name}」`, icon: 'none' })
+    } catch (err) {
+      wx.hideLoading()
+      const detail = (err as { data?: { detail?: string } })?.data?.detail
+      console.error('邀请落地入群失败', err)
+      wx.showToast({ title: detail || '入群失败，请检查邀请码', icon: 'none' })
+    } finally {
+      this.setData({ inviteJoining: false })
     }
   },
 

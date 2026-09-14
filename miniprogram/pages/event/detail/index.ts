@@ -55,6 +55,15 @@ function statusTextOf(status: string): string {
   return STATUS_TEXT[status] || status
 }
 
+/** 安全解码分享路径参数（失败返回原值） */
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value || '')
+  } catch {
+    return value || ''
+  }
+}
+
 /** 失效策略的展示文案。 */
 function expiryDisplayOf(event: EventDetail): string {
   if (event.status === 'EXPIRED') {
@@ -508,10 +517,18 @@ Page({
     windowSaving: false,
     // 收藏状态
     favorited: false,
-    favToggling: false
+    favToggling: false,
+    // 邀请落地：分享卡片携带 invite=1 时启用引导（未登录→登录→入群→加入活动）
+    inviteMode: false,
+    inviteJoining: false,
+    inviteJoinReady: false,
+    inviteGroupName: ''
   },
 
   _redirecting: false,
+  // 当前活动的群组（分享时携带邀请码，好友落地可一键入群）
+  _inviteCode: '',
+  _group: { id: 0, name: '', invite_code: '' },
 
   onLoad(options: Record<string, string>) {
     const eventId = Number(options.id || 0)
@@ -520,7 +537,18 @@ Page({
       setTimeout(() => wx.navigateBack(), 800)
       return
     }
-    this.setData({ eventId })
+    // 邀请落地：分享卡片携带 invite=1 时启用引导（未登录→登录→入群→加入活动）
+    if (options.invite === '1') {
+      this._inviteCode = options.code || ''
+      this.setData({
+        eventId,
+        inviteMode: true,
+        inviteJoinReady: !!this._inviteCode,
+        inviteGroupName: safeDecode(options.gname || '')
+      })
+    } else {
+      this.setData({ eventId })
+    }
     this.load()
     this.loadFavoriteStatus()
   },
@@ -569,6 +597,15 @@ Page({
           }]
       const full = { ...event, time_display: formatTime(event.event_time) }
       const overlap = buildOverlaps(members)
+      // 预取群组信息（邀请码），供分享卡片携带，好友落地可一键入群
+      if (!this._inviteCode) {
+        get<{ id: number; name: string; invite_code: string }>(`/groups/${event.group_id}`)
+          .then((g) => {
+            this._group = g
+            this._inviteCode = g.invite_code || ''
+          })
+          .catch(() => {})
+      }
       this.setData({
         event: { ...full, expiry_display: expiryDisplayOf(full), cover_src: resolveCoverSrc(full.cover_url) },
         members: members.map((m) => ({ ...m, short: m.nickname ? m.nickname[0] : '?', avatar_src: resolveAvatarSrc(m.avatar_url || '') })),
@@ -592,9 +629,23 @@ Page({
       if (statusCode === 401) {
         if (!this._redirecting) {
           this._redirecting = true
+          // 未登录：邀请落地链接回跳本页，否则仅跳登录
+          const redirect = this.data.inviteMode
+            ? `/pages/login/index?redirect=${encodeURIComponent(
+                `/pages/event/detail/index?id=${this.data.eventId}&invite=1&code=${encodeURIComponent(this._inviteCode)}&gname=${encodeURIComponent(this.data.inviteGroupName)}`
+              )}`
+            : '/pages/login/index'
           wx.showToast({ title: '请先登录', icon: 'none' })
-          wx.navigateTo({ url: '/pages/login/index' })
+          wx.navigateTo({ url: redirect })
         }
+        return
+      }
+      if (statusCode === 404) {
+        // 非群成员（或活动不存在）：邀请落地时保留引导横幅，避免死胡同
+        if (this.data.inviteMode && this._inviteCode) {
+          return
+        }
+        wx.showToast({ title: '组队不存在或已失效', icon: 'none' })
         return
       }
       wx.showToast({ title: '加载失败', icon: 'none' })
@@ -714,9 +765,65 @@ Page({
 
   onShareAppMessage() {
     const ev = this.data.event
+    if (!ev) {
+      return { title: '聚豆·组队聚餐', path: '/pages/index/index' }
+    }
+    // 邀请落地链路：好友点开 → 登录 → 带邀请码入群 → 加入活动
+    const params = [`id=${ev.id}`, 'invite=1']
+    if (this._inviteCode) {
+      params.push(`code=${encodeURIComponent(this._inviteCode)}`)
+      params.push(`gname=${encodeURIComponent(this.data.inviteGroupName || this._group.name || '')}`)
+    }
     return {
-      title: ev ? `「${ev.title}」组队中，快来加入` : '聚豆·组队聚餐',
-      path: ev ? `/pages/event/detail/index?id=${ev.id}` : '/pages/index/index'
+      title: `「${ev.title}」组队中，快来加入`,
+      path: `/pages/event/detail/index?${params.join('&')}`
+    }
+  },
+
+  /** 邀请落地入口：未登录跳登录页（登录后回跳本页），已登录直接入群 */
+  onInviteEnter() {
+    if (this.data.inviteJoining) return
+    const info = wx.getStorageSync('userInfo') as { id?: number } | null
+    if (!info || !info.id) {
+      wx.navigateTo({
+        url: `/pages/login/index?redirect=${encodeURIComponent(
+          `/pages/event/detail/index?id=${this.data.eventId}&invite=1&code=${encodeURIComponent(this._inviteCode)}&gname=${encodeURIComponent(this.data.inviteGroupName)}`
+        )}`
+      })
+      return
+    }
+    this.joinFromInvite()
+  },
+
+  /** 已登录的邀请落地：带邀请码自动加入群组，成功后刷新进入活动 */
+  async joinFromInvite() {
+    if (!this._inviteCode) {
+      wx.showModal({
+        title: '缺少邀请码',
+        content: '该分享链接未携带群组邀请码，请向群友索取邀请码后从「群组列表-输入邀请码」加入。',
+        showCancel: false
+      })
+      return
+    }
+    this.setData({ inviteJoining: true })
+    wx.showLoading({ title: '加入中' })
+    try {
+      const group = await post<{ id: number; name: string }>('/groups/join-by-code', {
+        invite_code: this._inviteCode
+      })
+      wx.hideLoading()
+      // 入群成功：退出邀请模式，刷新页面（此时已是成员，可正常加载详情并加入活动）
+      this._redirecting = false
+      await this.load()
+      this.setData({ inviteMode: false, inviteJoinReady: true })
+      wx.showToast({ title: `已加入「${group.name}」，可点击下方「加入组队」`, icon: 'none' })
+    } catch (err) {
+      wx.hideLoading()
+      const detail = (err as { data?: { detail?: string } })?.data?.detail
+      console.error('邀请落地入群失败', err)
+      wx.showToast({ title: detail || '入群失败，请检查邀请码', icon: 'none' })
+    } finally {
+      this.setData({ inviteJoining: false })
     }
   },
 
