@@ -1,5 +1,5 @@
-// 群组详情页：群信息、邀请码、成员列表、功能入口
-import { get } from '../../../utils/request'
+// 群组详情页：群信息、邀请码、成员列表、群公告、功能入口
+import { get, put, del } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
 
 interface Member {
@@ -33,6 +33,16 @@ interface EventBrief {
   status_text?: string
 }
 
+interface Announcement {
+  id: number
+  group_id: number
+  content: string
+  owner_id: number
+  created_at: string
+  updated_at: string
+  time_display?: string
+}
+
 const STATUS_TEXT: Record<string, string> = {
   RECRUITING: '招募中',
   CONFIRMED: '已确认',
@@ -58,7 +68,14 @@ Page({
     showMembers: [] as Member[],
     recentEvents: [] as EventBrief[],
     isMember: false,
-    showAllMembers: false
+    isOwner: false,
+    showAllMembers: false,
+    // 群公告
+    announcement: null as Announcement | null,
+    // 公告编辑弹窗
+    showAnnouncementEditor: false,
+    announcementDraft: '',
+    announcementSaving: false
   },
 
   onLoad(options: Record<string, string>) {
@@ -95,6 +112,8 @@ Page({
         get<Member[]>(`/groups/${groupId}/members`),
         get<EventBrief[]>(`/groups/${groupId}/events`).catch(() => [])
       ])
+      const info = wx.getStorageSync('userInfo') as { id?: number } | null
+      const userId = info && info.id ? info.id : 0
       const avatarSrc = resolveAvatarSrc(group.avatar_url || '')
       const mappedMembers = members.map((m) => ({
         ...m,
@@ -111,8 +130,10 @@ Page({
         members: mappedMembers,
         showMembers: mappedMembers.slice(0, 8),
         recentEvents: mappedEvents,
-        isMember: true
+        isMember: true,
+        isOwner: group.owner_id === userId
       })
+      this.loadAnnouncement()
     } catch (err) {
       console.error('加载群组失败', err)
       const statusCode = (err as { statusCode?: number })?.statusCode
@@ -125,6 +146,18 @@ Page({
     }
   },
 
+  /** 加载群公告（无公告静默处理） */
+  async loadAnnouncement() {
+    try {
+      const a = await get<Announcement>(`/groups/${this.data.groupId}/announcement`)
+      this.setData({
+        announcement: { ...a, time_display: a.updated_at ? formatTime(a.updated_at) : '' }
+      })
+    } catch (err) {
+      this.setData({ announcement: null })
+    }
+  },
+
   toggleMembers() {
     const showAll = !this.data.showAllMembers
     this.setData({
@@ -133,8 +166,68 @@ Page({
     })
   },
 
+  /** 打开公告编辑器（群主：编辑已有或新建；成员：仅查看） */
   onAnnouncement() {
-    wx.showToast({ title: '群公告功能开发中', icon: 'none' })
+    if (this.data.isOwner) {
+      this.setData({
+        showAnnouncementEditor: true,
+        announcementDraft: this.data.announcement?.content || ''
+      })
+    }
+  },
+
+  onAnnouncementInput(e: WechatMiniprogram.Input) {
+    this.setData({ announcementDraft: e.detail.value })
+  },
+
+  closeAnnouncementEditor() {
+    this.setData({ showAnnouncementEditor: false })
+  },
+
+  /** 群主保存公告 */
+  async saveAnnouncement() {
+    const content = (this.data.announcementDraft || '').trim()
+    if (!content) {
+      wx.showToast({ title: '公告内容不能为空', icon: 'none' })
+      return
+    }
+    if (this.data.announcementSaving) return
+    this.setData({ announcementSaving: true })
+    try {
+      const a = await put<Announcement>(`/groups/${this.data.groupId}/announcement`, { content })
+      this.setData({
+        announcement: { ...a, time_display: a.updated_at ? formatTime(a.updated_at) : '' },
+        showAnnouncementEditor: false
+      })
+      wx.showToast({ title: '公告已更新' })
+    } catch (err) {
+      console.error('保存公告失败', err)
+      wx.showToast({ title: '保存失败', icon: 'none' })
+    } finally {
+      this.setData({ announcementSaving: false })
+    }
+  },
+
+  /** 群主删除公告 */
+  onDeleteAnnouncement() {
+    wx.showModal({
+      title: '删除公告',
+      content: '确定删除当前群公告吗？',
+      success: async (res) => {
+        if (!res.confirm) return
+        try {
+          await del(`/groups/${this.data.groupId}/announcement`)
+          this.setData({
+            announcement: null,
+            showAnnouncementEditor: false
+          })
+          wx.showToast({ title: '公告已删除' })
+        } catch (err) {
+          console.error('删除公告失败', err)
+          wx.showToast({ title: '删除失败', icon: 'none' })
+        }
+      }
+    })
   },
 
   onMore() {

@@ -1,11 +1,15 @@
 """群组路由。"""
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user
 from app.db.session import get_db
 from app.models.user import User
+from app.schemas.announcement import (
+    AnnouncementCreateRequest,
+    AnnouncementOut,
+)
 from app.schemas.group import (
     GroupCreate,
     GroupOut,
@@ -13,7 +17,7 @@ from app.schemas.group import (
     MemberOut,
     TransferRequest,
 )
-from app.services import group_service
+from app.services import announcement_service, group_service
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -104,3 +108,42 @@ async def transfer_owner(
     db: AsyncSession = Depends(get_db),
 ) -> None:
     await group_service.transfer_owner(db, group_id, current_user.id, body.user_id)
+
+
+@router.get("/{group_id}/announcement", response_model=AnnouncementOut)
+async def get_group_announcement(
+    group_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> AnnouncementOut:
+    """读取群公告（群成员可见；无公告返回 404）。"""
+    await group_service.get_group_detail(db, group_id, current_user.id)
+    announcement = await announcement_service.get_announcement(db, group_id)
+    if announcement is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="暂无群公告"
+        )
+    return announcement
+
+
+@router.put("/{group_id}/announcement", response_model=AnnouncementOut)
+async def upsert_group_announcement(
+    group_id: int,
+    body: AnnouncementCreateRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> AnnouncementOut:
+    """群主发布/更新群公告。"""
+    return await announcement_service.upsert_announcement(
+        db, group_id, current_user.id, body.content
+    )
+
+
+@router.delete("/{group_id}/announcement", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_group_announcement(
+    group_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """群主删除群公告。"""
+    await announcement_service.delete_announcement(db, group_id, current_user.id)

@@ -47,6 +47,19 @@
     </view>
   </view>
 
+  <!-- 群公告 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">群公告</view>
+      <view class="section-link" wx:if="{{isOwner}}">编辑 ›</view>
+    </view>
+    <view wx:if="{{announcement}}" class="announcement-box">
+      <view class="announcement-content">{{announcement.content}}</view>
+      <view class="announcement-time" wx:if="{{announcement.time_display}}">更新于 {{announcement.time_display}}</view>
+    </view>
+    <view wx:else class="empty-hint">暂无公告{{isOwner ? '，点击「编辑」发布第一条' : ''}}</view>
+  </view>
+
   <!-- 群组活动 -->
   <view class="section-card">
     <view class="section-header">
@@ -79,5 +92,32 @@
         <view wx:if="{{item.role === 'OWNER'}}" class="member-role">群主</view>
       </view>
     </view>
+  </view>
+</view>
+
+<!-- 公告编辑弹窗（仅群主） -->
+<view class="ann-mask" wx:if="{{showAnnouncementEditor}}" bindtap="closeAnnouncementEditor"></view>
+<view class="ann-sheet" wx:if="{{showAnnouncementEditor}}">
+  <view class="ann-title">发布群公告</view>
+  <textarea
+    class="ann-textarea"
+    placeholder="填写公告内容，如：本周五火锅局集合地点…"
+    value="{{announcementDraft}}"
+    bindinput="onAnnouncementInput"
+    maxlength="500"
+    auto-height
+  />
+  <view class="ann-count">{{announcementDraft.length}}/500</view>
+  <view class="ann-actions">
+    <button
+      class="ann-btn danger"
+      wx:if="{{announcement}}"
+      catchtap="onDeleteAnnouncement"
+      disabled="{{announcementSaving}}"
+    >删除公告</button>
+    <button class="ann-btn" catchtap="closeAnnouncementEditor">取消</button>
+    <button class="ann-btn primary" catchtap="saveAnnouncement" disabled="{{announcementSaving}}">
+      {{announcementSaving ? '保存中' : '保存'}}
+    </button>
   </view>
 </view>
