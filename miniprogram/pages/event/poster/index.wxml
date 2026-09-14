@@ -1,0 +1,20 @@
+<view class="poster-page">
+  <!-- 海报预览区 -->
+  <view class="poster-wrap">
+    <canvas
+      type="2d"
+      id="posterCanvas"
+      class="poster-canvas"
+      style="width: {{canvasW}}px; height: {{canvasH}}px;"
+      bindtap="onCanvasReady"
+    ></canvas>
+    <view class="poster-loading" wx:if="{{!ready}}">海报生成中…</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="poster-actions">
+    <button class="poster-btn" bindtap="goDetail">查看活动</button>
+    <button class="poster-btn primary" bindtap="onSave">保存海报</button>
+    <button class="poster-btn share" open-type="share">转发给好友</button>
+  </view>
+</view>

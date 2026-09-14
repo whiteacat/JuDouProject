@@ -3,11 +3,12 @@
 import datetime as dt
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user
 from app.db.session import get_db
+from app.models.group import Group
 from app.models.user import User
 from app.schemas.event import (
     EventCreate,
@@ -15,7 +16,7 @@ from app.schemas.event import (
     EventMemberOut,
     EventOut,
 )
-from app.services import event_service
+from app.services import event_service, qr_service
 
 router = APIRouter(tags=["events"])
 
@@ -92,6 +93,21 @@ async def get_event(
 ) -> EventOut:
     detail = await event_service.get_event_detail(db, event_id, current_user.id)
     return EventOut(**detail)
+
+
+@router.get("/events/{event_id}/qrcode")
+async def get_event_qrcode(
+    event_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Response:
+    """活动二维码（海报用）：配置微信凭证时返回小程序码，否则降级为 URL 二维码。"""
+    detail = await event_service.get_event_detail(db, event_id, current_user.id)
+    group = await db.get(Group, detail["group_id"])
+    invite_code = group.invite_code if group else ""
+    group_name = group.name if group else ""
+    png = await qr_service.event_qrcode_png(event_id, invite_code, group_name)
+    return Response(content=png, media_type="image/png")
 
 
 @router.get("/events/{event_id}/members", response_model=list[EventMemberOut])

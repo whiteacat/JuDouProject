@@ -193,19 +193,22 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar" wx:if="{{event.status === 'RECRUITING' || event.status === 'CONFIRMED'}}">
-    <block wx:if="{{isCreator}}">
-      <button class="btn-action secondary" open-type="share">邀请好友</button>
-      <button class="btn-action secondary" bindtap="onCancel">取消组队</button>
-      <button class="btn-action primary" bindtap="onComplete">完成聚餐</button>
-    </block>
-    <block wx:elif="{{joined}}">
-      <button class="btn-action secondary" open-type="share">邀请好友</button>
-      <button class="btn-action secondary" bindtap="onLeave">退出组队</button>
-    </block>
-    <block wx:else>
-      <button class="btn-action secondary" open-type="share">邀请好友</button>
-      <button class="btn-action primary" bindtap="onJoin">立即加入</button>
-    </block>
+    <view class="action-bar-main">
+      <block wx:if="{{isCreator}}">
+        <button class="btn-action secondary" bindtap="onCancel">取消组队</button>
+        <button class="btn-action primary" bindtap="onComplete">完成聚餐</button>
+      </block>
+      <block wx:elif="{{joined}}">
+        <button class="btn-action secondary" bindtap="onLeave">退出组队</button>
+      </block>
+      <block wx:else>
+        <button class="btn-action primary full" bindtap="onJoin">立即加入</button>
+      </block>
+    </view>
+    <view class="action-bar-sub">
+      <view class="action-link" bindtap="goPoster">🎨 生成海报</view>
+      <button class="action-link action-link-btn" open-type="share">分享活动</button>
+    </view>
   </view>
   <view class="action-bar" wx:elif="{{event.status === 'COMPLETED' && event.restaurant}}">
     <button class="btn-action primary full" bindtap="goReview" disabled="{{reviewed}}">

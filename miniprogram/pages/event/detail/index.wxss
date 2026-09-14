@@ -585,11 +585,43 @@
   right: 0;
   bottom: 0;
   display: flex;
-  gap: 24rpx;
+  flex-direction: column;
+  gap: 16rpx;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
   background: #fff;
   box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06);
   z-index: 100;
+}
+
+.action-bar-main {
+  display: flex;
+  gap: 24rpx;
+}
+
+.action-bar-sub {
+  display: flex;
+  justify-content: center;
+  gap: 64rpx;
+}
+
+.action-link {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.action-link-btn {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  line-height: inherit;
+  font-size: inherit;
+  color: #666;
+  border: none;
+  border-radius: 0;
+}
+
+.action-link-btn::after {
+  border: none;
 }
 
 .btn-action {

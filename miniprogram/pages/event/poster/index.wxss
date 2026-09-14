@@ -1,0 +1,69 @@
+.poster-page {
+  min-height: 100vh;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.poster-wrap {
+  position: relative;
+  margin: 0 40rpx;
+  overflow: hidden;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+}
+
+.poster-canvas {
+  display: block;
+}
+
+.poster-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 30rpx;
+  color: #999;
+}
+
+.poster-actions {
+  display: flex;
+  gap: 20rpx;
+  width: 100%;
+  padding: 48rpx 40rpx 0;
+  box-sizing: border-box;
+}
+
+.poster-btn {
+  flex: 1;
+  margin: 0;
+  background: #fff;
+  color: #333;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  padding: 20rpx 0;
+  border: 2rpx solid #eee;
+}
+
+.poster-btn::after {
+  border: none;
+}
+
+.poster-btn.primary {
+  background: #ff6b35;
+  border-color: #ff6b35;
+  color: #fff;
+}
+
+.poster-btn.share {
+  background: #e8f1fb;
+  border-color: #c5dcf5;
+  color: #4a90d9;
+}

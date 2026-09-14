@@ -763,6 +763,12 @@ Page({
     }
   },
 
+  goPoster() {
+    const ev = this.data.event
+    if (!ev) return
+    wx.navigateTo({ url: `/pages/event/poster/index?id=${ev.id}` })
+  },
+
   onShareAppMessage() {
     const ev = this.data.event
     if (!ev) {
