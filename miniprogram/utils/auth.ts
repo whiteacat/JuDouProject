@@ -6,6 +6,13 @@ export interface UserProfile {
   nickname: string
   avatar_url: string
   signature?: string | null
+  preferences?: {
+    food?: string[]
+    play?: string[]
+    budget?: string
+    distance?: string
+    time_pref?: string
+  } | null
 }
 
 export interface LoginResponse {

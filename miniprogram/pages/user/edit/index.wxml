@@ -79,17 +79,32 @@
   <!-- 其他设置 -->
   <view class="section">
     <view class="section-title">其他设置</view>
-    <view class="setting-item">
+    <view class="setting-item" hover-class="setting-hover">
       <text class="setting-label">消费预算</text>
-      <text class="setting-value">{{budget || '50-100元'}}</text>
+      <picker range="{{budgetOptions}}" value="{{budget ? budgetOptions.indexOf(budget) : 0}}" bindchange="onBudgetChange">
+        <view class="setting-picker">
+          <text class="setting-value {{budget ? '' : 'placeholder'}}">{{budget || '50-100元'}}</text>
+          <text class="setting-arrow">›</text>
+        </view>
+      </picker>
     </view>
-    <view class="setting-item">
+    <view class="setting-item" hover-class="setting-hover">
       <text class="setting-label">出行距离</text>
-      <text class="setting-value">{{distance || '10km以内'}}</text>
+      <picker range="{{distanceOptions}}" value="{{distance ? distanceOptions.indexOf(distance) : 0}}" bindchange="onDistanceChange">
+        <view class="setting-picker">
+          <text class="setting-value {{distance ? '' : 'placeholder'}}">{{distance || '10km以内'}}</text>
+          <text class="setting-arrow">›</text>
+        </view>
+      </picker>
     </view>
-    <view class="setting-item">
+    <view class="setting-item" hover-class="setting-hover">
       <text class="setting-label">时间偏好</text>
-      <text class="setting-value">{{timePref || '周末优先'}}</text>
+      <picker range="{{timePrefOptions}}" value="{{timePref ? timePrefOptions.indexOf(timePref) : 0}}" bindchange="onTimePrefChange">
+        <view class="setting-picker">
+          <text class="setting-value {{timePref ? '' : 'placeholder'}}">{{timePref || '周末优先'}}</text>
+          <text class="setting-arrow">›</text>
+        </view>
+      </picker>
     </view>
   </view>
 

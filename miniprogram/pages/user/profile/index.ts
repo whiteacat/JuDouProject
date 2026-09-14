@@ -74,7 +74,7 @@ Page({
   },
 
   goPreferences() {
-    wx.showToast({ title: '偏好设置开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/user/edit/index' })
   },
 
   goPrivacy() {

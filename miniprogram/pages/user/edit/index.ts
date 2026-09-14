@@ -14,6 +14,10 @@ const PRESET_AVATAR_SRCS = PRESET_AVATARS.map(resolveAvatarSrc)
 const FOOD_PREFS = ['火锅', '日料', '烧烤', '甜品', '川菜', '粤菜', '西餐', '东南亚']
 const PLAY_PREFS = ['电影', '桌游', '户外', '展览', '密室', 'KTV', '运动', '旅行']
 
+const BUDGET_OPTIONS = ['50以内', '50-100元', '100-200元', '200-500元', '500元以上']
+const DISTANCE_OPTIONS = ['3km以内', '5km以内', '10km以内', '20km以内', '不限']
+const TIME_PREFS = ['工作日晚上', '周末优先', '节假日', '随时']
+
 Page({
   data: {
     nickname: '',
@@ -30,6 +34,9 @@ Page({
     selectedFoodPrefs: [] as string[],
     selectedPlayPrefs: [] as string[],
     // 其他设置
+    budgetOptions: BUDGET_OPTIONS,
+    distanceOptions: DISTANCE_OPTIONS,
+    timePrefOptions: TIME_PREFS,
     budget: '',
     distance: '',
     timePref: '',
@@ -39,12 +46,18 @@ Page({
     const profile: UserProfile | null = getUserProfile()
     if (profile) {
       const isPreset = profile.avatar_url.startsWith('preset://')
+      const prefs = profile.preferences || {}
       this.setData({
         nickname: profile.nickname || '',
         avatarUrl: profile.avatar_url || '',
         avatarSrc: resolveAvatarSrc(profile.avatar_url || ''),
         selectedPreset: isPreset ? profile.avatar_url : '',
         signature: profile.signature || '',
+        selectedFoodPrefs: prefs.food || [],
+        selectedPlayPrefs: prefs.play || [],
+        budget: prefs.budget || '',
+        distance: prefs.distance || '',
+        timePref: prefs.time_pref || '',
       })
     }
   },
@@ -90,8 +103,20 @@ Page({
     }
   },
 
+  onBudgetChange(e: WechatMiniprogram.PickerChange) {
+    this.setData({ budget: this.data.budgetOptions[Number(e.detail.value)] })
+  },
+
+  onDistanceChange(e: WechatMiniprogram.PickerChange) {
+    this.setData({ distance: this.data.distanceOptions[Number(e.detail.value)] })
+  },
+
+  onTimePrefChange(e: WechatMiniprogram.PickerChange) {
+    this.setData({ timePref: this.data.timePrefOptions[Number(e.detail.value)] })
+  },
+
   async onSave() {
-    const { nickname, avatarUrl, signature } = this.data
+    const { nickname, avatarUrl, signature, selectedFoodPrefs, selectedPlayPrefs, budget, distance, timePref } = this.data
     // 内容编辑开关预检（提交包含文本字段，与后端守卫一致）
     if (!(await isContentEditEnabled())) {
       wx.showToast({ title: CONTENT_EDIT_DISABLED_TIP, icon: 'none' })
@@ -113,6 +138,13 @@ Page({
         nickname: nickname.trim(),
         avatar_url: avatarUrl,
         signature: (signature || '').trim(),
+        preferences: {
+          food: selectedFoodPrefs,
+          play: selectedPlayPrefs,
+          budget: budget || '',
+          distance: distance || '',
+          time_pref: timePref || ''
+        },
       })
       wx.setStorageSync('userInfo', user)
       wx.showToast({ title: '保存成功' })

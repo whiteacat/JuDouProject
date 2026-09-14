@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Optional
 
-from sqlalchemy import BigInteger, DateTime, SmallInteger, String, func
+from sqlalchemy import BigInteger, DateTime, JSON, SmallInteger, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -23,6 +23,8 @@ class User(Base):
     avatar_url: Mapped[str] = mapped_column(String(512), default="")
     # 个性签名，可空
     signature: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    # 偏好设置：{ food: string[], play: string[], budget: string, distance: string, time_pref: string }
+    preferences: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)
     created_at: Mapped[dt.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

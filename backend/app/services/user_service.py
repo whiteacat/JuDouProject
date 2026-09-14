@@ -62,8 +62,9 @@ async def update_user_profile(
     nickname: Optional[str] = None,
     avatar_url: Optional[str] = None,
     signature: Optional[str] = None,
+    preferences: Optional[dict] = None,
 ) -> User:
-    """修改用户昵称/头像/个性签名，含敏感词校验。
+    """修改用户昵称/头像/个性签名/偏好设置，含敏感词校验。
 
     Raises:
         ProfileUpdateError: 校验不通过时抛出。
@@ -95,8 +96,28 @@ async def update_user_profile(
             user.signature = signature or None
             changed = True
 
+    if preferences is not None:
+        user.preferences = _sanitize_preferences(preferences)
+        changed = True
+
     if changed:
         await db.commit()
         await db.refresh(user)
 
     return user
+
+
+def _sanitize_preferences(raw: dict) -> dict:
+    """偏好设置白名单清洗：只保留已知字段与类型，防止注入任意数据。"""
+    prefs: dict = {}
+    food = raw.get("food")
+    if isinstance(food, list):
+        prefs["food"] = [str(t)[:20] for t in food if isinstance(t, str)][:20]
+    play = raw.get("play")
+    if isinstance(play, list):
+        prefs["play"] = [str(t)[:20] for t in play if isinstance(t, str)][:20]
+    for key in ("budget", "distance", "time_pref"):
+        value = raw.get(key)
+        if isinstance(value, str) and value.strip():
+            prefs[key] = value.strip()[:32]
+    return prefs or None

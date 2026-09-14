@@ -36,6 +36,7 @@ async def update_me(
             nickname=body.nickname,
             avatar_url=body.avatar_url,
             signature=body.signature,
+            preferences=body.preferences,
         )
     except ProfileUpdateError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message) from e

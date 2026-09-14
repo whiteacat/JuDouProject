@@ -10,6 +10,7 @@ class UserOut(BaseModel):
     nickname: str
     avatar_url: str
     signature: str | None = None
+    preferences: dict | None = None
 
 
 class UserUpdateRequest(BaseModel):
@@ -18,6 +19,7 @@ class UserUpdateRequest(BaseModel):
     nickname: str | None = Field(default=None, min_length=1, max_length=20, description="新昵称")
     avatar_url: str | None = Field(default=None, max_length=512, description="新头像 URL")
     signature: str | None = Field(default=None, max_length=100, description="个性签名")
+    preferences: dict | None = Field(default=None, description="偏好设置")
 
 
 # 预设头像列表（小程序端同步维护，后端用于白名单校验）
