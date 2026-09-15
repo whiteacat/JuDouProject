@@ -39,6 +39,7 @@ async def list_my_favorites(
         out.append(
             FavoriteItemOut(
                 id=ev.id,
+                group_id=ev.group_id,
                 title=ev.title,
                 cover_url=ev.cover_url,
                 budget=float(ev.budget) if ev.budget is not None else None,

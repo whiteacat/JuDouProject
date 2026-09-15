@@ -13,11 +13,22 @@ import io
 
 import httpx
 import qrcode
+from PIL import Image
 
 from app.core.config import get_settings
 
 # 降级二维码的落地页占位（H5 版未开发前仅作海报展示）
 FALLBACK_BASE = "https://judou.example.com/share"
+
+
+def _reencode_png(image_bytes: bytes) -> bytes:
+    """把微信返回的 JPEG 图片重新编码为 PNG（路由固定声明 image/png）。"""
+    img = Image.open(io.BytesIO(image_bytes))
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
 
 
 async def _get_access_token() -> str | None:
@@ -63,7 +74,8 @@ async def event_qrcode_png(event_id: int, invite_code: str = "", group_name: str
                 )
                 content_type = resp.headers.get("content-type", "")
                 if "image" in content_type:
-                    return resp.content
+                    # 微信 getwxacode 返回的图片实为 JPEG，声明 image/png 会让客户端解码失败
+                    return _reencode_png(resp.content)
             # 非图片响应（凭证过期等）落到降级
         except httpx.HTTPError:
             pass

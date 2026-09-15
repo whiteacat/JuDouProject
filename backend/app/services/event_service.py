@@ -175,6 +175,8 @@ def _event_dict(event: GroupEvent, current_members: int, restaurant: Optional[Re
         "group_id": event.group_id,
         "creator_id": event.creator_id,
         "title": event.title,
+        "cover_url": event.cover_url,
+        "budget": float(event.budget) if event.budget is not None else None,
         "event_time": event.event_time,
         "status": event.status,
         "min_members": event.min_members,
@@ -196,6 +198,9 @@ async def create_event(
     await _require_group_member(db, group_id, user_id)
 
     event_time = payload["event_time"]
+    if event_time.tzinfo is None:
+        # 客户端可能提交 naive 时间戳，统一按 UTC 归一化，避免与 aware now 比较 500
+        event_time = event_time.replace(tzinfo=dt.timezone.utc)
     if event_time <= dt.datetime.now(dt.timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="组队时间必须晚于当前时间"
@@ -227,6 +232,8 @@ async def create_event(
     # 失效策略：at_time 用用户指定时间；after_hours 在创建时折算为绝对截止
     expiry_mode = payload.get("expiry_mode") or ExpiryMode.NONE
     expires_at = payload.get("expires_at")
+    if expires_at is not None and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=dt.timezone.utc)
     if expiry_mode == ExpiryMode.AFTER_HOURS:
         hours = payload.get("expires_after_hours")
         expires_at = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=hours)
