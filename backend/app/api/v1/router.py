@@ -7,6 +7,7 @@ from app.api.v1 import (
     auth,
     events,
     favorites,
+    feedbacks,
     groups,
     health,
     notifications,
@@ -24,5 +25,6 @@ api_router.include_router(restaurants.router)
 api_router.include_router(events.router)
 api_router.include_router(reviews.router)
 api_router.include_router(favorites.router)
+api_router.include_router(feedbacks.router)
 api_router.include_router(notifications.router)
 api_router.include_router(admin.router)

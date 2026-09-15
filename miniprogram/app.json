@@ -19,6 +19,10 @@
     "pages/user/edit/index",
     "pages/user/avatar-crop/index",
     "pages/user/favorites/index",
+    "pages/user/feedback/index",
+    "pages/user/about/index",
+    "pages/user/privacy/index",
+    "pages/user/privacy-settings/index",
     "pages/login/index"
   ],
   "window": {

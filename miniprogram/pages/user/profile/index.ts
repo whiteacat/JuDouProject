@@ -78,15 +78,15 @@ Page({
   },
 
   goPrivacy() {
-    wx.showToast({ title: '隐私设置开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/user/privacy-settings/index' })
   },
 
   goFeedback() {
-    wx.showToast({ title: '帮助与反馈开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/user/feedback/index' })
   },
 
   goAbout() {
-    wx.showToast({ title: '关于我们开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/user/about/index' })
   },
 
   onLogout() {

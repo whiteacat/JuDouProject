@@ -1,0 +1,38 @@
+<view class="about-page">
+  <!-- Logo 区 -->
+  <view class="about-hero">
+    <view class="about-logo">聚</view>
+    <view class="about-name">聚豆 JuDou</view>
+    <view class="about-version">v{{version}}</view>
+  </view>
+
+  <!-- 简介 -->
+  <view class="about-card">
+    <view class="about-desc">
+      聚豆是一个面向年轻人的「吃饭 · 玩乐 · 组队」小程序。\n
+      创建群组、发起活动、拉上朋友，从找餐厅到定时间，把每次聚餐安排得明明白白。
+    </view>
+    <view class="about-features">
+      <view class="feature-item">👥 群组组队 · 邀请码拉人</view>
+      <view class="feature-item">📅 活动招募 · 满员自动确认</view>
+      <view class="feature-item">📍 餐厅搜索 · 地图选点</view>
+      <view class="feature-item">⭐ 收藏评价 · 好店沉淀在群里</view>
+    </view>
+  </view>
+
+  <!-- 协议入口 -->
+  <view class="about-menu">
+    <view
+      wx:for="{{items}}"
+      wx:key="key"
+      class="about-menu-item"
+      data-key="{{item.key}}"
+      bindtap="onTapItem"
+    >
+      <text class="about-menu-label">{{item.label}}</text>
+      <text class="about-menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="about-footer">© 2026 聚豆 · 用心安排每一餐</view>
+</view>

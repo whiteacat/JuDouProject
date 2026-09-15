@@ -1,0 +1,151 @@
+.container {
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding: 24rpx 24rpx calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin: 16rpx 0 20rpx;
+}
+
+/* FAQ */
+.faq-list {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.faq-item {
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 24rpx;
+}
+
+.faq-q-text {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.faq-arrow {
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  color: #ccc;
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+}
+
+.faq-arrow.open {
+  transform: rotate(-90deg);
+}
+
+.faq-a {
+  padding: 0 24rpx 28rpx;
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.7;
+}
+
+/* 反馈表单 */
+.fb-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.fb-kinds {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.fb-kind {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 26rpx;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+}
+
+.fb-kind.active {
+  color: #ff6b35;
+  background: #fff3ee;
+  border-color: #ff6b35;
+}
+
+.fb-textarea {
+  width: 100%;
+  min-height: 180rpx;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.fb-count {
+  margin-top: 8rpx;
+  text-align: right;
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+.fb-contact-row {
+  margin-top: 20rpx;
+}
+
+.fb-contact {
+  width: 100%;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.fb-contact-error {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #e74c3c;
+}
+
+.fb-submit {
+  margin-top: 32rpx;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  padding: 20rpx 0;
+}
+
+.fb-submit::after {
+  border: none;
+}
+
+.fb-submit[disabled] {
+  background: #ccc;
+  color: #fff;
+}
+
+.footer-tip {
+  margin-top: 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #bbb;
+}

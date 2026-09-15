@@ -1,0 +1,9 @@
+<view class="doc-page" wx:if="{{doc}}">
+  <view class="doc-title">{{doc.title}}</view>
+  <view class="doc-updated">更新日期：{{doc.updated}}</view>
+
+  <block wx:for="{{doc.sections}}" wx:key="h">
+    <view class="doc-h">{{item.h}}</view>
+    <view class="doc-p">{{item.p}}</view>
+  </block>
+</view>

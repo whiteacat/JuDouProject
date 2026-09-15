@@ -1,0 +1,56 @@
+<view class="container">
+  <!-- FAQ -->
+  <view class="section-title">常见问题</view>
+  <view class="faq-list">
+    <view class="faq-item" wx:for="{{faqs}}" wx:key="q">
+      <view class="faq-q" bindtap="toggleFaq" data-index="{{index}}">
+        <text class="faq-q-text">{{item.q}}</text>
+        <text class="faq-arrow {{expanded === index ? 'open' : ''}}">›</text>
+      </view>
+      <view class="faq-a" wx:if="{{expanded === index}}">{{item.a}}</view>
+    </view>
+  </view>
+
+  <!-- 反馈表单 -->
+  <view class="section-title">意见反馈</view>
+  <view class="fb-card">
+    <view class="fb-kinds">
+      <view
+        wx:for="{{kinds}}"
+        wx:key="value"
+        class="fb-kind {{kind === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="onKindChange"
+      >{{item.label}}</view>
+    </view>
+
+    <textarea
+      class="fb-textarea"
+      placeholder="告诉我们你的建议或遇到的问题（1-500 字）"
+      placeholder-style="color: #bbb"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="500"
+      auto-height
+    />
+    <view class="fb-count">{{content.length}}/500</view>
+
+    <view class="fb-contact-row">
+      <input
+        class="fb-contact"
+        placeholder="手机号 / 邮箱（选填，便于回访）"
+        placeholder-style="color: #bbb"
+        value="{{contact}}"
+        bindinput="onContactInput"
+        maxlength="64"
+      />
+      <view class="fb-contact-error" wx:if="{{contactError}}">{{contactError}}</view>
+    </view>
+
+    <button class="fb-submit" bindtap="submitFeedback" disabled="{{submitting || !content.trim()}}">
+      {{submitting ? '提交中…' : '提交反馈'}}
+    </button>
+  </view>
+
+  <view class="footer-tip">你的反馈会被认真查看，感谢让聚豆变得更好 🌶️</view>
+</view>
