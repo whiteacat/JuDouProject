@@ -20,8 +20,13 @@ Page({
   data: {
     eventId: 0,
     event: null as EventInfo | null,
+    // 画布按 750 设计宽度绘制（导出高清图）；高度需覆盖全部内容
+    // （二维码引导文案在 y=1215，旧值 1000 会把底部裁掉）
     canvasW: 750,
-    canvasH: 1000,
+    canvasH: 1280,
+    // 预览显示尺寸：按屏宽等比缩放（避免 750px 溢出屏幕被裁边）
+    previewW: 0,
+    previewH: 0,
     ready: false,
     generating: false
   },
@@ -33,7 +38,14 @@ Page({
       setTimeout(() => wx.navigateBack(), 800)
       return
     }
-    this.setData({ eventId })
+    // 预览区左右各留 40px 边距，按屏宽等比缩放 750 设计宽度
+    const windowWidth = wx.getSystemInfoSync().windowWidth
+    const scale = Math.min(1, (windowWidth - 80) / this.data.canvasW)
+    this.setData({
+      eventId,
+      previewW: Math.round(this.data.canvasW * scale),
+      previewH: Math.round(this.data.canvasH * scale)
+    })
     this.loadEvent()
   },
 

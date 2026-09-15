@@ -5,7 +5,7 @@
       type="2d"
       id="posterCanvas"
       class="poster-canvas"
-      style="width: {{canvasW}}px; height: {{canvasH}}px;"
+      style="width: {{previewW}}px; height: {{previewH}}px;"
       bindtap="onCanvasReady"
     ></canvas>
     <view class="poster-loading" wx:if="{{!ready}}">海报生成中…</view>
