@@ -15,10 +15,13 @@
       选择微信头像
     </button>
 
-    <view class="sub-title">从相册选择（可裁剪）</view>
-    <button class="wechat-avatar-btn" bindtap="onChooseFromAlbum">
-      选择相册图片
-    </button>
+    <!-- 相册上传头像暂时隐藏（上传链路待完善，如恢复把 false 改 true） -->
+    <block wx:if="{{false}}">
+      <view class="sub-title">从相册选择（可裁剪）</view>
+      <button class="wechat-avatar-btn" bindtap="onChooseFromAlbum">
+        选择相册图片
+      </button>
+    </block>
 
     <view class="sub-title">预设头像</view>
     <view class="preset-grid">
