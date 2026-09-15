@@ -51,7 +51,9 @@
       <view wx:else class="group-avatar-text">{{item.name[0]}}</view>
       <view class="group-info">
         <view class="group-name">{{item.name}}</view>
-        <view class="group-meta">{{item.member_count}} 人 · 邀请码 {{item.invite_code}}</view>
+        <view class="group-meta">
+          {{item.member_count}} 人 · 活跃 {{item.active_count}} 人 · 邀请码 {{item.invite_code}}
+        </view>
       </view>
       <view class="manage-btn" catchtap="goDetail" data-id="{{item.id}}">
         管理

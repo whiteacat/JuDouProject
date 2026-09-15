@@ -23,7 +23,7 @@ from app.services import announcement_service, group_service
 router = APIRouter(prefix="/groups", tags=["groups"])
 
 
-def _group_to_out(group, member_count: int) -> GroupOut:
+def _group_to_out(group, member_count: int, active_count: int = 0) -> GroupOut:
     return GroupOut(
         id=group.id,
         name=group.name,
@@ -32,13 +32,15 @@ def _group_to_out(group, member_count: int) -> GroupOut:
         owner_id=group.owner_id,
         invite_code=group.invite_code,
         member_count=member_count,
+        active_count=active_count,
         created_at=group.created_at,
     )
 
 
 async def _group_out_with_count(db: AsyncSession, group) -> GroupOut:
     counts = await group_service.count_active_members_batch(db, [group.id])
-    return _group_to_out(group, counts.get(group.id, 1))
+    active = await group_service.count_week_active_batch(db, [group.id])
+    return _group_to_out(group, counts.get(group.id, 1), active.get(group.id, 0))
 
 
 @router.post("", response_model=GroupOut, status_code=status.HTTP_201_CREATED)
@@ -76,7 +78,10 @@ async def list_groups(
     counts = await group_service.count_active_members_batch(
         db, [g.id for g in groups]
     )
-    return [_group_to_out(g, counts.get(g.id, 1)) for g in groups]
+    active = await group_service.count_week_active_batch(db, [g.id for g in groups])
+    return [
+        _group_to_out(g, counts.get(g.id, 1), active.get(g.id, 0)) for g in groups
+    ]
 
 
 @router.post("/join-by-code", response_model=GroupOut)

@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import secrets
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.event import GroupEvent
+from app.models.event_member import EventMember
 from app.models.group import Group
 from app.models.member import GroupMember, GroupRole
 from app.models.user import User
@@ -40,6 +43,50 @@ async def count_active_members_batch(
         .group_by(GroupMember.group_id)
     )
     return {group_id: int(count) for group_id, count in result.all()}
+
+
+async def count_week_active_batch(
+    db: AsyncSession, group_ids: list[int]
+) -> dict[int, int]:
+    """批量统计群组「活跃 N 人」：近 7 天内有活动参与的当前成员数。
+
+    活跃定义（满足其一即算）：
+    - 近 7 天内在该群创建过活动（group_events.created_at）
+    - 近 7 天内加入过该群任一活动（event_members.joined_at）
+    且当前仍为该群有效成员。
+    """
+    if not group_ids:
+        return {}
+    since = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=7)
+    result = await db.execute(
+        select(GroupEvent.group_id, GroupEvent.creator_id)
+        .where(GroupEvent.group_id.in_(group_ids), GroupEvent.created_at >= since)
+    )
+    active = {(g, u) for g, u in result.all()}
+    result2 = await db.execute(
+        select(GroupEvent.group_id, EventMember.user_id)
+        .join(EventMember, EventMember.event_id == GroupEvent.id)
+        .where(
+            GroupEvent.group_id.in_(group_ids),
+            EventMember.joined_at >= since,
+        )
+    )
+    active.update({(g, u) for g, u in result2.all()})
+
+    counts: dict[int, int] = {g: 0 for g in group_ids}
+    if not active:
+        return counts
+
+    member_result = await db.execute(
+        select(GroupMember.group_id, GroupMember.user_id).where(
+            GroupMember.group_id.in_(group_ids), GroupMember.status == 1
+        )
+    )
+    member_pairs = {(g, u) for g, u in member_result.all()}
+    for group_id, user_id in active:
+        if (group_id, user_id) in member_pairs:
+            counts[group_id] = counts.get(group_id, 0) + 1
+    return counts
 
 
 async def get_membership(

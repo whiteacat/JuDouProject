@@ -19,6 +19,8 @@ class GroupOut(BaseModel):
     owner_id: int
     invite_code: str
     member_count: int = 0
+    # 近 7 天参与过群活动的当前成员数（「活跃 N 人」）
+    active_count: int = 0
     created_at: dt.datetime
 
 

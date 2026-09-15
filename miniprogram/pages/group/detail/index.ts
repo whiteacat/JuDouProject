@@ -23,6 +23,7 @@ interface GroupDetail {
   owner_id: number
   invite_code: string
   member_count: number
+  active_count: number
 }
 
 interface EventBrief {

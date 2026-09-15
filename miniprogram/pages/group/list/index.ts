@@ -9,6 +9,7 @@ interface GroupItem {
   owner_id: number
   invite_code: string
   member_count: number
+  active_count: number
   avatar_src?: string
 }
 
