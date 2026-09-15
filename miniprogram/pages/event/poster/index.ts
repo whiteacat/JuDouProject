@@ -65,13 +65,10 @@ Page({
     if (!event) return
     this.setData({ generating: true })
 
-    const query = wx.createSelectorQuery()
-    const canvas = (await query
-      .select('#posterCanvas')
-      .fields({ node: true, size: true })
-      .exec())[0]?.node as WechatMiniprogram.Canvas | undefined
+    const canvas = await this.waitForCanvas()
     if (!canvas) {
       this.setData({ generating: false })
+      wx.showToast({ title: '海报尚未就绪，点击海报重试', icon: 'none' })
       return
     }
     const ctx = canvas.getContext('2d')
@@ -145,6 +142,33 @@ Page({
     ctx.textAlign = 'left'
 
     this.setData({ generating: false })
+  },
+
+  /** 等待 canvas 节点就绪（带重试）。
+   * 用回调式 exec + 空值兜底：Promise 式 exec() 在部分基础库版本/
+   * 节点未渲染完成时会 resolve 为 undefined，直接 [0] 会抛
+   * "Cannot read properties of undefined (reading '0')"。
+   * 生成时机可能在 setData 后立即执行，此时 canvas 尚未渲染，需短重试。 */
+  waitForCanvas(tries = 10, delay = 150): Promise<WechatMiniprogram.Canvas | null> {
+    return new Promise((resolve) => {
+      const attempt = (n: number) => {
+        const query = wx.createSelectorQuery()
+        query
+          .select('#posterCanvas')
+          .fields({ node: true, size: true })
+          .exec((res) => {
+            const node = (res && res[0] && (res[0] as { node?: WechatMiniprogram.Canvas }).node) || null
+            if (node) {
+              resolve(node)
+            } else if (n > 0) {
+              setTimeout(() => attempt(n - 1), delay)
+            } else {
+              resolve(null)
+            }
+          })
+      }
+      attempt(tries)
+    })
   },
 
   getToken(): string {
