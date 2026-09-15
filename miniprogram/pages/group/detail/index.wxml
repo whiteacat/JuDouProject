@@ -105,7 +105,9 @@
   <view class="section-card">
     <view class="section-header">
       <view class="section-title">群成员（{{members.length}}）</view>
-      <view class="section-link" wx:if="{{members.length > 8}}">查看更多 ›</view>
+      <view class="section-link" wx:if="{{members.length > 8}}" bindtap="toggleMembers">
+        {{showAllMembers ? '收起' : '查看更多'}} ›
+      </view>
     </view>
     <view class="member-grid">
       <view wx:for="{{showMembers}}" wx:key="user_id" class="member">
