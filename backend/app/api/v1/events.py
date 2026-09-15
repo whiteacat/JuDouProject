@@ -3,11 +3,13 @@
 import datetime as dt
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, get_current_user_or_anonymous
 from app.db.session import get_db
+from app.models.event import EventStatus, GroupEvent
 from app.models.group import Group
 from app.models.user import User
 from app.schemas.event import (
@@ -98,12 +100,20 @@ async def get_event(
 @router.get("/events/{event_id}/qrcode")
 async def get_event_qrcode(
     event_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User | None = Depends(get_current_user_or_anonymous),
     db: AsyncSession = Depends(get_db),
 ) -> Response:
-    """活动二维码（海报用）：配置微信凭证时返回小程序码，否则降级为 URL 二维码。"""
-    detail = await event_service.get_event_detail(db, event_id, current_user.id)
-    group = await db.get(Group, detail["group_id"])
+    """活动二维码（海报用）：配置微信凭证时返回小程序码，否则降级为 URL 二维码。
+
+    鉴权用 get_current_user_or_anonymous：海报 canvas 的 createImage 无法携带
+    Authorization 头，靠 ?token= query 兜底；二维码内容为公开分享信息
+    （事件 id + 群邀请码），无需成员校验，仅要求事件存在。
+    """
+    result = await db.execute(select(GroupEvent).where(GroupEvent.id == event_id))
+    event = result.scalar_one_or_none()
+    if event is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="活动不存在")
+    group = await db.get(Group, event.group_id)
     invite_code = group.invite_code if group else ""
     group_name = group.name if group else ""
     png = await qr_service.event_qrcode_png(event_id, invite_code, group_name)

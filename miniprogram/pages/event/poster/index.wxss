@@ -31,6 +31,8 @@
   background: rgba(255, 255, 255, 0.9);
   font-size: 30rpx;
   color: #999;
+  /* 遮罩不能拦截 canvas 的 tap，否则 onCanvasReady 永远收不到点击 */
+  pointer-events: none;
 }
 
 .poster-actions {

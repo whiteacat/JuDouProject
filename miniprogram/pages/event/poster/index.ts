@@ -40,7 +40,11 @@ Page({
   async loadEvent() {
     try {
       const event = await get<EventInfo>(`/events/${this.data.eventId}`)
-      this.setData({ event })
+      // 活动加载完成后自动生成海报。
+      // 不依赖「点击 canvas」触发：加载遮罩是绝对定位覆盖层，会拦截 tap，
+      // 导致 onCanvasReady 永远不触发、海报卡在"生成中"。
+      this.setData({ event, ready: true })
+      this.generate()
     } catch (err) {
       console.error('加载活动失败', err)
       wx.showToast({ title: '加载失败', icon: 'none' })
@@ -49,6 +53,7 @@ Page({
   },
 
   onCanvasReady() {
+    if (this.data.ready) return
     this.setData({ ready: true })
     this.generate()
   },
@@ -118,7 +123,12 @@ Page({
 
     // 7. 二维码
     try {
-      const qrUrl = `${BASE_URL}/events/${event.id}/qrcode?token=${this.getToken()}`
+      // canvas 的 createImage 无法携带 Authorization 请求头，
+      // 需走后端 ?token= query 鉴权（二维码为公开内容，token 仅用于身份校验）
+      const token = this.getToken()
+      const qrUrl = token
+        ? `${BASE_URL}/events/${event.id}/qrcode?token=${encodeURIComponent(token)}`
+        : `${BASE_URL}/events/${event.id}/qrcode`
       await this.drawQrCode(ctx, canvas, qrUrl, W - 300, 940, 240, 240)
     } catch (e) {
       console.error('二维码加载失败', e)
@@ -233,10 +243,12 @@ Page({
     pad: number
   ): Promise<void> {
     const img = canvas.createImage()
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve()
-      img.onerror = () => {
-        throw new Error('qrcode load failed')
+      img.onerror = (e) => {
+        // 必须 reject（不能 throw）：throw 会让 Promise 永不 settle，
+        // generate() 在 await 处永久挂起，海报卡死
+        reject(new Error('qrcode load failed: ' + (e?.errMsg || String(e))))
       }
       img.src = url
     })
