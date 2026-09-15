@@ -63,10 +63,40 @@ Page({
   },
 
   onChooseAvatar(e: { detail: { avatarUrl: string } }) {
-    this.setData({
-      avatarUrl: e.detail.avatarUrl,
-      avatarSrc: e.detail.avatarUrl,
-      selectedPreset: '',
+    // 选图 → 裁剪页（圆形裁剪 + 缩放拖动）→ 裁剪页内上传 → 回传 avatar_url
+    const tempPath = e.detail.avatarUrl
+    if (!tempPath) return
+    wx.navigateTo({
+      url: `/pages/user/avatar-crop/index?path=${encodeURIComponent(tempPath)}`
+    })
+  },
+
+  /** 从裁剪页返回后接收上传成功的 avatar_url */
+  onShow() {
+    const picked = wx.getStorageSync('avatarPicked')
+    if (picked) {
+      wx.removeStorageSync('avatarPicked')
+      this.setData({
+        avatarUrl: picked,
+        avatarSrc: resolveAvatarSrc(picked),
+        selectedPreset: '',
+      })
+    }
+  },
+
+  /** 本地相册选图 → 裁剪（微信头像 chooseAvatar 不可裁剪，走此入口补充） */
+  onChooseFromAlbum() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempPath = res.tempFiles?.[0]?.tempFilePath
+        if (!tempPath) return
+        wx.navigateTo({
+          url: `/pages/user/avatar-crop/index?path=${encodeURIComponent(tempPath)}`
+        })
+      }
     })
   },
 

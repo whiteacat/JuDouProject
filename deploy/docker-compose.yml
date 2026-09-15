@@ -44,6 +44,9 @@ services:
       REDIS_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
+    volumes:
+      # 头像上传持久化
+      - ./uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy

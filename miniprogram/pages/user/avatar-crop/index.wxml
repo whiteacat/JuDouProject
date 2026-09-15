@@ -1,0 +1,32 @@
+<view class="crop-page">
+  <view class="crop-tip">双指缩放 · 拖动调整位置</view>
+
+  <!-- 裁剪区（300px 正方形，圆形遮罩） -->
+  <view
+    class="crop-stage"
+    style="width: {{canvasSize}}px; height: {{canvasSize}}px;"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    bindtouchcancel="onTouchEnd"
+  >
+    <image
+      class="crop-img"
+      src="{{tempPath}}"
+      style="width: {{imgW * scale}}px; height: {{imgH * scale}}px; transform: translate({{offset.x}}px, {{offset.y}}px);"
+      mode="aspectFill"
+      wx:if="{{tempPath}}"
+    />
+    <view class="crop-mask"></view>
+    <view class="crop-circle"></view>
+    <!-- 离屏输出 canvas（1px 不可见） -->
+    <canvas type="2d" id="cropCanvas" class="crop-offscreen"></canvas>
+  </view>
+
+  <view class="crop-actions">
+    <button class="crop-btn" bindtap="onCancel" disabled="{{submitting}}">取消</button>
+    <button class="crop-btn primary" bindtap="onConfirm" disabled="{{submitting}}">
+      {{submitting ? '处理中…' : '确认裁剪'}}
+    </button>
+  </view>
+</view>

@@ -17,6 +17,7 @@
     "pages/group/mine/index",
     "pages/user/profile/index",
     "pages/user/edit/index",
+    "pages/user/avatar-crop/index",
     "pages/user/favorites/index",
     "pages/login/index"
   ],

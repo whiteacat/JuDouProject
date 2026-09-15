@@ -1,0 +1,93 @@
+.crop-page {
+  min-height: 100vh;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.crop-tip {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 26rpx;
+  margin-bottom: 32rpx;
+}
+
+.crop-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #111;
+}
+
+.crop-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* 圆形外遮罩 */
+.crop-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.crop-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* 离屏输出 canvas：1x1 不可见 */
+.crop-offscreen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 24rpx;
+  width: 100%;
+  padding: 48rpx 60rpx 0;
+  box-sizing: border-box;
+}
+
+.crop-btn {
+  flex: 1;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 30rpx;
+  border-radius: 40rpx;
+  padding: 20rpx 0;
+}
+
+.crop-btn::after {
+  border: none;
+}
+
+.crop-btn.primary {
+  background: #ff6b35;
+}
+
+.crop-btn[disabled] {
+  opacity: 0.5;
+  color: #fff;
+}

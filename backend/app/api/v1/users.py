@@ -1,6 +1,6 @@
 """用户路由。"""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,10 +12,26 @@ from app.models.review import Review
 from app.models.user import User
 from app.schemas.review import MyReviewOut
 from app.schemas.user import UserOut, UserStatsOut, UserUpdateRequest
-from app.services import review_service
+from app.services import review_service, upload_service
 from app.services.user_service import ProfileUpdateError, update_user_profile
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.post("/me/avatar", response_model=UserOut)
+async def upload_my_avatar(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """上传裁剪后的头像（PNG/JPG，≤2MB），成功后自动更新 avatar_url。"""
+    data = await file.read()
+    try:
+        ext = upload_service.validate_avatar_bytes(file.filename or "", data)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+    url = upload_service.save_avatar(data, ext)
+    return await update_user_profile(db, current_user, avatar_url=url)
 
 
 @router.get("/me", response_model=UserOut)

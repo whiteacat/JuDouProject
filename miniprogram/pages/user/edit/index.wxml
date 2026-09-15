@@ -10,9 +10,14 @@
       </view>
     </view>
 
-    <view class="sub-title">从微信选择</view>
+    <view class="sub-title">从微信选择（可裁剪）</view>
     <button class="wechat-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
       选择微信头像
+    </button>
+
+    <view class="sub-title">从相册选择（可裁剪）</view>
+    <button class="wechat-avatar-btn" bindtap="onChooseFromAlbum">
+      选择相册图片
     </button>
 
     <view class="sub-title">预设头像</view>
