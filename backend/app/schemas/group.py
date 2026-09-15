@@ -8,16 +8,22 @@ from pydantic import BaseModel, Field
 class GroupCreate(BaseModel):
     name: str = Field(min_length=1, max_length=64, description="群组名称")
     avatar_url: str = Field(default="", max_length=512)
+    cover_url: str | None = Field(default=None, max_length=64, description="群组封面背景（预设白名单）")
 
 
 class GroupOut(BaseModel):
     id: int
     name: str
     avatar_url: str
+    cover_url: str | None = None
     owner_id: int
     invite_code: str
     member_count: int = 0
     created_at: dt.datetime
+
+
+class GroupCoverUpdate(BaseModel):
+    cover_url: str | None = Field(default=None, max_length=64, description="群组封面背景（预设白名单，null 清除）")
 
 
 class JoinByCodeRequest(BaseModel):

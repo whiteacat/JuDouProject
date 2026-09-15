@@ -11,6 +11,7 @@ from app.schemas.announcement import (
     AnnouncementOut,
 )
 from app.schemas.group import (
+    GroupCoverUpdate,
     GroupCreate,
     GroupOut,
     JoinByCodeRequest,
@@ -27,6 +28,7 @@ def _group_to_out(group, member_count: int) -> GroupOut:
         id=group.id,
         name=group.name,
         avatar_url=group.avatar_url,
+        cover_url=group.cover_url,
         owner_id=group.owner_id,
         invite_code=group.invite_code,
         member_count=member_count,
@@ -45,7 +47,23 @@ async def create_group(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> GroupOut:
-    group = await group_service.create_group(db, current_user.id, body.name, body.avatar_url)
+    group = await group_service.create_group(
+        db, current_user.id, body.name, body.avatar_url, body.cover_url
+    )
+    return await _group_out_with_count(db, group)
+
+
+@router.patch("/{group_id}/cover", response_model=GroupOut)
+async def update_group_cover(
+    group_id: int,
+    body: GroupCoverUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> GroupOut:
+    """群主更换群组封面背景（预设白名单；cover_url=null 清除用默认背景）。"""
+    group = await group_service.update_group_cover(
+        db, group_id, current_user.id, body.cover_url
+    )
     return await _group_out_with_count(db, group)
 
 

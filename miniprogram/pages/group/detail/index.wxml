@@ -10,14 +10,15 @@
   </view>
 
   <!-- 顶部封面 -->
-  <view class="cover-section">
-    <image class="cover-bg" src="{{group.avatar_src || '/assets/icons/default-cover.png'}}" mode="aspectFill" />
+  <view class="cover-section" bindtap="openCoverPicker">
+    <image class="cover-bg" src="{{group.cover_src || group.avatar_src || '/assets/icons/default-cover.png'}}" mode="aspectFill" />
     <view class="cover-overlay"></view>
     <view class="cover-info">
       <view class="group-name">{{group.name}}</view>
       <view class="group-meta">{{group.member_count}} 位成员</view>
       <view class="joined-badge" wx:if="{{isMember}}">已加入</view>
     </view>
+    <view class="cover-edit-badge" wx:if="{{isOwner}}">更换封面</view>
   </view>
 
   <!-- 功能按钮行 -->
@@ -135,5 +136,29 @@
     <button class="ann-btn primary" catchtap="saveAnnouncement" disabled="{{announcementSaving}}">
       {{announcementSaving ? '保存中' : '保存'}}
     </button>
+  </view>
+</view>
+
+<!-- 封面背景选择弹窗（仅群主） -->
+<view class="cover-mask" wx:if="{{showCoverPicker}}" bindtap="closeCoverPicker"></view>
+<view class="cover-sheet" wx:if="{{showCoverPicker}}">
+  <view class="cover-sheet-title">选择群组封面</view>
+  <view class="cover-grid">
+    <view
+      wx:for="{{groupCovers}}"
+      wx:key="key"
+      class="cover-cell {{group.cover_url === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      catchtap="onPickCover"
+    >
+      <image class="cover-cell-img" src="{{item.image}}" mode="aspectFill" />
+      <view class="cover-cell-check" wx:if="{{group.cover_url === item.key}}">✓</view>
+    </view>
+  </view>
+  <view class="cover-sheet-actions">
+    <button class="cover-clear-btn" catchtap="onClearCover" disabled="{{coverSaving}}" wx:if="{{group.cover_url}}">
+      恢复默认背景
+    </button>
+    <button class="cover-cancel-btn" catchtap="closeCoverPicker">关闭</button>
   </view>
 </view>

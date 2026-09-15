@@ -1,6 +1,7 @@
 // 群组入口页：创建新群组 / 邀请码加入已有群组
 import { post } from '../../../utils/request'
 import { isContentEditEnabled, CONTENT_EDIT_DISABLED_TIP } from '../../../utils/appSetting'
+import { GROUP_COVERS } from '../../../utils/cover'
 
 interface JoinResult {
   id: number
@@ -13,7 +14,10 @@ Page({
     tab: 'create',
     name: '',
     inviteCode: '',
-    submitting: false
+    submitting: false,
+    // 封面背景选择（仅创建时可选，不选则默认背景）
+    groupCovers: GROUP_COVERS,
+    coverUrl: ''
   },
 
   onLoad(options: Record<string, string>) {
@@ -35,6 +39,12 @@ Page({
     this.setData({ inviteCode: e.detail.value.trim() })
   },
 
+  /** 选择封面背景（再次点击已选中的可取消） */
+  onPickCover(e: WechatMiniprogram.TouchEvent) {
+    const key = e.currentTarget.dataset.key as string
+    this.setData({ coverUrl: this.data.coverUrl === key ? '' : key })
+  },
+
   /** 创建群组 */
   async onCreate() {
     if (!(await isContentEditEnabled())) {
@@ -50,7 +60,9 @@ Page({
     this.setData({ submitting: true })
     wx.showLoading({ title: '创建中' })
     try {
-      const group = await post<JoinResult>('/groups', { name })
+      const payload: Record<string, unknown> = { name }
+      if (this.data.coverUrl) payload.cover_url = this.data.coverUrl
+      const group = await post<JoinResult>('/groups', payload)
       wx.hideLoading()
       wx.showToast({ title: '创建成功' })
       setTimeout(() => {

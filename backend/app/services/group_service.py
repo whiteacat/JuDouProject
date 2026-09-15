@@ -12,6 +12,7 @@ from app.models.group import Group
 from app.models.member import GroupMember, GroupRole
 from app.models.user import User
 from app.services import app_setting_service
+from app.services import cover as cover_service
 
 GROUP_NOT_FOUND = "群组不存在或无权访问"
 
@@ -54,10 +55,20 @@ async def get_membership(
 
 
 async def create_group(
-    db: AsyncSession, user_id: int, name: str, avatar_url: str = ""
+    db: AsyncSession,
+    user_id: int,
+    name: str,
+    avatar_url: str = "",
+    cover_url: str | None = None,
 ) -> Group:
     await app_setting_service.ensure_content_edit_enabled(db)
-    group = Group(name=name, avatar_url=avatar_url, owner_id=user_id, invite_code="")
+    group = Group(
+        name=name,
+        avatar_url=avatar_url,
+        cover_url=cover_service.validate_group_cover_url(cover_url),
+        owner_id=user_id,
+        invite_code="",
+    )
     # 邀请码唯一性：极低概率冲突时重试
     for _ in range(5):
         code = _generate_invite_code()
@@ -166,6 +177,25 @@ async def leave_group(db: AsyncSession, group_id: int, user_id: int) -> None:
 
     membership.status = 0
     await db.commit()
+
+
+async def update_group_cover(
+    db: AsyncSession, group_id: int, user_id: int, cover_url: str | None
+) -> Group:
+    """群主更换群组封面背景（白名单校验；None 清除用默认背景）。"""
+    group = await db.get(Group, group_id)
+    _require_group(group)
+
+    caller = await get_membership(db, group_id, user_id)
+    if caller is None or caller.status != 1:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=GROUP_NOT_FOUND)
+    if group.owner_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="仅群主可修改群组封面")
+
+    group.cover_url = cover_service.validate_group_cover_url(cover_url)
+    await db.commit()
+    await db.refresh(group)
+    return group
 
 
 async def transfer_owner(

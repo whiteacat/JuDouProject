@@ -57,3 +57,29 @@ export function defaultCoverOf(title: string): string {
   else if (DINE.some((kw) => t.includes(kw))) theme = 'dine'
   return `preset://cover/${String(THEME_DEFAULTS[theme]).padStart(2, '0')}`
 }
+
+/* ==================== 群组封面（详情页背景） ==================== */
+
+export interface GroupCover {
+  key: string
+  image: string
+}
+
+const gimg = (n: number) => `/assets/group_cover_assets/group_cover_${String(n).padStart(2, '0')}.png`
+
+/** 预设群组封面列表（20 张，与后端 cover.PRESET_GROUP_COVERS 同步） */
+export const GROUP_COVERS: GroupCover[] = Array.from({ length: 20 }, (_, i) => {
+  const n = i + 1
+  return { key: `preset://group_cover/${String(n).padStart(2, '0')}`, image: gimg(n) }
+})
+
+/** 将群组封面 URL（preset://group_cover/NN 或空）解析为本地图片路径；空返回默认背景。 */
+export function resolveGroupCoverSrc(coverUrl: string | null | undefined): string {
+  if (!coverUrl) return gimg(1)
+  const m = /^preset:\/\/group_cover\/(\d{2})$/.exec(coverUrl)
+  if (m) {
+    const found = GROUP_COVERS.find((c) => c.key === coverUrl)
+    if (found) return found.image
+  }
+  return gimg(1)
+}

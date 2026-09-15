@@ -83,3 +83,42 @@
   color: #999;
   box-shadow: none;
 }
+
+/* 封面背景选择（创建页） */
+.cover-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.cover-cell {
+  position: relative;
+  width: 210rpx;
+  height: 126rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  border: 3rpx solid transparent;
+}
+
+.cover-cell.active {
+  border-color: #ff6b35;
+}
+
+.cover-cell-img {
+  width: 100%;
+  height: 100%;
+}
+
+.cover-cell-check {
+  position: absolute;
+  right: 8rpx;
+  top: 8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 24rpx;
+  border-radius: 50%;
+}

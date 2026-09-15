@@ -19,6 +19,24 @@
       />
       <view class="field-hint">创建后生成专属邀请码，可分享给群友加入</view>
     </view>
+
+    <view class="form-card">
+      <view class="field-label">封面背景（可选）</view>
+      <view class="cover-grid">
+        <view
+          wx:for="{{groupCovers}}"
+          wx:key="key"
+          class="cover-cell {{coverUrl === item.key ? 'active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onPickCover"
+        >
+          <image class="cover-cell-img" src="{{item.image}}" mode="aspectFill" />
+          <view class="cover-cell-check" wx:if="{{coverUrl === item.key}}">✓</view>
+        </view>
+      </view>
+      <view class="field-hint">不选则使用默认背景；创建后群主可随时在群组详情更换</view>
+    </view>
+
     <button class="submit" bindtap="onCreate" disabled="{{submitting || !name.trim()}}">创建群组</button>
   </block>
 

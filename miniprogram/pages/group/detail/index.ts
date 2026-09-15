@@ -1,6 +1,7 @@
 // 群组详情页：群信息、邀请码、成员列表、群公告、功能入口
-import { get, post, put, del } from '../../../utils/request'
+import { get, post, put, del, patch } from '../../../utils/request'
 import { resolveAvatarSrc } from '../../../utils/avatar'
+import { GROUP_COVERS, resolveGroupCoverSrc } from '../../../utils/cover'
 
 interface Member {
   user_id: number
@@ -17,6 +18,8 @@ interface GroupDetail {
   name: string
   avatar_url: string
   avatar_src?: string
+  cover_url?: string | null
+  cover_src?: string
   owner_id: number
   invite_code: string
   member_count: number
@@ -80,7 +83,11 @@ Page({
     inviteMode: false,
     inviteJoining: false,
     inviteJoinReady: false,
-    inviteCode: ''
+    inviteCode: '',
+    // 群组封面背景选择弹窗（仅群主）
+    groupCovers: GROUP_COVERS,
+    showCoverPicker: false,
+    coverSaving: false
   },
 
   _redirecting: false,
@@ -148,7 +155,11 @@ Page({
         status_text: STATUS_TEXT[e.status] || e.status,
       }))
       this.setData({
-        group: { ...group, avatar_src: avatarSrc },
+        group: {
+          ...group,
+          avatar_src: avatarSrc,
+          cover_src: resolveGroupCoverSrc(group.cover_url)
+        },
         members: mappedMembers,
         showMembers: mappedMembers.slice(0, 8),
         recentEvents: mappedEvents,
@@ -250,6 +261,67 @@ Page({
       showAllMembers: showAll,
       showMembers: showAll ? this.data.members : this.data.members.slice(0, 8)
     })
+  },
+
+  /** 打开封面背景选择弹窗（仅群主） */
+  openCoverPicker() {
+    if (!this.data.isOwner) return
+    this.setData({ showCoverPicker: true })
+  },
+
+  closeCoverPicker() {
+    this.setData({ showCoverPicker: false })
+  },
+
+  /** 群主选择封面背景 */
+  async onPickCover(e: WechatMiniprogram.TouchEvent) {
+    const key = e.currentTarget.dataset.key as string
+    if (!key || this.data.coverSaving) return
+    this.setData({ coverSaving: true })
+    try {
+      const group = await patch<GroupDetail>(`/groups/${this.data.groupId}/cover`, {
+        cover_url: key
+      })
+      this.setData({
+        group: {
+          ...(this.data.group as GroupDetail),
+          cover_url: group.cover_url,
+          cover_src: resolveGroupCoverSrc(group.cover_url)
+        },
+        showCoverPicker: false
+      })
+      wx.showToast({ title: '封面已更新' })
+    } catch (err) {
+      console.error('更新封面失败', err)
+      wx.showToast({ title: '更新失败', icon: 'none' })
+    } finally {
+      this.setData({ coverSaving: false })
+    }
+  },
+
+  /** 群主清除封面（恢复默认背景） */
+  async onClearCover() {
+    if (this.data.coverSaving) return
+    this.setData({ coverSaving: true })
+    try {
+      const group = await patch<GroupDetail>(`/groups/${this.data.groupId}/cover`, {
+        cover_url: null
+      })
+      this.setData({
+        group: {
+          ...(this.data.group as GroupDetail),
+          cover_url: group.cover_url,
+          cover_src: resolveGroupCoverSrc(group.cover_url)
+        },
+        showCoverPicker: false
+      })
+      wx.showToast({ title: '已恢复默认背景' })
+    } catch (err) {
+      console.error('清除封面失败', err)
+      wx.showToast({ title: '操作失败', icon: 'none' })
+    } finally {
+      this.setData({ coverSaving: false })
+    }
   },
 
   /** 打开公告编辑器（群主：编辑已有或新建；成员：仅查看） */
