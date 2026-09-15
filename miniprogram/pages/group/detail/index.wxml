@@ -16,6 +16,12 @@
     <view class="cover-info">
       <view class="group-name">{{group.name}}</view>
       <view class="group-meta">{{group.member_count}} 位成员</view>
+      <view class="owner-row" wx:if="{{owner}}">
+        <image wx:if="{{owner.avatar_src}}" class="owner-avatar-img" src="{{owner.avatar_src}}" mode="aspectFill" />
+        <view wx:else class="owner-avatar">{{owner.short}}</view>
+        <text class="owner-label">{{owner.nickname}}</text>
+        <text class="owner-tag">群主</text>
+      </view>
       <view class="joined-badge" wx:if="{{isMember}}">已加入</view>
     </view>
     <view class="cover-edit-badge" wx:if="{{isOwner}}">更换封面</view>

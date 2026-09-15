@@ -69,6 +69,7 @@ Page({
     group: null as GroupDetail | null,
     members: [] as Member[],
     showMembers: [] as Member[],
+    owner: null as Member | null,
     recentEvents: [] as EventBrief[],
     isMember: false,
     isOwner: false,
@@ -162,6 +163,7 @@ Page({
         },
         members: mappedMembers,
         showMembers: mappedMembers.slice(0, 8),
+        owner: mappedMembers.find((m) => m.role === 'OWNER') || null,
         recentEvents: mappedEvents,
         isMember: true,
         isOwner: group.owner_id === userId

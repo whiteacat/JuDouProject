@@ -191,6 +191,50 @@
   color: rgba(255,255,255,0.85);
 }
 
+/* 群主信息行 */
+.owner-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.owner-avatar-img {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(255,255,255,0.6);
+}
+
+.owner-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.owner-label {
+  font-size: 26rpx;
+  color: #fff;
+  max-width: 320rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.owner-tag {
+  padding: 2rpx 14rpx;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 20rpx;
+  border-radius: 16rpx;
+}
+
 .joined-badge {
   display: inline-block;
   margin-top: 12rpx;
