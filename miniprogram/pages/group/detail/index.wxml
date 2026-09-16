@@ -35,7 +35,7 @@
       </view>
       <text class="action-label">发起活动</text>
     </view>
-    <view class="action-item" bindtap="toggleMembers">
+    <view class="action-item" bindtap="goMembers">
       <view class="action-icon">
         <image class="action-icon-img" src="/assets/icons/users.svg" mode="aspectFit" />
       </view>
@@ -105,9 +105,7 @@
   <view class="section-card">
     <view class="section-header">
       <view class="section-title">群成员（{{members.length}}）</view>
-      <view class="section-link" wx:if="{{members.length > 8}}" bindtap="toggleMembers">
-        {{showAllMembers ? '收起' : '查看更多'}} ›
-      </view>
+      <view class="section-link" bindtap="goMembers">查看更多 ›</view>
     </view>
     <view class="member-grid">
       <view wx:for="{{showMembers}}" wx:key="user_id" class="member">

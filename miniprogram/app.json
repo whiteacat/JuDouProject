@@ -5,6 +5,7 @@
     "pages/group/create/index",
     "pages/group/join/index",
     "pages/group/detail/index",
+    "pages/group/members/index",
     "pages/group/events/index",
     "pages/event/create/index",
     "pages/event/detail/index",

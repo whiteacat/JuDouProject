@@ -71,10 +71,10 @@ Page({
     members: [] as Member[],
     showMembers: [] as Member[],
     owner: null as Member | null,
+    // 成员网格恒展示前 8 人（完整列表见独立成员页）
     recentEvents: [] as EventBrief[],
     isMember: false,
     isOwner: false,
-    showAllMembers: false,
     // 群公告
     announcement: null as Announcement | null,
     // 公告编辑弹窗
@@ -258,12 +258,10 @@ Page({
     }
   },
 
-  toggleMembers() {
-    const showAll = !this.data.showAllMembers
-    this.setData({
-      showAllMembers: showAll,
-      showMembers: showAll ? this.data.members : this.data.members.slice(0, 8)
-    })
+  /** 跳转独立群成员页（原 toggleMembers 就地展开/收起已废弃：
+   * 功能区的「成员列表」与成员区的「查看更多」均跳转完整成员页） */
+  goMembers() {
+    wx.navigateTo({ url: `/pages/group/members/index?id=${this.data.groupId}` })
   },
 
   /** 打开封面背景选择弹窗（仅群主） */
