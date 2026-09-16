@@ -58,7 +58,8 @@ Page({
   },
 
   goEvents() {
-    wx.navigateTo({ url: '/pages/event/list/index' })
+    // 「我的活动」= 我创建或已加入的活动（/events/mine），非附近活动
+    wx.navigateTo({ url: '/pages/event/mine/index' })
   },
 
   goGroups() {

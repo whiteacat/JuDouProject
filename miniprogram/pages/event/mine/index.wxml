@@ -1,0 +1,40 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view class="empty" wx:if="{{loading && !loaded}}">
+    <view class="empty-text">加载中…</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:elif="{{items.length === 0}}">
+    <image class="empty-icon" src="/assets/icons/date.svg" mode="aspectFit" />
+    <view class="empty-text">还没有参加过的活动</view>
+    <view class="empty-sub">加入群组发起活动，或参加群友发起的组队</view>
+    <button class="empty-btn" bindtap="goHome">去逛逛群组</button>
+  </view>
+
+  <!-- 活动列表 -->
+  <block wx:else>
+    <view
+      class="fav-card"
+      wx:for="{{items}}"
+      wx:key="id"
+      hover-class="fav-card-hover"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
+      <image class="fav-cover" src="{{item.cover_src}}" mode="aspectFill" />
+      <view class="fav-body">
+        <view class="fav-title-row">
+          <view class="fav-title">{{item.title}}</view>
+          <view class="fav-status">{{item.status_text}}</view>
+        </view>
+        <view class="fav-meta" wx:if="{{item.restaurant && item.restaurant.name}}">📍 {{item.restaurant.name}}</view>
+        <view class="fav-meta">🕐 {{item.time_display}} · {{item.current_members}}/{{item.max_members}}人</view>
+        <view class="fav-bottom">
+          <view class="fav-budget" wx:if="{{item.budget_text}}">{{item.budget_text}}</view>
+          <view class="fav-budget" wx:else>未设预算</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
