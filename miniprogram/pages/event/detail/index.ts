@@ -657,6 +657,11 @@ Page({
     wx.navigateTo({ url: `/pages/event/review/index?id=${eventId}` })
   },
 
+  goMembers() {
+    const { eventId } = this.data
+    wx.navigateTo({ url: `/pages/event/members/index?id=${eventId}` })
+  },
+
   onToggleGantt() {
     this.setData({ ganttOpen: !this.data.ganttOpen })
   },

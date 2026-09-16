@@ -1,0 +1,26 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view class="empty" wx:if="{{loading && !loaded}}">
+    <view class="empty-text">加载中…</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:elif="{{members.length === 0}}">
+    <image class="empty-icon" src="/assets/icons/user.svg" mode="aspectFit" />
+    <view class="empty-text">还没有人加入</view>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="member-list" wx:else>
+    <view class="member-item" wx:for="{{members}}" wx:key="id">
+      <image class="member-avatar" src="{{item.avatar_src}}" mode="aspectFill" />
+      <view class="member-body">
+        <view class="member-name-row">
+          <text class="member-name">{{item.nickname}}</text>
+          <text class="member-tag" wx:if="{{item.is_creator}}">发起人</text>
+        </view>
+        <view class="member-time">{{item.time_display}} 加入</view>
+      </view>
+    </view>
+  </view>
+</view>

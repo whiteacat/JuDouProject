@@ -58,7 +58,7 @@
   <view class="section-card">
     <view class="section-header">
       <view class="section-title">活动成员（{{members.length}}）</view>
-      <view class="section-link" wx:if="{{members.length > 6}}">查看更多 ›</view>
+      <view class="section-link" wx:if="{{members.length > 6}}" bindtap="goMembers">查看更多 ›</view>
     </view>
     <view class="member-grid">
       <view wx:for="{{members}}" wx:key="user_id" class="member">

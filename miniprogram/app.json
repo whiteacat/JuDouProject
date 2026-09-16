@@ -10,6 +10,7 @@
     "pages/event/detail/index",
     "pages/event/list/index",
     "pages/event/mine/index",
+    "pages/event/members/index",
     "pages/event/review/index",
     "pages/event/poster/index",
     "pages/review/mine/index",
