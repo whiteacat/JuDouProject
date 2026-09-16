@@ -20,6 +20,10 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
+.item-hover {
+  background: #fafafa;
+}
+
 .item-top {
   display: flex;
   justify-content: space-between;

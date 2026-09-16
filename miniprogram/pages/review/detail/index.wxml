@@ -1,0 +1,56 @@
+<view class="container" wx:if="{{!loading}}">
+  <!-- 加载失败/不存在 -->
+  <view class="empty" wx:if="{{notFound || !review}}">
+    <view class="empty-text">评价不存在或已删除</view>
+    <button class="empty-btn" bindtap="wx.navigateBack">返回</button>
+  </view>
+
+  <block wx:else>
+    <!-- 餐厅 + 总分 -->
+    <view class="head-card" bindtap="goRestaurant" hover-class="head-hover">
+      <view class="head-name">{{review.restaurant_name}}</view>
+      <view class="head-score-row">
+        <image class="star-icon" src="/assets/icons/star.svg" mode="aspectFit" />
+        <text class="head-score">{{review.overall_score}}</text>
+        <text class="head-unit">分</text>
+      </view>
+      <view class="head-sub">餐厅 ›</view>
+    </view>
+
+    <!-- 五维评分 -->
+    <view class="section-title">评分明细</view>
+    <view class="score-card">
+      <view class="score-item" wx:for="{{review.score_items}}" wx:key="label">
+        <view class="score-label">{{item.label}}</view>
+        <view class="score-bar">
+          <view class="score-bar-inner" style="width: {{item.value / 5 * 100}}%"></view>
+        </view>
+        <view class="score-value">{{item.value}}</view>
+      </view>
+    </view>
+
+    <!-- 文字评价 -->
+    <view class="section-title">评价内容</view>
+    <view class="content-card">{{review.content || '（未填写文字评价）'}}</view>
+
+    <!-- 关联信息 -->
+    <view class="section-title">关联信息</view>
+    <view class="link-card">
+      <view class="link-item" wx:if="{{review.event_title}}" bindtap="goEvent" hover-class="link-hover">
+        <text class="link-label">活动</text>
+        <text class="link-value">{{review.event_title}}</text>
+        <text class="link-arrow">›</text>
+      </view>
+      <view class="link-item" wx:if="{{review.group_name}}">
+        <text class="link-label">群组</text>
+        <text class="link-value">{{review.group_name}}</text>
+      </view>
+      <view class="link-item">
+        <text class="link-label">时间</text>
+        <text class="link-value">{{review.time_display}}</text>
+      </view>
+    </view>
+  </block>
+</view>
+
+<view class="loading" wx:if="{{loading}}">加载中…</view>

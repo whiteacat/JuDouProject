@@ -1,0 +1,200 @@
+.container {
+  min-height: 100vh;
+  background: #f7f7f7;
+  padding: 24rpx;
+  box-sizing: border-box;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+
+.loading {
+  text-align: center;
+  padding: 200rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 空状态 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 200rpx 60rpx 0;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #666;
+}
+
+.empty-btn {
+  margin-top: 48rpx;
+  padding: 0 64rpx;
+  background: #ff6b35;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 36rpx;
+}
+
+.empty-btn::after {
+  border: none;
+}
+
+/* 餐厅头卡 */
+.head-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.head-hover {
+  background: #fafafa;
+}
+
+.head-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #222;
+}
+
+.head-score-row {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.star-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.head-score {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #ff6b35;
+}
+
+.head-unit {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.head-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #aaa;
+}
+
+.section-title {
+  margin: 32rpx 8rpx 20rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 五维评分 */
+.score-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 12rpx 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.score-item:last-child {
+  border-bottom: none;
+}
+
+.score-label {
+  width: 140rpx;
+  font-size: 26rpx;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.score-bar {
+  flex: 1;
+  height: 16rpx;
+  background: #f2f2f2;
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin: 0 24rpx;
+}
+
+.score-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b35, #ff9a5c);
+  border-radius: 8rpx;
+}
+
+.score-value {
+  width: 70rpx;
+  text-align: right;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #ff6b35;
+  flex-shrink: 0;
+}
+
+/* 文字评价 */
+.content-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.7;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 关联信息 */
+.link-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 0 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.link-item:last-child {
+  border-bottom: none;
+}
+
+.link-hover {
+  background: #fafafa;
+}
+
+.link-label {
+  width: 100rpx;
+  font-size: 26rpx;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.link-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-arrow {
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  color: #ccc;
+}

@@ -46,5 +46,10 @@ Page({
     } finally {
       this.setData({ loading: false })
     }
+  },
+
+  goDetail(e: WechatMiniprogram.TouchEvent) {
+    const id = Number(e.currentTarget.dataset.id)
+    wx.navigateTo({ url: `/pages/review/detail/index?id=${id}` })
   }
 })

@@ -98,3 +98,17 @@ async def get_my_reviews(
 ) -> list[MyReviewOut]:
     reviews = await review_service.list_my_reviews(db, current_user.id)
     return [MyReviewOut(**r) for r in reviews]
+
+
+@router.get("/me/reviews/{review_id}", response_model=MyReviewOut)
+async def get_my_review_detail(
+    review_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> MyReviewOut:
+    """评价详情（仅本人可见）。"""
+    reviews = await review_service.list_my_reviews(db, current_user.id)
+    for r in reviews:
+        if r["id"] == review_id:
+            return MyReviewOut(**r)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="评价不存在")

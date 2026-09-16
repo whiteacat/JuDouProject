@@ -13,6 +13,7 @@
     "pages/event/review/index",
     "pages/event/poster/index",
     "pages/review/mine/index",
+    "pages/review/detail/index",
     "pages/restaurant/detail/index",
     "pages/group/restaurants/index",
     "pages/group/mine/index",

@@ -170,6 +170,11 @@ async def list_my_reviews(db: AsyncSession, user_id: int) -> list[dict]:
             "event_id": review.event_id,
             "event_title": event_title,
             "overall_score": float(review.overall_score),
+            "taste_score": float(review.taste_score),
+            "value_score": float(review.value_score),
+            "environment_score": float(review.environment_score),
+            "service_score": float(review.service_score),
+            "traffic_score": float(review.traffic_score),
             "content": review.content,
             "created_at": review.created_at,
         }

@@ -4,7 +4,14 @@
   </view>
 
   <view class="list">
-    <view wx:for="{{reviews}}" wx:key="id" class="item">
+    <view
+      wx:for="{{reviews}}"
+      wx:key="id"
+      class="item"
+      hover-class="item-hover"
+      data-id="{{item.id}}"
+      bindtap="goDetail"
+    >
       <view class="item-top">
         <view class="item-name">{{item.restaurant_name}}</view>
         <view class="item-score">

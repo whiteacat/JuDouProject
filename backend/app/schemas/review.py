@@ -35,7 +35,7 @@ class ReviewOut(BaseModel):
 
 
 class MyReviewOut(BaseModel):
-    """我的评价：附餐厅/群/组队信息。"""
+    """我的评价：附餐厅/群/组队信息（详情页与列表共用）。"""
 
     id: int
     restaurant_id: int
@@ -45,6 +45,11 @@ class MyReviewOut(BaseModel):
     event_id: int
     event_title: Optional[str] = None
     overall_score: float
+    taste_score: float
+    value_score: float
+    environment_score: float
+    service_score: float
+    traffic_score: float
     content: str
     created_at: dt.datetime
 
