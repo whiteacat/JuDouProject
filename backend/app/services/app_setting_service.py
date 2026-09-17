@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.app_setting import AppSetting, DEFAULTS, KEY_CONTENT_EDIT_ENABLED
+from app.models.app_setting import DEFAULTS, KEY_CONTENT_EDIT_ENABLED, AppSetting
 
 
 async def get_setting_bool(db: AsyncSession, key: str) -> bool:

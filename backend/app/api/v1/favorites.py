@@ -61,7 +61,8 @@ async def get_favorite_status(
     db: AsyncSession = Depends(get_db),
 ) -> FavoriteStatusOut:
     """查询某活动是否已收藏。"""
-    return FavoriteStatusOut(favorited=await favorite_service.is_favorite(db, current_user.id, event_id))
+    favorited = await favorite_service.is_favorite(db, current_user.id, event_id)
+    return FavoriteStatusOut(favorited=favorited)
 
 
 @router.put("/{event_id}", response_model=FavoriteStatusOut)

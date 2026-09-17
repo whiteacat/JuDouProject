@@ -45,7 +45,7 @@ if (-not $Network) {
 
 Write-Host "==> 启动新隧道（网络: $Network，目标 backend:8000）..."
 docker run -d --name judou-tunnel --network $Network `
-    cloudflare/cloudflared tunnel --url http://backend:8000 --no-autoupdate | Out-Null
+    cloudflare/cloudflared tunnel --url http://backend:8000 --no-autoupdate --protocol http2 | Out-Null
 
 # --- 2. 等待并提取 URL ---
 $Url = $null

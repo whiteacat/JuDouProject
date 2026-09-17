@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user, get_current_user_or_anonymous
 from app.db.session import get_db
-from app.models.event import EventStatus, GroupEvent
+from app.models.event import GroupEvent
 from app.models.group import Group
 from app.models.user import User
 from app.schemas.event import (

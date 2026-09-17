@@ -6,7 +6,7 @@ import datetime as dt
 import secrets
 
 from fastapi import HTTPException, status
-from sqlalchemy import distinct, func, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.event import GroupEvent

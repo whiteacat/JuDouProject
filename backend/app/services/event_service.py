@@ -15,9 +15,8 @@ from app.models.event_member import EventMember, EventMemberStatus
 from app.models.member import GroupMember
 from app.models.restaurant import Restaurant
 from app.models.user import User
-from app.services import app_setting_service
+from app.services import app_setting_service, group_restaurant_service
 from app.services import cover as cover_service
-from app.services import group_restaurant_service
 from app.services.notification_service import notify
 
 EVENT_NOT_FOUND = "组队不存在或无权访问"

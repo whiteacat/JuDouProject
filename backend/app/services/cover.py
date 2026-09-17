@@ -25,7 +25,8 @@ def validate_cover_url(cover_url: Optional[str]) -> Optional[str]:
         校验通过的 cover_url；传入 None/空串时返回 None；
         不在白名单时抛出 HTTPException。
     """
-    from fastapi import HTTPException, status as http_status
+    from fastapi import HTTPException
+    from fastapi import status as http_status
 
     if cover_url is None or cover_url == "":
         return None
@@ -39,7 +40,8 @@ def validate_cover_url(cover_url: Optional[str]) -> Optional[str]:
 
 def validate_group_cover_url(cover_url: Optional[str]) -> Optional[str]:
     """校验群组封面背景 URL 是否在白名单内（None 合法：用默认背景）。"""
-    from fastapi import HTTPException, status as http_status
+    from fastapi import HTTPException
+    from fastapi import status as http_status
 
     if cover_url is None or cover_url == "":
         return None

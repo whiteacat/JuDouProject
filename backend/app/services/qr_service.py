@@ -51,13 +51,11 @@ async def _get_access_token() -> str | None:
 
 async def event_qrcode_png(event_id: int, invite_code: str = "", group_name: str = "") -> bytes:
     """生成活动二维码 PNG 字节流。"""
-    path = f"pages/event/detail/index"
     params = [f"id={event_id}", "invite=1"]
     if invite_code:
         params.append(f"code={invite_code}")
     if group_name:
         params.append(f"gname={group_name}")
-    page_path = f"{path}?{'&'.join(params)}"
 
     token = await _get_access_token()
     if token:

@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.announcement import Announcement
 from app.models.group import Group
-from app.models.member import GroupMember, GroupRole
 
 NOT_OWNER = "仅群主可操作群公告"
 

@@ -25,7 +25,7 @@ class TimeWindow(BaseModel):
             start_t = dt.datetime.strptime(self.start, "%H:%M")
             end_t = dt.datetime.strptime(self.end, "%H:%M")
         except ValueError:
-            raise ValueError("日期或时间格式不合法（应为 YYYY-MM-DD / HH:mm）")
+            raise ValueError("日期或时间格式不合法（应为 YYYY-MM-DD / HH:mm）") from None
         if end_t <= start_t:
             raise ValueError("时段结束必须晚于开始")
         return self
@@ -47,7 +47,7 @@ def _validate_window_list(windows: list[TimeWindow]):
         by_date.setdefault(w.date, []).append((s, e, len(by_date.get(w.date, []))))
     for date, segs in by_date.items():
         segs.sort()
-        for (s1, e1, _), (s2, _e2, _) in zip(segs, segs[1:]):
+        for (_s1, e1, _), (s2, _e2, _) in zip(segs, segs[1:]):
             if s2 < e1:
                 raise ValueError(f"{date} 存在重叠的时间段")
 

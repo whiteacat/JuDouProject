@@ -81,7 +81,6 @@ async def main():
         # ---- 通知 ----
         r = await c.get("/notifications/unread-count", headers=h2)
         check("5.未读数接口200", r.status_code == 200, f"got={r.status_code} {r.text[:80]}")
-        unread = r.json().get("unread_count")
         r = await c.get("/notifications", headers=h2)
         items = r.json().get("items", []) if r.status_code == 200 and isinstance(r.json(), dict) else (r.json() if r.status_code == 200 else [])
         check("6.通知列表200(含事件通知)", r.status_code == 200 and len(items) >= 1, f"got={r.status_code} n={len(items)}")
