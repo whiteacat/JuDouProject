@@ -6,7 +6,7 @@
 
   <!-- 空状态 -->
   <view class="empty" wx:elif="{{members.length === 0}}">
-    <image class="empty-icon" src="/assets/icons/user.svg" mode="aspectFit" />
+    <image class="empty-icon" src="/assets/icons/users.svg" mode="aspectFit" />
     <view class="empty-text">还没有成员</view>
   </view>
 

@@ -246,15 +246,20 @@ Page({
     }
   },
 
-  /** 加载群公告（无公告静默处理） */
+  /** 加载群公告（无公告时后端返回 404，属正常状态，静默置空不报错） */
   async loadAnnouncement() {
     try {
       const a = await get<Announcement>(`/groups/${this.data.groupId}/announcement`)
       this.setData({
         announcement: { ...a, time_display: a.updated_at ? formatTime(a.updated_at) : '' }
       })
-    } catch (err) {
+    } catch (err: unknown) {
       this.setData({ announcement: null })
+      // 404 = 暂无公告（预期状态）；其他错误才记录
+      const code = (err as { statusCode?: number })?.statusCode
+      if (code !== 404) {
+        console.error('加载群公告失败', err)
+      }
     }
   },
 
