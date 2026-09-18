@@ -774,6 +774,26 @@ Page({
     wx.navigateTo({ url: `/pages/event/poster/index?id=${ev.id}` })
   },
 
+  goRoute() {
+    const ev = this.data.event
+    if (!ev) return
+    const dest = ev.latitude && ev.longitude
+      ? { longitude: ev.longitude, latitude: ev.latitude, name: ev.title }
+      : ev.restaurant
+        ? { longitude: ev.restaurant.longitude, latitude: ev.restaurant.latitude, name: ev.restaurant.name }
+        : null
+    if (!dest) {
+      wx.showToast({ title: '该活动暂无地点信息', icon: 'none' })
+      return
+    }
+    wx.navigateTo({
+      url:
+        `/pages/route/index?dest_lng=${dest.longitude}` +
+        `&dest_lat=${dest.latitude}` +
+        `&dest_name=${encodeURIComponent(dest.name)}`
+    })
+  },
+
   onShareAppMessage() {
     const ev = this.data.event
     if (!ev) {

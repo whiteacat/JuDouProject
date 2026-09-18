@@ -44,5 +44,8 @@
     </view>
   </view>
 
-  <button class="create-btn" bindtap="goCreateEvent">发起组队</button>
+  <view class="bottom-bar">
+    <button class="route-btn" bindtap="goRoute">路线</button>
+    <button class="create-btn" bindtap="goCreateEvent">发起组队</button>
+  </view>
 </view>

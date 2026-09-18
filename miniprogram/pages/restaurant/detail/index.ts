@@ -17,6 +17,8 @@ interface RestaurantInfo {
   category: string
   address: string
   phone: string | null
+  longitude: number
+  latitude: number
 }
 
 interface ReviewItem {
@@ -113,6 +115,20 @@ Page({
         `&group_name=${encodeURIComponent(groupName)}` +
         `&restaurant_id=${restaurant.id}` +
         `&restaurant_name=${encodeURIComponent(restaurant.name)}`
+    })
+  },
+
+  goRoute() {
+    const { restaurant } = this.data
+    if (!restaurant || !restaurant.longitude || !restaurant.latitude) {
+      wx.showToast({ title: '该餐厅暂无位置信息', icon: 'none' })
+      return
+    }
+    wx.navigateTo({
+      url:
+        `/pages/route/index?dest_lng=${restaurant.longitude}` +
+        `&dest_lat=${restaurant.latitude}` +
+        `&dest_name=${encodeURIComponent(restaurant.name)}`
     })
   },
 

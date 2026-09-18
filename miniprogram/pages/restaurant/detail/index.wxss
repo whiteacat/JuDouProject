@@ -147,11 +147,25 @@
   color: #666;
 }
 
-.create-btn {
+.bottom-bar {
   position: fixed;
   left: 24rpx;
   right: 24rpx;
   bottom: 24rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.route-btn {
+  flex: 1;
+  background-color: #fff;
+  color: #ff6b35;
+  border: 2rpx solid #ff6b35;
+  border-radius: 12rpx;
+}
+
+.create-btn {
+  flex: 2;
   background-color: #ff6b35;
   color: #fff;
   border-radius: 12rpx;

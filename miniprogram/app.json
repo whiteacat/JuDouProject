@@ -17,6 +17,7 @@
     "pages/review/mine/index",
     "pages/review/detail/index",
     "pages/restaurant/detail/index",
+    "pages/route/index",
     "pages/group/restaurants/index",
     "pages/group/mine/index",
     "pages/user/profile/index",

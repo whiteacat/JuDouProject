@@ -206,6 +206,7 @@
       </block>
     </view>
     <view class="action-bar-sub">
+      <view class="action-link" bindtap="goRoute">🗺️ 路线</view>
       <view class="action-link" bindtap="goPoster">🎨 生成海报</view>
       <button class="action-link action-link-btn" open-type="share">分享活动</button>
     </view>

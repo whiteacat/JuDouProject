@@ -1,0 +1,25 @@
+<view class="page">
+  <map
+    id="routeMap"
+    class="map"
+    latitude="{{centerLat}}"
+    longitude="{{centerLng}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+    polyline="{{polyline}}"
+    show-location
+  />
+
+  <view class="panel">
+    <view class="mode-tabs">
+      <view class="mode-tab {{mode === 'driving' ? 'active' : ''}}" data-mode="driving" bindtap="switchMode">驾车</view>
+      <view class="mode-tab {{mode === 'walking' ? 'active' : ''}}" data-mode="walking" bindtap="switchMode">步行</view>
+    </view>
+    <view class="info" wx:if="{{info}}">{{info}}</view>
+    <view class="error" wx:if="{{error}}">{{error}}</view>
+    <view class="btn-row">
+      <button class="btn secondary" bindtap="retry" loading="{{loading}}">重试</button>
+      <button class="btn primary" bindtap="openNav">导航</button>
+    </view>
+  </view>
+</view>
